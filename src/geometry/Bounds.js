@@ -1,108 +1,117 @@
 /*
- * L.Bounds represents a rectangular area on the screen in pixel coordinates.
+ * Bounds class represents a rectangular are on the screen in pixel coordinates.
  */
+import { Point } from './Point';
 
-L.Bounds = function (a, b) { // (Point, Point) or Point[]
-	if (!a) { return; }
+export class Bounds {
 
-	var points = b ? [a, b] : a;
+  constructor(a,b) { // (Point, Point) or (Point[])
+    if (!a) { return; }
 
-	for (var i = 0, len = points.length; i < len; i++) {
-		this.extend(points[i]);
-	}
-};
+    let points = b ? [a, b] : a;
 
-L.Bounds.prototype = {
-	// extend the bounds to contain the given point
-	extend: function (point) { // (Point)
-		point = L.point(point);
+    for( let p of points ) {
+      this.extend(p);
+    }
+  }
 
-		if (!this.min && !this.max) {
-			this.min = point.clone();
-			this.max = point.clone();
-		} else {
-			this.min.x = Math.min(point.x, this.min.x);
-			this.max.x = Math.max(point.x, this.max.x);
-			this.min.y = Math.min(point.y, this.min.y);
-			this.max.y = Math.max(point.y, this.max.y);
-		}
-		return this;
-	},
+  static bounds(a,b) { // (Bounds) or (Point, Point) or (Point[])
+    if (!a || a instanceof Bounds) {
+      return a;
+    }
 
-	getCenter: function (round) { // (Boolean) -> Point
-		return new L.Point(
-		        (this.min.x + this.max.x) / 2,
-		        (this.min.y + this.max.y) / 2, round);
-	},
+    return new Bounds(a,b);
+  }
 
-	getBottomLeft: function () { // -> Point
-		return new L.Point(this.min.x, this.max.y);
-	},
+  extend(p) { // (Point) or ([x,y])
+    let pt = Point.point(p);
 
-	getTopRight: function () { // -> Point
-		return new L.Point(this.max.x, this.min.y);
-	},
+    if (!this.min && !this.max ) {
+      this.min = pt.clone();
+      this.max = pt.clone();
+    } else {
+      this.min.x = Math.min(pt.x, this.min.x);
+      this.max.x = Math.max(pt.x, this.max.x);
+      this.min.y = Math.min(pt.y, this.min.y);
+      this.max.y = Math.max(pt.y, this.max.y);
+    }
 
-	getSize: function () {
-		return this.max.subtract(this.min);
-	},
+    return this;
+  }
 
-	contains: function (obj) { // (Bounds) or (Point) -> Boolean
-		var min, max;
+  getCenter(round) { // (Boolean) -> Point
+    return new Point(
+                      (this.min.x + this.max.x) / 2,
+                      (this.min.y + this.max.y) / 2,
+                      round );
+  }
 
-		if (typeof obj[0] === 'number' || obj instanceof L.Point) {
-			obj = L.point(obj);
-		} else {
-			obj = L.bounds(obj);
-		}
+  getBottomLeft() { // () -> Point
+    return new Point(this.min.x,this.max.y);
+  }
 
-		if (obj instanceof L.Bounds) {
-			min = obj.min;
-			max = obj.max;
-		} else {
-			min = max = obj;
-		}
+  getTopRight() { // () -> Point
+    return new Point(this.max.x,this.min.y);
+  }
 
-		return (min.x >= this.min.x) &&
-		       (max.x <= this.max.x) &&
-		       (min.y >= this.min.y) &&
-		       (max.y <= this.max.y);
-	},
+  getSize() { // () -> Point
+    return this.max.subtract(this.min);
+  }
 
-	intersects: function (bounds) { // (Bounds) -> Boolean
-		bounds = L.bounds(bounds);
+  contains(obj) { // (Bounds) or (Point) -> Boolean
+    let min, max;
 
-		var min = this.min,
-		    max = this.max,
-		    min2 = bounds.min,
-		    max2 = bounds.max,
-		    xIntersects = (max2.x >= min.x) && (min2.x <= max.x),
-		    yIntersects = (max2.y >= min.y) && (min2.y <= max.y);
+    if (typeof obj[0] === 'number' || obj instanceof Point) {
+      obj = Point.point(obj);
+    } else {
+      obj = Bounds.bounds(obj);
+    }
 
-		return xIntersects && yIntersects;
-	},
+    if (obj instanceof Bounds) {
+      min = obj.min;
+      max = obj.max;
+    } else {
+      min = max = obj;
+    }
 
-	overlaps: function (bounds) { // (Bounds) -> Boolean
-		bounds = L.bounds(bounds);
+    return (min.x >= this.min.x) &&
+            (max.x <= this.max.x) &&
+            (min.y >= this.min.y) &&
+            (max.y <= this.max.y);
+  }
 
-		var min = this.min,
-		    max = this.max,
-		    min2 = bounds.min,
-		    max2 = bounds.max,
-		    xOverlaps = (max2.x > min.x) && (min2.x < max.x),
-		    yOverlaps = (max2.y > min.y) && (min2.y < max.y);
+  intersects(b) { // (Bounds) -> Boolean
+    b = Bounds.bounds(b);
 
-		return xOverlaps && yOverlaps;
-	},
+    let min = this.min,
+        max = this.max,
+        min2 = b.min,
+        max2 = b.max,
+        xIntersects = (max2.x >= min.x) && (min2.x <= max.x),
+        yIntersects = (max2.y >= min.y) && (min2.y <= max.y);
 
-	isValid: function () {
-		return !!(this.min && this.max);
-	}
-};
+    return xIntersects && yIntersects;
+  }
 
-L.bounds = function (a, b) { // (Bounds) or (Point, Point) or (Point[])
-	if (!a || a instanceof L.Bounds) {
-		return a;
-	}
-	return new L.Bounds(a, b);
-};
+  overlaps(b) { // (Bounds) -> Boolean
+    b = Bounds.bounds(b);
+
+    let min = this.min,
+        max = this.max,
+        min2 = b.min,
+        max2 = b.max,
+        xOverlaps = (max2.x > min.x) && (min2.x < max.x),
+        yOverlaps = (max2.y > min.y) && (min2.y < max.y);
+
+    return xOverlaps && yOverlaps;
+  }
+
+  isValid() { // -> Boolean
+    return !!(this.min && this.max);
+  }
+
+  toString() {
+    return `Bounds[${this.getTopLeft()},${this.getBottomRight()}]`;
+  }
+
+}
