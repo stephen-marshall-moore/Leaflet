@@ -11,49 +11,69 @@ describe('LineUtil', () => {
 
 		beforeEach( () => {
 			bounds = Bounds.bounds([5, 0], [15, 10]);
-      lu = new LineUtil();
+      //lu = new LineUtil();
 		});
 
 		it('clips a segment by bounds', () => {
 			let a = new Point(0, 0);
 			let b = new Point(15, 15);
 
-			let segment = lu.clipSegment(a, b, bounds);
+			let { segment: seg1, lastCode:lc1 } = LineUtil.clipSegment(a, b, bounds);
 
-			expect(segment[0]).toEqual(new Point(5, 5));
-			expect(segment[1]).toEqual(new Point(10, 10));
+			expect(seg1[0]).toEqual(new Point(5, 5));
+			expect(seg1[1]).toEqual(new Point(10, 10));
+			expect(lc1).toEqual(8);
 
 			let c = new Point(5, -5);
 			let d = new Point(20, 10);
 
-			let segment2 = lu.clipSegment(c, d, bounds);
+			let { segment: seg2, lastCode:lc2 }  = LineUtil.clipSegment(c, d, bounds);
 
-			expect(segment2[0]).toEqual(new Point(10, 0));
-			expect(segment2[1]).toEqual(new Point(15, 5));
+			expect(seg2[0]).toEqual(new Point(10, 0));
+			expect(seg2[1]).toEqual(new Point(15, 5));
+			expect(lc2).toEqual(2);
+		});
+
+		it('clips array of segments by bounds', () => {
+			let a = new Point(0, 0);
+			let b = new Point(15, 15);
+			let c = new Point(5, -5);
+			let d = new Point(20, 10);
+
+			let testdata = [  { segment: [a.clone(), b.clone()], result: [new Point(5, 5),new Point(10, 10)], lastCode: 8 },
+                        { segment: [c.clone(), d.clone()], result: [new Point(10, 0),new Point(15, 5)], lastCode: 2 } ];
+
+      for( let td of testdata ) {
+
+			  let { segment: seg1, lastCode:lc1 } = LineUtil.clipSegment(td.segment[0], td.segment[1], bounds);
+
+			  expect(seg1).toEqual(td.result);
+			  expect(lc1).toEqual(td.lastCode);
+      }
 		});
 
 		it('uses last bit code and reject segments out of bounds', () => {
 			let a = new Point(15, 15);
 			let b = new Point(25, 20);
-      lu._lastCode = 0;
-			let segment = lu.clipSegment(a, b, bounds, true);
+      //lu._lastCode = 0;
+			let { segment: s, lastCode:lc } = LineUtil.clipSegment(a, b, bounds, true, 8);
 
-			expect(segment).toBe(false);
+			expect(s).toBe(false);
 		});
 
 		it('can round numbers in clipped bounds', () => {
 			let a = new Point(4, 5);
 			let b = new Point(8, 6);
 
-			let segment1 = lu.clipSegment(a, b, bounds);
+			let { segment: s1, lastCode:lc1 } = LineUtil.clipSegment(a, b, bounds);
 
-			expect(segment1[0]).toEqual(new Point(5, 5.25));
-			expect(segment1[1]).toEqual(b);
+			expect(s1[0]).toEqual(new Point(5, 5.25));
+			expect(s1[1]).toEqual(b);
 
-			let segment2 = lu.clipSegment(a, b, bounds, false, true);
+			let { segment: s2, lastCode:lc2 } = LineUtil.clipSegment(a, b, bounds, false, lc1, true);
 
-			expect(segment2[0]).toEqual(new Point(5, 5));
-			expect(segment2[1]).toEqual(b);
+			expect(s2[0]).toEqual(new Point(5, 5));
+			expect(s2[1]).toEqual(b);
 		});
 	});
 

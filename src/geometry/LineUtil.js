@@ -100,21 +100,22 @@ export class LineUtil {
 	// Cohen-Sutherland line clipping algorithm.
 	// Used to avoid rendering parts of a polyline that are not currently visible.
 
-	clipSegment(a, b, bounds, useLastCode, round) {
-		let codeA = useLastCode ? this._lastCode : LineUtil._getBitCode(a, bounds),
+	static clipSegment(a, b, bounds, useLastCode, lastCode, round) {
+    let _lastCode = 0;
+		let codeA = useLastCode ? lastCode : LineUtil._getBitCode(a, bounds),
 		    codeB = LineUtil._getBitCode(b, bounds),
 
 		    codeOut, p, newCode;
 
 		// save 2nd code to avoid calculating it on the next segment
-		this._lastCode = codeB;
+		_lastCode = codeB;
 
 		while (true) {
 			// if a,b is inside the clip window (trivial accept)
-			if (!(codeA | codeB)) { return [a, b]; }
+			if (!(codeA | codeB)) { return { segment: [a, b], lastCode: _lastCode}; }
 
 			// if a,b is outside the clip window (trivial reject)
-			if (codeA & codeB) { return false; }
+			if (codeA & codeB) { return { segment: false, lastCode: _lastCode}; }
 
 			// other cases
 			codeOut = codeA || codeB;
