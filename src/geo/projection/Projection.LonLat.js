@@ -2,16 +2,17 @@
  * Simple equirectangular (Plate Carree) projection, used by CRS like EPSG:4326 and Simple.
  */
 
-L.Projection = {};
+import Point from '../../geometry/Point';
+import LatLng from '../LatLng';
+import Projection from './Projection';
 
-L.Projection.LonLat = {
-	project: function (latlng) {
-		return new L.Point(latlng.lng, latlng.lat);
-	},
+export class LonLat extends Projection {
 
-	unproject: function (point) {
-		return new L.LatLng(point.y, point.x);
-	},
+  constructor(a = [-180, -90] , b = [180, 90]) {
+    super(a, b);
+  }
 
-	bounds: L.bounds([-180, -90], [180, 90])
-};
+  project(latlng) { return new Point(latlng.lng, latlng.lat); }
+
+	unproject(point) { return new LatLng(point.y, point.x); }
+}

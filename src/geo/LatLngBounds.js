@@ -2,41 +2,43 @@
  * L.LatLngBounds represents a rectangular area on the map in geographical coordinates.
  */
 
-L.LatLngBounds = function (southWest, northEast) { // (LatLng, LatLng) or (LatLng[])
-	if (!southWest) { return; }
 
-	var latlngs = northEast ? [southWest, northEast] : southWest;
 
-	for (var i = 0, len = latlngs.length; i < len; i++) {
-		this.extend(latlngs[i]);
-	}
-};
+export class LatLngBounds {
 
-L.LatLngBounds.prototype = {
+  constructor(southWest, northEast) { // (LatLng, LatLng) or (LatLng[])
+	  if (!southWest) { return; }
+
+	  let latlngs = northEast ? [southWest, northEast] : southWest;
+
+	  for (let latlng of latlngs) {
+		  this.extend(latlng);
+	  }
+  }
 
 	// extend the bounds to contain the given point or bounds
-	extend: function (obj) { // (LatLng) or (LatLngBounds)
-		var sw = this._southWest,
+	extend(obj) { // (LatLng) or (LatLngBounds)
+		let sw = this._southWest,
 		    ne = this._northEast,
 		    sw2, ne2;
 
-		if (obj instanceof L.LatLng) {
+		if (obj instanceof LatLng) {
 			sw2 = obj;
 			ne2 = obj;
 
-		} else if (obj instanceof L.LatLngBounds) {
+		} else if (obj instanceof LatLngBounds) {
 			sw2 = obj._southWest;
 			ne2 = obj._northEast;
 
 			if (!sw2 || !ne2) { return this; }
 
 		} else {
-			return obj ? this.extend(L.latLng(obj) || L.latLngBounds(obj)) : this;
+			return obj ? this.extend(LatLng.latLng(obj) || LatLngBounds.latLngBounds(obj)) : this;
 		}
 
 		if (!sw && !ne) {
-			this._southWest = new L.LatLng(sw2.lat, sw2.lng);
-			this._northEast = new L.LatLng(ne2.lat, ne2.lng);
+			this._southWest = new LatLng(sw2.lat, sw2.lng);
+			this._northEast = new LatLng(ne2.lat, ne2.lng);
 		} else {
 			sw.lat = Math.min(sw2.lat, sw.lat);
 			sw.lng = Math.min(sw2.lng, sw.lng);
@@ -45,70 +47,53 @@ L.LatLngBounds.prototype = {
 		}
 
 		return this;
-	},
+	}
 
 	// extend the bounds by a percentage
-	pad: function (bufferRatio) { // (Number) -> LatLngBounds
-		var sw = this._southWest,
+	pad(bufferRatio) { // (Number) -> LatLngBounds
+		let sw = this._southWest,
 		    ne = this._northEast,
 		    heightBuffer = Math.abs(sw.lat - ne.lat) * bufferRatio,
 		    widthBuffer = Math.abs(sw.lng - ne.lng) * bufferRatio;
 
-		return new L.LatLngBounds(
-		        new L.LatLng(sw.lat - heightBuffer, sw.lng - widthBuffer),
-		        new L.LatLng(ne.lat + heightBuffer, ne.lng + widthBuffer));
-	},
+		return new LatLngBounds(
+		        new LatLng(sw.lat - heightBuffer, sw.lng - widthBuffer),
+		        new LatLng(ne.lat + heightBuffer, ne.lng + widthBuffer));
+	}
 
-	getCenter: function () { // -> LatLng
-		return new L.LatLng(
+	get center() {
+            return new LatLng(
 		        (this._southWest.lat + this._northEast.lat) / 2,
-		        (this._southWest.lng + this._northEast.lng) / 2);
-	},
+		        (this._southWest.lng + this._northEast.lng) / 2) };
 
-	getSouthWest: function () {
-		return this._southWest;
-	},
+	get southWest() { return this._southWest; }
 
-	getNorthEast: function () {
-		return this._northEast;
-	},
+	get northEast() { return this._northEast; }
 
-	getNorthWest: function () {
-		return new L.LatLng(this.getNorth(), this.getWest());
-	},
+	get northWest() { return new LatLng(this.north, this.west); }
 
-	getSouthEast: function () {
-		return new L.LatLng(this.getSouth(), this.getEast());
-	},
+	get southEast() { return new LatLng(this.south, this.east); }
 
-	getWest: function () {
-		return this._southWest.lng;
-	},
+	get west() { return this._southWest.lng; }
 
-	getSouth: function () {
-		return this._southWest.lat;
-	},
+	get south() { return this._southWest.lat; }
 
-	getEast: function () {
-		return this._northEast.lng;
-	},
+	get east() { return this._northEast.lng; }
 
-	getNorth: function () {
-		return this._northEast.lat;
-	},
+	get north() { return this._northEast.lat; }
 
-	contains: function (obj) { // (LatLngBounds) or (LatLng) -> Boolean
+	contains(obj) { // (LatLngBounds) or (LatLng) -> Boolean
 		if (typeof obj[0] === 'number' || obj instanceof L.LatLng) {
-			obj = L.latLng(obj);
+			obj = LatLng.latLng(obj);
 		} else {
-			obj = L.latLngBounds(obj);
+			obj = LatLngBounds.latLngBounds(obj);
 		}
 
-		var sw = this._southWest,
+		let sw = this._southWest,
 		    ne = this._northEast,
 		    sw2, ne2;
 
-		if (obj instanceof L.LatLngBounds) {
+		if (obj instanceof LatLngBounds) {
 			sw2 = obj.getSouthWest();
 			ne2 = obj.getNorthEast();
 		} else {
@@ -117,12 +102,12 @@ L.LatLngBounds.prototype = {
 
 		return (sw2.lat >= sw.lat) && (ne2.lat <= ne.lat) &&
 		       (sw2.lng >= sw.lng) && (ne2.lng <= ne.lng);
-	},
+	}
 
-	intersects: function (bounds) { // (LatLngBounds) -> Boolean
-		bounds = L.latLngBounds(bounds);
+	intersects(bounds) { // (LatLngBounds) -> Boolean
+		bounds = LatLngBounds.latLngBounds(bounds);
 
-		var sw = this._southWest,
+		let sw = this._southWest,
 		    ne = this._northEast,
 		    sw2 = bounds.getSouthWest(),
 		    ne2 = bounds.getNorthEast(),
@@ -131,12 +116,12 @@ L.LatLngBounds.prototype = {
 		    lngIntersects = (ne2.lng >= sw.lng) && (sw2.lng <= ne.lng);
 
 		return latIntersects && lngIntersects;
-	},
+	}
 
-	overlaps: function (bounds) { // (LatLngBounds) -> Boolean
-		bounds = L.latLngBounds(bounds);
+	overlaps(bounds) { // (LatLngBounds) -> Boolean
+		bounds = LatLngBounds.latLngBounds(bounds);
 
-		var sw = this._southWest,
+		let sw = this._southWest,
 		    ne = this._northEast,
 		    sw2 = bounds.getSouthWest(),
 		    ne2 = bounds.getNorthEast(),
@@ -145,31 +130,29 @@ L.LatLngBounds.prototype = {
 		    lngOverlaps = (ne2.lng > sw.lng) && (sw2.lng < ne.lng);
 
 		return latOverlaps && lngOverlaps;
-	},
+	}
 
-	toBBoxString: function () {
-		return [this.getWest(), this.getSouth(), this.getEast(), this.getNorth()].join(',');
-	},
+	toBBoxString() { return [this.west, this.south, this.east, this.north].join(','); }
 
-	equals: function (bounds) { // (LatLngBounds)
+	equals(bounds) { // (LatLngBounds)
 		if (!bounds) { return false; }
 
-		bounds = L.latLngBounds(bounds);
+		bounds = LatLngBounds.latLngBounds(bounds);
 
-		return this._southWest.equals(bounds.getSouthWest()) &&
-		       this._northEast.equals(bounds.getNorthEast());
-	},
-
-	isValid: function () {
-		return !!(this._southWest && this._northEast);
+		return this._southWest.equals(bounds.southWest()) &&
+		       this._northEast.equals(bounds.northEast());
 	}
-};
 
-// TODO International date line?
+	isValid() { return !!(this._southWest && this._northEast); }
 
-L.latLngBounds = function (a, b) { // (LatLngBounds) or (LatLng, LatLng)
-	if (!a || a instanceof L.LatLngBounds) {
-		return a;
-	}
-	return new L.LatLngBounds(a, b);
-};
+  // TODO International date line?
+
+  static latLngBounds(a, b) { // (LatLngBounds) or (LatLng, LatLng)
+	  if (!a || a instanceof LatLngBounds) {
+		  return a;
+	  }
+	  return new LatLngBounds(a, b);
+  }
+
+}
+

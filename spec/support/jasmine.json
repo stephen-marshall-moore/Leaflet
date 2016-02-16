@@ -1,7 +1,8 @@
 {
   "spec_dir": "spec",
   "spec_files": [
-    "**/geometry/*[sS]pec.js"
+    "**/geometry/*[sS]pec.js",
+    "**/geo/LatLngSpec.js"
   ],
   "helpers": [
     "helpers/**/*.js"
