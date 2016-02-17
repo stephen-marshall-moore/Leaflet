@@ -61,7 +61,7 @@ describe('LatLng', () => {
 	});
 
 	describe('#distanceTo', () => {
-    let crs = new Earth;
+    let crs = new Earth();
 
 		it('calculates distance in meters', () => {
 			let a = new LatLng(50.5, 30.5);
@@ -81,44 +81,44 @@ describe('LatLng', () => {
 		it('returns LatLng instance as is', () => {
 			let a = new LatLng(50, 30);
 
-			expect(LatLng(a)).toEqual(a);
+			expect(LatLng.latLng(a)).toEqual(a);
 		});
 
 		it('accepts an array of coordinates', () => {
-			expect(LatLng([])).toEqual(null);
-			expect(LatLng([50])).toEqual(null);
-			expect(LatLng([50, 30])).toEqual(new LatLng(50, 30));
-			expect(LatLng([50, 30, 100])).toEqual(new LatLng(50, 30, 100));
+			expect(LatLng.latLng([])).toEqual(null);
+			expect(LatLng.latLng([50])).toEqual(null);
+			expect(LatLng.latLng([50, 30])).toEqual(new LatLng(50, 30));
+			expect(LatLng.latLng([50, 30, 100])).toEqual(new LatLng(50, 30, 100));
 		});
 
 		it('passes null or undefined as is', () => {
-			expect(LatLng(undefined)).toEqual(undefined);
-			expect(LatLng(null)).toEqual(null);
+			expect(LatLng.latLng(undefined)).toEqual(undefined);
+			expect(LatLng.latLng(null)).toEqual(null);
 		});
 
 		it('creates a LatLng object from two coordinates', () => {
-			expect(LatLng(50, 30)).toEqual(new LatLng(50, 30));
+			expect(LatLng.latLng(50, 30)).toEqual(new LatLng(50, 30));
 		});
 
 		it('accepts an object with lat/lng', () => {
-			expect(LatLng({lat: 50, lng: 30})).toEqual(new LatLng(50, 30));
+			expect(LatLng.latLng({lat: 50, lng: 30})).toEqual(new LatLng(50, 30));
 		});
 
 		it('accepts an object with lat/lon', () => {
-			expect(LatLng({lat: 50, lon: 30})).toEqual(new LatLng(50, 30));
+			expect(LatLng.latLng({lat: 50, lon: 30})).toEqual(new LatLng(50, 30));
 		});
 
 		it('returns null if lng not specified', () => {
-			expect(LatLng(50)).to.be(null);
+			expect(LatLng.latLng(50)).toBe(null);
 		});
 
 		it('accepts altitude as third parameter', () => {
-			expect(LatLng(50, 30, 100)).toEqual(new LatLng(50, 30, 100));
+			expect(LatLng.latLng(50, 30, 100)).toEqual(new LatLng(50, 30, 100));
 		});
 
 		it('accepts an object with alt', () => {
-			expect(LatLng({lat: 50, lng: 30, alt: 100})).toEqual(new LatLng(50, 30, 100));
-			expect(LatLng({lat: 50, lon: 30, alt: 100})).toEqual(new LatLng(50, 30, 100));
+			expect(LatLng.latLng({lat: 50, lng: 30, alt: 100})).toEqual(new LatLng(50, 30, 100));
+			expect(LatLng.latLng({lat: 50, lon: 30, alt: 100})).toEqual(new LatLng(50, 30, 100));
 		});
 	});
 
@@ -128,16 +128,16 @@ describe('LatLng', () => {
 			let a = new LatLng(50.5, 30.5, 100);
 			let b = a.clone();
 
-			expect(b.lat).to.equal(50.5);
-			expect(b.lng).to.equal(30.5);
-			expect(b.alt).to.equal(100);
+			expect(b.lat).toEqual(50.5);
+			expect(b.lng).toEqual(30.5);
+			expect(b.alt).toEqual(100);
 		});
 
 		it('should create another reference', () => {
 			let a = new LatLng(50.5, 30.5, 100);
 			let b = a.clone();
 
-			expect(a === b).to.be(false);
+			expect(a === b).toBe(false);
 		});
 
 	});

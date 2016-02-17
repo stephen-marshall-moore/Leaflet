@@ -1,7 +1,7 @@
 /*
  * L.CRS.Earth is the base class for all CRS representing Earth.
  */
-import CRS from './CRS';
+import { CRS } from './CRS';
 
 export class Earth extends CRS {
   

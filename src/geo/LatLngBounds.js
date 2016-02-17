@@ -1,7 +1,7 @@
 /*
- * L.LatLngBounds represents a rectangular area on the map in geographical coordinates.
+ * LatLngBounds represents a rectangular area on the map in geographical coordinates.
  */
-
+import { LatLng } from './LatLng';
 
 
 export class LatLngBounds {
@@ -83,7 +83,7 @@ export class LatLngBounds {
 	get north() { return this._northEast.lat; }
 
 	contains(obj) { // (LatLngBounds) or (LatLng) -> Boolean
-		if (typeof obj[0] === 'number' || obj instanceof L.LatLng) {
+		if (typeof obj[0] === 'number' || obj instanceof LatLng) {
 			obj = LatLng.latLng(obj);
 		} else {
 			obj = LatLngBounds.latLngBounds(obj);
@@ -94,8 +94,8 @@ export class LatLngBounds {
 		    sw2, ne2;
 
 		if (obj instanceof LatLngBounds) {
-			sw2 = obj.getSouthWest();
-			ne2 = obj.getNorthEast();
+			sw2 = obj.southWest;
+			ne2 = obj.northEast;
 		} else {
 			sw2 = ne2 = obj;
 		}
@@ -109,8 +109,8 @@ export class LatLngBounds {
 
 		let sw = this._southWest,
 		    ne = this._northEast,
-		    sw2 = bounds.getSouthWest(),
-		    ne2 = bounds.getNorthEast(),
+		    sw2 = bounds.southWest,
+		    ne2 = bounds.northEast,
 
 		    latIntersects = (ne2.lat >= sw.lat) && (sw2.lat <= ne.lat),
 		    lngIntersects = (ne2.lng >= sw.lng) && (sw2.lng <= ne.lng);
@@ -123,8 +123,8 @@ export class LatLngBounds {
 
 		let sw = this._southWest,
 		    ne = this._northEast,
-		    sw2 = bounds.getSouthWest(),
-		    ne2 = bounds.getNorthEast(),
+		    sw2 = bounds.southWest,
+		    ne2 = bounds.northEast,
 
 		    latOverlaps = (ne2.lat > sw.lat) && (sw2.lat < ne.lat),
 		    lngOverlaps = (ne2.lng > sw.lng) && (sw2.lng < ne.lng);
@@ -139,8 +139,8 @@ export class LatLngBounds {
 
 		bounds = LatLngBounds.latLngBounds(bounds);
 
-		return this._southWest.equals(bounds.southWest()) &&
-		       this._northEast.equals(bounds.northEast());
+		return this._southWest.equals(bounds.southWest) &&
+		       this._northEast.equals(bounds.northEast);
 	}
 
 	isValid() { return !!(this._southWest && this._northEast); }

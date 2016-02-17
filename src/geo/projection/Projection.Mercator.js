@@ -2,13 +2,15 @@
  * Mercator projection that takes into account that the Earth is not a perfect sphere.
  * Less popular than spherical mercator; used by projections like EPSG:3395.
  */
-
-import Projection from './Projection';
+import { Point } from '../../geometry/Point';
+import { Bounds } from '../../geometry/Bounds';
+import { LatLng } from '../LatLng';
+import { Projection } from './Projection';
 
 export class Mercator extends Projection {
 
-  constructor( r = 6378137 , r_minor = 6356752.314245179, bounds = [[-20037508.34279, -15496570.73972], [20037508.34279, 18764656.23138]]) {
-    super(bounds);
+  constructor( r = 6378137 , r_minor = 6356752.314245179, b = new Bounds( [[-20037508.34279, -15496570.73972], [20037508.34279, 18764656.23138]]) ) {
+    super(b);
     this.R = r;
     this.R_MINOR = r_minor;
   }

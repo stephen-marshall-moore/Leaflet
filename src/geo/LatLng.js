@@ -2,7 +2,7 @@
  * L.LatLng represents a geographical point with latitude and longitude coordinates.
  */
 
-import CRS from './crs/CRS';
+import { CRS } from './crs/CRS';
 
 export class LatLng {
 
@@ -36,7 +36,7 @@ export class LatLng {
   }
 
 	distanceTo(crs,other) {
-    return crs.distance(this, L.latLng(other));
+    return crs.distance(this, LatLng.latLng(other));
   }
 
 	wrap(crs) { // (CoordinateReferenceSystem)

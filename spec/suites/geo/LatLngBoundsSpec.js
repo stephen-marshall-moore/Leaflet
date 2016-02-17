@@ -1,160 +1,164 @@
-describe('LatLngBounds', function () {
+import { LatLng } from '../../../src/geo/LatLng';
+import { LatLngBounds } from '../../../src/geo/LatLngBounds';
+//import { Earth } from '../../../src/geo/crs/CRS.Earth';
+
+describe('LatLngBounds', () => {
 	var a, c;
 
-	beforeEach(function () {
-		a = new L.LatLngBounds(
-			new L.LatLng(14, 12),
-			new L.LatLng(30, 40));
-		c = new L.LatLngBounds();
+	beforeEach(() => {
+		a = new LatLngBounds(
+			new LatLng(14, 12),
+			new LatLng(30, 40));
+		c = new LatLngBounds();
 	});
 
-	describe('constructor', function () {
-		it('instantiates either passing two latlngs or an array of latlngs', function () {
-			var b = new L.LatLngBounds([
-				new L.LatLng(14, 12),
-				new L.LatLng(30, 40)
+	describe('constructor', () => {
+		it('instantiates either passing two latlngs or an array of latlngs', () => {
+			var b = new LatLngBounds([
+				new LatLng(14, 12),
+				new LatLng(30, 40)
 			]);
-			expect(b).to.eql(a);
-			expect(b.getNorthWest()).to.eql(new L.LatLng(30, 12));
+			expect(b).toEqual(a);
+			expect(b.northWest).toEqual(new LatLng(30, 12));
 		});
 	});
 
-	describe('#extend', function () {
-		it('extends the bounds by a given point', function () {
-			a.extend(new L.LatLng(20, 50));
-			expect(a.getNorthEast()).to.eql(new L.LatLng(30, 50));
+	describe('#extend', () => {
+		it('extends the bounds by a given point', () => {
+			a.extend(new LatLng(20, 50));
+			expect(a.northEast).toEqual(new LatLng(30, 50));
 		});
 
-		it('extends the bounds by given bounds', function () {
+		it('extends the bounds by given bounds', () => {
 			a.extend([[20, 50], [8, 40]]);
-			expect(a.getSouthEast()).to.eql(new L.LatLng(8, 50));
+			expect(a.southEast).toEqual(new LatLng(8, 50));
 		});
 
-		it('extends the bounds by undefined', function () {
-			expect(a.extend()).to.eql(a);
+		it('extends the bounds by undefined', () => {
+			expect(a.extend()).toEqual(a);
 		});
 
-		it('extends the bounds by raw object', function () {
+		it('extends the bounds by raw object', () => {
 			a.extend({lat: 20, lng: 50});
-			expect(a.getNorthEast()).to.eql(new L.LatLng(30, 50));
+			expect(a.northEast).toEqual(new LatLng(30, 50));
 		});
 
-		it('extend the bounds by an empty bounds object', function () {
-			expect(a.extend(new L.LatLngBounds())).to.eql(a);
-		});
-	});
-
-	describe('#getCenter', function () {
-		it('returns the bounds center', function () {
-			expect(a.getCenter()).to.eql(new L.LatLng(22, 26));
+		it('extend the bounds by an empty bounds object', () => {
+			expect(a.extend(new LatLngBounds())).toEqual(a);
 		});
 	});
 
-	describe('#pad', function () {
-		it('pads the bounds by a given ratio', function () {
+	describe('#get center', () => {
+		it('returns the bounds center', () => {
+			expect(a.center).toEqual(new LatLng(22, 26));
+		});
+	});
+
+	describe('#pad', () => {
+		it('pads the bounds by a given ratio', () => {
 			var b = a.pad(0.5);
 
-			expect(b).to.eql(L.latLngBounds([[6, -2], [38, 54]]));
+			expect(b).toEqual(LatLngBounds.latLngBounds([[6, -2], [38, 54]]));
 		});
 	});
 
-	describe('#equals', function () {
-		it('returns true if bounds equal', function () {
-			expect(a.equals([[14, 12], [30, 40]])).to.eql(true);
-			expect(a.equals([[14, 13], [30, 40]])).to.eql(false);
-			expect(a.equals(null)).to.eql(false);
+	describe('#equals', () => {
+		it('returns true if bounds equal', () => {
+			expect(a.equals([[14, 12], [30, 40]])).toEqual(true);
+			expect(a.equals([[14, 13], [30, 40]])).toEqual(false);
+			expect(a.equals(null)).toEqual(false);
 		});
 	});
 
-	describe('#isValid', function () {
-		it('returns true if properly set up', function () {
-			expect(a.isValid()).to.be.ok();
+	describe('#isValid', () => {
+		it('returns true if properly set up', () => {
+			expect(a.isValid()).toBe(true);
 		});
-		it('returns false if is invalid', function () {
-			expect(c.isValid()).to.not.be.ok();
+		it('returns false if is invalid', () => {
+			expect(c.isValid()).toBe(false);
 		});
-		it('returns true if extended', function () {
+		it('returns true if extended', () => {
 			c.extend([0, 0]);
-			expect(c.isValid()).to.be.ok();
+			expect(c.isValid()).toBe(true);
 		});
 	});
 
-	describe('#getWest', function () {
-		it('returns a proper bbox west value', function () {
-			expect(a.getWest()).to.eql(12);
+	describe('#get west', () => {
+		it('returns a proper bbox west value', () => {
+			expect(a.west).toEqual(12);
 		});
 	});
 
-	describe('#getSouth', function () {
-		it('returns a proper bbox south value', function () {
-			expect(a.getSouth()).to.eql(14);
-		});
-
-	});
-
-	describe('#getEast', function () {
-		it('returns a proper bbox east value', function () {
-			expect(a.getEast()).to.eql(40);
+	describe('#get south', () => {
+		it('returns a proper bbox south value', () => {
+			expect(a.south).toEqual(14);
 		});
 
 	});
 
-	describe('#getNorth', function () {
-		it('returns a proper bbox north value', function () {
-			expect(a.getNorth()).to.eql(30);
+	describe('#get east', () => {
+		it('returns a proper bbox east value', () => {
+			expect(a.east).toEqual(40);
 		});
 
 	});
 
-	describe('#toBBoxString', function () {
-		it('returns a proper left,bottom,right,top bbox', function () {
-			expect(a.toBBoxString()).to.eql("12,14,40,30");
+	describe('#get north', () => {
+		it('returns a proper bbox north value', () => {
+			expect(a.north).toEqual(30);
 		});
 
 	});
 
-	describe('#getNorthWest', function () {
-		it('returns a proper north-west LatLng', function () {
-			expect(a.getNorthWest()).to.eql(new L.LatLng(a.getNorth(), a.getWest()));
+	describe('#toBBoxString', () => {
+		it('returns a proper left,bottom,right,top bbox', () => {
+			expect(a.toBBoxString()).toEqual("12,14,40,30");
 		});
 
 	});
 
-	describe('#getSouthEast', function () {
-		it('returns a proper south-east LatLng', function () {
-			expect(a.getSouthEast()).to.eql(new L.LatLng(a.getSouth(), a.getEast()));
+	describe('#get northWest', () => {
+		it('returns a proper north-west LatLng', () => {
+			expect(a.northWest).toEqual(new LatLng(a.north, a.west));
+		});
+
+	});
+
+	describe('#get southEast', () => {
+		it('returns a proper south-east LatLng', () => {
+			expect(a.southEast).toEqual(new LatLng(a.south, a.east));
 		});
 	});
 
-	describe('#contains', function () {
-		it('returns true if contains latlng point', function () {
-			expect(a.contains([16, 20])).to.eql(true);
-			expect(L.latLngBounds(a).contains([5, 20])).to.eql(false);
+	describe('#contains', () => {
+		it('returns true if contains latlng point', () => {
+			expect(a.contains([16, 20])).toEqual(true);
+			expect(LatLngBounds.latLngBounds(a).contains([5, 20])).toEqual(false);
 		});
 
-		it('returns true if contains bounds', function () {
-			expect(a.contains([[16, 20], [20, 40]])).to.eql(true);
-			expect(a.contains([[16, 50], [8, 40]])).to.eql(false);
+		it('returns true if contains bounds', () => {
+			expect(a.contains([[16, 20], [20, 40]])).toEqual(true);
+			expect(a.contains([[16, 50], [8, 40]])).toEqual(false);
 		});
 	});
 
-	describe('#intersects', function () {
-		it('returns true if intersects the given bounds', function () {
-			expect(a.intersects([[16, 20], [50, 60]])).to.eql(true);
-			expect(a.contains([[40, 50], [50, 60]])).to.eql(false);
+	describe('#intersects', () => {
+		it('returns true if intersects the given bounds', () => {
+			expect(a.intersects([[16, 20], [50, 60]])).toEqual(true);
+			expect(a.contains([[40, 50], [50, 60]])).toEqual(false);
 		});
 
-		it('returns true if just touches the boundary of the given bounds', function () {
-			expect(a.intersects([[25, 40], [55, 50]])).to.eql(true);
+		it('returns true if just touches the boundary of the given bounds', () => {
+			expect(a.intersects([[25, 40], [55, 50]])).toEqual(true);
 		});
 	});
 
-	describe('#overlaps', function () {
-		it('returns true if overlaps the given bounds', function () {
-			expect(a.overlaps([[16, 20], [50, 60]])).to.eql(true);
+	describe('#overlaps', () => {
+		it('returns true if overlaps the given bounds', () => {
+			expect(a.overlaps([[16, 20], [50, 60]])).toEqual(true);
 		});
-		it('returns false if just touches the boundary of the given bounds', function () {
-			expect(a.overlaps([[25, 40], [55, 50]])).to.eql(false);
+		it('returns false if just touches the boundary of the given bounds', () => {
+			expect(a.overlaps([[25, 40], [55, 50]])).toEqual(false);
 		});
 	});
 

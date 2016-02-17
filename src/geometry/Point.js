@@ -89,7 +89,7 @@ export class Point {
 
   distanceTo(p) {
     let dx = p.x - this.x;
-    let dy = p.y = this.y;
+    let dy = p.y - this.y;
     return Math.sqrt( dx * dx + dy * dy );
   }
 

@@ -1,9 +1,9 @@
 /*
  * A simple CRS that can be used for flat non-Earth maps like panoramas or game maps.
  */
-import CRS from './CRS';
-import LonLat from '../projection/Projection.LonLat';
-import Transformation from '../../geo/Transformation';
+import { CRS } from './CRS';
+import { LonLat } from '../projection/Projection.LonLat';
+import { Transformation } from '../../geometry/Transformation';
 
 export class Simple extends CRS {
   

@@ -1,9 +1,9 @@
 /*
  * L.CRS is the base object for all defined CRS (Coordinate Reference Systems) in Leaflet.
  */
-import Util from '../../core/Util';
-import LatLng from '../LatLng';
-import LatLngBounds from '../LatLngBounds';
+import { Util } from '../../core/Util';
+import { Bounds } from '../../geometry/Bounds';
+import { LatLng } from '../LatLng';
 
 export class CRS {
   
@@ -13,6 +13,7 @@ export class CRS {
     this.wrapLng = wraplng;
     this.wrapLat = wraplat;
     this.R = r;
+    this.infinite = false;
   }
 
 	// converts geo coords to pixel ones
@@ -51,7 +52,7 @@ export class CRS {
 		    min = this.transformation.transform(b.min, s),
 		    max = this.transformation.transform(b.max, s);
 
-		return LatLngBounds.bounds(min, max);
+		return Bounds.bounds(min, max);
 	}
 
 	// whether a coordinate axis wraps in a given range (e.g. longitude from -180 to 180); depends on CRS

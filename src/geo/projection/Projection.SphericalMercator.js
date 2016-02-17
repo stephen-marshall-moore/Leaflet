@@ -1,13 +1,15 @@
 /*
  * Spherical Mercator is the most popular map projection, used by EPSG:3857 CRS used by default.
  */
-
-import Projection from './Projection';
+import { Point } from '../../geometry/Point';
+import { Bounds } from '../../geometry/Bounds';
+import { LatLng } from '../LatLng';
+import { Projection } from './Projection';
 
 export class SphericalMercator extends Projection {
 
-  constructor( r = 6378137 , max_latitude = 6356752.314245179, bounds = [[-6378137 * Math.PI, -6378137 * Math.PI], [6378137 * Math.PI, 6378137 * Math.PI]]) {
-    super(bounds);
+  constructor( r = 6378137 , max_latitude = 6356752.314245179, b = new Bounds([[-6378137 * Math.PI, -6378137 * Math.PI], [6378137 * Math.PI, 6378137 * Math.PI]])) {
+    super(b);
     this.R = r;
     this.MAX_LATITUDE = max_latitude;
   }
@@ -26,7 +28,7 @@ export class SphericalMercator extends Projection {
 	unproject(point) {
 		let d = 180 / Math.PI;
 
-		return new L.LatLng(
+		return new LatLng(
 			(2 * Math.atan(Math.exp(point.y / this.R)) - (Math.PI / 2)) * d,
 			point.x * d / this.R);
 	}
