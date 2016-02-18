@@ -2,8 +2,7 @@
   "spec_dir": "spec",
   "spec_files": [
     "**/geometry/*[sS]pec.js",
-    "**/geo/LatLngSpec.js",
-    "**/geo/CRSSpec.js"
+    "**/geo/*[sS]pec.js"
   ],
   "helpers": [
     "helpers/**/*.js"
