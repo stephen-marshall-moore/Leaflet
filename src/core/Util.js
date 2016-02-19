@@ -4,6 +4,17 @@
 
 export class Util {
 
+  constructor() {
+  }
+
+	// return unique ID of an object
+	static stamp(obj) {
+		/*eslint-disable */
+		obj._leaflet_id = obj._leaflet_id || ++Util._lastId;
+		return obj._leaflet_id;
+		/*eslint-enable */
+	}
+
 	// wrap the given number to lie within a certain range (used for wrapping longitude)
   static wrapNum(x, range, includeMax) {
 		let max = range[1],
@@ -12,5 +23,34 @@ export class Util {
 		return x === max && includeMax ? x : ((x - min) % d + d) % d + min;
 	}
 
+	// do nothing (used as a noop throughout the code)
+	static falseFn() { return false; }
+
+	// trim whitespace from both sides of a string
+	static trim(str) {
+		return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, '');
+	}
+
+	// split a string into words
+	static splitWords(str) {
+		return Util.trim(str).split(/\s+/);
+	}
+
+	// bind a function to be called with a given context
+	static bind(fn, obj) {
+		let slice = Array.prototype.slice;
+
+		if (fn.bind) {
+			return fn.bind.apply(fn, slice.call(arguments, 1));
+		}
+
+		let args = slice.call(arguments, 2);
+
+		return function () {
+			return fn.apply(obj, args.length ? args.concat(slice.call(arguments)) : arguments);
+		};
+	}
 }
+
+Util._lastId = 0;
 

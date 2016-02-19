@@ -1,5 +1,6 @@
+import {Evented} from '../../core/Events';
 
-L.Layer = L.Evented.extend({
+export class Layer extends Evented {
 
 	options: {
 		pane: 'overlayPane',
@@ -11,33 +12,33 @@ L.Layer = L.Evented.extend({
 		return this;
 	},
 
-	remove: function () {
+	remove() => {
 		return this.removeFrom(this._map || this._mapToAdd);
-	},
+	}
 
-	removeFrom: function (obj) {
+	removeFrom(obj) => {
 		if (obj) {
 			obj.removeLayer(this);
 		}
 		return this;
-	},
+	}
 
-	getPane: function (name) {
+	getPane(name) => {
 		return this._map.getPane(name ? (this.options[name] || name) : this.options.pane);
-	},
+	}
 
-	addInteractiveTarget: function (targetEl) {
-		this._map._targets[L.stamp(targetEl)] = this;
+	addInteractiveTarget(targetEl) => {
+		this._map._targets[Util.stamp(targetEl)] = this;
 		return this;
-	},
+	}
 
-	removeInteractiveTarget: function (targetEl) {
-		delete this._map._targets[L.stamp(targetEl)];
+	removeInteractiveTarget(targetEl) => {
+		delete this._map._targets[Util.stamp(targetEl)];
 		return this;
-	},
+	}
 
-	_layerAdd: function (e) {
-		var map = e.target;
+	_layerAdd(e) => {
+		let map = e.target;
 
 		// check in case layer gets added and then removed before the map is ready
 		if (!map.hasLayer(this)) { return; }
@@ -58,7 +59,7 @@ L.Layer = L.Evented.extend({
 		this.fire('add');
 		map.fire('layeradd', {layer: this});
 	}
-});
+}
 
 
 L.Map.include({
