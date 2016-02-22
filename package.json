@@ -3,6 +3,8 @@
   "version": "1.0.0-beta.2",
   "description": "JavaScript library for mobile-friendly interactive maps",
   "devDependencies": {
+    "babel": "^6.5.1",
+    "babel-register": "^6.5.2",
     "eslint": "^1.5.1",
     "eslint-config-mourner": "^1.0.0",
     "happen": "~0.2.0",
@@ -22,6 +24,7 @@
   "main": "dist/leaflet-src.js",
   "style": "dist/leaflet.css",
   "scripts": {
+    "mtest": "mocha src/index.js -w --compilers js:babel/register",
     "test": "jake test",
     "build": "jake build",
     "release": "./build/publish.sh"
