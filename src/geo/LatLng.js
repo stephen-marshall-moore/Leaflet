@@ -2,22 +2,23 @@
  * L.LatLng represents a geographical point with latitude and longitude coordinates.
  */
 
-import { CRS } from './crs/CRS';
+// import {CRS} from './crs/CRS';
+import {LatLngBounds} from './LatLngBounds';
 
 export class LatLng {
 
-  constructor(lat, lng, alt) {
-	  if (isNaN(lat) || isNaN(lng)) {
-		  throw new Error('Invalid LatLng object: (' + lat + ', ' + lng + ')');
-	  }
+	constructor(lat, lng, alt) {
+		if (isNaN(lat) || isNaN(lng)) {
+			throw new Error('Invalid LatLng object: (' + lat + ', ' + lng + ')');
+		}
 
-	  this.lat = +lat;
-	  this.lng = +lng;
+		this.lat = +lat;
+		this.lng = +lng;
 
-	  if (alt !== undefined) {
-		  this.alt = +alt;
-	  }
-  }
+		if (alt !== undefined) {
+			this.alt = +alt;
+		}
+	}
 
 	equals(obj, maxMargin) {
 		if (!obj) { return false; }
@@ -32,57 +33,57 @@ export class LatLng {
 	}
 
 	toString(precision) {
-    return `LatLng(${this.lat.toPrecision(precision)}, ${this.lng.toPrecision(precision)})`;
-  }
+		return `LatLng(${this.lat.toPrecision(precision)}, ${this.lng.toPrecision(precision)})`;
+	}
 
-	distanceTo(crs,other) {
-    return crs.distance(this, LatLng.latLng(other));
-  }
+	distanceTo(crs, other) {
+		return crs.distance(this, LatLng.latLng(other));
+	}
 
 	wrap(crs) { // (CoordinateReferenceSystem)
-    return crs.wrapLatLng(this);
-  }
+		return crs.wrapLatLng(this);
+	}
 
 	toBounds(sizeInMeters) {
 		let latAccuracy = 180 * sizeInMeters / 40075017,
 		    lngAccuracy = latAccuracy / Math.cos((Math.PI / 180) * this.lat);
 
-		return latLngBounds(
+		return LatLngBounds.latLngBounds(
 		        [this.lat - latAccuracy, this.lng - lngAccuracy],
 		        [this.lat + latAccuracy, this.lng + lngAccuracy]);
 	}
 
 	clone() {
-    return new LatLng(this.lat, this.lng, this.alt);
-  }
+		return new LatLng(this.lat, this.lng, this.alt);
+	}
 
   // constructs LatLng with different signatures
   // (LatLng) or ([Number, Number]) or (Number, Number) or (Object)
 
-  static latLng(a, b, c) {
-	  if (a instanceof LatLng) {
-		  return a;
-	  }
-	  if (Array.isArray(a) && typeof a[0] !== 'object') {
-		  if (a.length === 3) {
-			  return new LatLng(a[0], a[1], a[2]);
-		  }
-		  if (a.length === 2) {
-			  return new LatLng(a[0], a[1]);
-		  }
-		  return null;
-	  }
-	  if (a === undefined || a === null) {
-		  return a;
-	  }
-	  if (typeof a === 'object' && 'lat' in a) {
-		  return new LatLng(a.lat, 'lng' in a ? a.lng : a.lon, a.alt);
-	  }
-	  if (b === undefined) {
-		  return null;
-	  }
-	  return new LatLng(a, b, c);
-  }
+	static latLng(a, b, c) {
+		if (a instanceof LatLng) {
+			return a;
+		}
+		if (Array.isArray(a) && typeof a[0] !== 'object') {
+			if (a.length === 3) {
+				return new LatLng(a[0], a[1], a[2]);
+			}
+			if (a.length === 2) {
+				return new LatLng(a[0], a[1]);
+			}
+			return null;
+		}
+		if (a === undefined || a === null) {
+			return a;
+		}
+		if (typeof a === 'object' && 'lat' in a) {
+			return new LatLng(a.lat, 'lng' in a ? a.lng : a.lon, a.alt);
+		}
+		if (b === undefined) {
+			return null;
+		}
+		return new LatLng(a, b, c);
+	}
 }
 
 

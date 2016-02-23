@@ -4,8 +4,8 @@
 
 export class Util {
 
-  constructor() {
-  }
+	constructor() {
+	}
 
 	// return unique ID of an object
 	static stamp(obj) {
@@ -16,7 +16,7 @@ export class Util {
 	}
 
 	// wrap the given number to lie within a certain range (used for wrapping longitude)
-  static wrapNum(x, range, includeMax) {
+	static wrapNum(x, range, includeMax) {
 		let max = range[1],
 		    min = range[0],
 		    d = max - min;

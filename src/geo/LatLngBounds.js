@@ -1,20 +1,20 @@
 /*
  * LatLngBounds represents a rectangular area on the map in geographical coordinates.
  */
-import { LatLng } from './LatLng';
+import {LatLng} from './LatLng';
 
 
 export class LatLngBounds {
 
-  constructor(southWest, northEast) { // (LatLng, LatLng) or (LatLng[])
-	  if (!southWest) { return; }
+	constructor(southWest, northEast) { // (LatLng, LatLng) or (LatLng[])
+		if (!southWest) { return; }
 
-	  let latlngs = northEast ? [southWest, northEast] : southWest;
+		let latlngs = northEast ? [southWest, northEast] : southWest;
 
-	  for (let latlng of latlngs) {
-		  this.extend(latlng);
-	  }
-  }
+		for (let latlng of latlngs) {
+			this.extend(latlng);
+		}
+	}
 
 	// extend the bounds to contain the given point or bounds
 	extend(obj) { // (LatLng) or (LatLngBounds)
@@ -62,9 +62,8 @@ export class LatLngBounds {
 	}
 
 	get center() {
-            return new LatLng(
-		        (this._southWest.lat + this._northEast.lat) / 2,
-		        (this._southWest.lng + this._northEast.lng) / 2) };
+		return new LatLng((this._southWest.lat + this._northEast.lat) / 2,
+			(this._southWest.lng + this._northEast.lng) / 2); }
 
 	get southWest() { return this._southWest; }
 
@@ -147,12 +146,11 @@ export class LatLngBounds {
 
   // TODO International date line?
 
-  static latLngBounds(a, b) { // (LatLngBounds) or (LatLng, LatLng)
-	  if (!a || a instanceof LatLngBounds) {
-		  return a;
-	  }
-	  return new LatLngBounds(a, b);
-  }
-
+	static latLngBounds(a, b) { // (LatLngBounds) or (LatLng, LatLng)
+		if (!a || a instanceof LatLngBounds) {
+			return a;
+		}
+		return new LatLngBounds(a, b);
+	}
 }
 

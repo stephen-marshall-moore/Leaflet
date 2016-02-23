@@ -1,19 +1,13 @@
 /*
  * L.CRS.Earth is the base class for all CRS representing Earth.
  */
-import { CRS } from './CRS';
+import {CRS} from './CRS';
 
 export class Earth extends CRS {
-  
-  constructor( wraplng = [-180, 180], wraplat = false, r = 6378137 ) {
-    super(wraplng, wraplat, r);  
-    //constructor() {
-    //super( [-180, 180], false );
-    //super();
-    //this.wrapLng = [-180, 180];
-    //this.wraplat = false;
-    //this.R = 6378137;
-  }
+
+	constructor(wraplng = [-180, 180], wraplat = false, r = 6378137) {
+		super(wraplng, wraplat, r);
+	}
 
 	// distance between two geographical points using spherical law of cosines approximation
 	distance(latlng1, latlng2) {

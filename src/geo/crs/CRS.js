@@ -1,20 +1,18 @@
 /*
  * L.CRS is the base object for all defined CRS (Coordinate Reference Systems) in Leaflet.
  */
-import { Util } from '../../core/Util';
-import { Bounds } from '../../geometry/Bounds';
-import { LatLng } from '../LatLng';
+import {Util} from '../../core/Util';
+import {Bounds} from '../../geometry/Bounds';
+import {LatLng} from '../LatLng';
 
 export class CRS {
-  
-  constructor( wraplng = false, wraplat = false, r = undefined ) {
-  //constructor( wraplng, wraplat ) {
-  //constructor() {
-    this.wrapLng = wraplng;
-    this.wrapLat = wraplat;
-    this.R = r;
-    this.infinite = false;
-  }
+
+	constructor(wraplng = false, wraplat = false, r = undefined) {
+		this.wrapLng = wraplng;
+		this.wrapLat = wraplat;
+		this.R = r;
+		this.infinite = false;
+	}
 
 	// converts geo coords to pixel ones
 	latLngToPoint(latlng, zoom) {
