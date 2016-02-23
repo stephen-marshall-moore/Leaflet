@@ -2,7 +2,7 @@
  * L.LineUtil contains different utility functions for line segments
  * and polylines (clipping, simplification, distances, etc.)
  */
-import { Point } from './Point';
+import {Point} from './Point';
 
 export class LineUtil {
 
@@ -59,10 +59,10 @@ export class LineUtil {
 
 	static _simplifyDPStep(points, markers, sqTolerance, first, last) {
 
-		var maxSqDist = 0,
+		let maxSqDist = 0,
 		    index, i, sqDist;
 
-		for (i = first + 1; i <= last - 1; i++) {
+		for (i = first + 1; i < last; i++) {
 			sqDist = LineUtil._sqClosestPointOnSegment(points[i], points[first], points[last], true);
 
 			if (sqDist > maxSqDist) {
@@ -83,7 +83,7 @@ export class LineUtil {
 	static _reducePoints(points, sqTolerance) {
 		let reducedPoints = [points[0]];
 
-    let i, prev, len;
+		let i, prev, len;
 
 		for (i = 1, prev = 0, len = points.length; i < len; i++) {
 			if (this._sqDist(points[i], points[prev]) > sqTolerance) {
@@ -101,7 +101,7 @@ export class LineUtil {
 	// Used to avoid rendering parts of a polyline that are not currently visible.
 
 	static clipSegment(a, b, bounds, useLastCode, lastCode, round) {
-    let _lastCode = 0;
+		let _lastCode = 0;
 		let codeA = useLastCode ? lastCode : LineUtil._getBitCode(a, bounds),
 		    codeB = LineUtil._getBitCode(b, bounds),
 
@@ -112,10 +112,10 @@ export class LineUtil {
 
 		while (true) {
 			// if a,b is inside the clip window (trivial accept)
-			if (!(codeA | codeB)) { return { segment: [a, b], lastCode: _lastCode}; }
+			if (!(codeA | codeB)) { return {segment: [a, b], lastCode: _lastCode}; }
 
 			// if a,b is outside the clip window (trivial reject)
-			if (codeA & codeB) { return { segment: false, lastCode: _lastCode}; }
+			if (codeA & codeB) { return {segment: false, lastCode: _lastCode}; }
 
 			// other cases
 			codeOut = codeA || codeB;

@@ -1,16 +1,16 @@
 /*
  * L.Transformation is an utility class to perform simple point transformations through a 2d-matrix.
  */
-import { Point } from './Point';
+import {Point} from './Point';
 
 export class Transformation {
 
-  constructor(a, b, c, d) {
-	  this._a = a;
-	  this._b = b;
-	  this._c = c;
-	  this._d = d;
-  }
+	constructor(a, b, c, d) {
+		this._a = a;
+		this._b = b;
+		this._c = c;
+		this._d = d;
+	}
 
 	transform(point, scale) { // (Point, Number) -> Point
 		return this._transform(point.clone(), scale);
