@@ -1,13 +1,13 @@
 var gulp = require('gulp'),
     uglify = require('gulp-uglifyjs'),
     sourcemaps = require('gulp-sourcemaps'),
-    karma = require('karma').server;
+    Server = require('karma').Server;
 
 gulp.task('test', function(done) {
-    karma.start({
+    new Server({
         configFile: __dirname + '/spec/karma.conf.js',
         singleRun: true
-    }, done);
+    }, done).start();
 });
 
 gulp.task('compile:polyfills', function() {
