@@ -146,6 +146,7 @@ export class LatLngBounds {
 
   // TODO International date line?
 
+	//static bounds(a, b) { // (LatLngBounds) or (LatLng, LatLng)
 	static latLngBounds(a, b) { // (LatLngBounds) or (LatLng, LatLng)
 		if (!a || a instanceof LatLngBounds) {
 			return a;

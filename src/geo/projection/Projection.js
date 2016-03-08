@@ -1,12 +1,12 @@
 /*
  * Base for Projections
  */
-import {LatLngBounds} from '../LatLngBounds';
+import {Bounds} from '../../geometry/Bounds';
 
 export class Projection {
 
 	constructor(a) {
-		this._bounds = LatLngBounds.bounds(a);
+		this._bounds = Bounds.bounds(a);
 	}
 
 	get bounds() { return this._bounds; }
