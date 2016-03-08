@@ -76,4 +76,4 @@ happen.drag = function (fromX, fromY, toX, toY, then, duration) {
 };
 
 // We'll want to skip a couple of things when in PhantomJS :-/
-it.skipInPhantom = L.Browser.any3d ? it : it.skip;
+//it.skipInPhantom = L.Browser.any3d ? it : it.skip;

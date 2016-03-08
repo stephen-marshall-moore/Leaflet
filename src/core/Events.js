@@ -14,7 +14,7 @@ export class Evented {
     }
   }
 
-	on(types, fn, context) => {
+	on(types, fn, context) {
 
 		// types can be a map of types/handlers
 		if (typeof types === 'object') {
@@ -36,7 +36,7 @@ export class Evented {
 		return this;
 	}
 
-	off(types, fn, context) => {
+	off(types, fn, context) {
 
 		if (!types) {
 			// clear all listeners if called without arguments
@@ -56,10 +56,10 @@ export class Evented {
 		}
 
 		return this;
-	},
+	}
 
 	// attach listener (without syntactic sugar now)
-	_on(type, fn, context) => {
+	_on(type, fn, context) {
 
 		let events = this._events = this._events || {},
 		    contextId = context && context !== this && Util.stamp(context);
@@ -89,7 +89,7 @@ export class Evented {
 		}
 	}
 
-	_off(type, fn, context) => {
+	_off(type, fn, context) {
 		let events = this._events,
 		    indexKey = type + '_idx',
 		    indexLenKey = type + '_len';
@@ -137,7 +137,7 @@ export class Evented {
 		}
 	}
 
-	fire(type, data, propagate) => {
+	fire(type, data, propagate) {
 		if (!this.listens(type, propagate)) { return this; }
 
 		let event = L.Util.extend({}, data, {type: type, target: this}),
@@ -170,7 +170,7 @@ export class Evented {
 		return this;
 	}
 
-	listens(type, propagate) => {
+	listens(type, propagate) {
 		let events = this._events;
 
 		if (events && (events[type] || events[type + '_len'])) { return true; }
@@ -184,7 +184,7 @@ export class Evented {
 		return false;
 	}
 
-	once(types, fn, context) => {
+	once(types, fn, context) {
 
 		if (typeof types === 'object') {
 			for (let type of types) {
@@ -206,20 +206,20 @@ export class Evented {
 	}
 
 	// adds a parent to propagate events to (when you fire with true as a 3rd argument)
-	addEventParent(obj) => {
+	addEventParent(obj) {
 		this._eventParents = this._eventParents || {};
 		this._eventParents[Util.stamp(obj)] = obj;
 		return this;
-	},
+	}
 
-	removeEventParent(obj) => {
+	removeEventParent(obj) {
 		if (this._eventParents) {
 			delete this._eventParents[Util.stamp(obj)];
 		}
 		return this;
 	}
 
-	_propagateEvent(e) => {
+	_propagateEvent(e) {
 		for (let id of this._eventParents) {
 			this._eventParents[id].fire(e.type, L.extend({layer: e.target}, e), true);
 		}

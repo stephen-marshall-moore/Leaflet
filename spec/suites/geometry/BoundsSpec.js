@@ -1,219 +1,120 @@
-import { Point } from '../../../src/geometry/Point';
-import { Bounds } from '../../../src/geometry/Bounds';
+"use strict";
 
-describe("Bounds", () =>
-  {
+describe('Bounds', function () {
 
-    describe('constructor', () =>
-      {
+		let Point, Bounds = null;
 
-        it("creates a Bounds with the given points", () =>
-          {
-            let b = new Bounds(new Point(125, 200), new Point(20,35));
-            expect(b.min.x).toEqual(20);
-            expect(b.min.y).toEqual(35);
-            expect(b.max.x).toEqual(125);
-            expect(b.max.y).toEqual(200);
-          }
-        )
+    before(function(done) {
+        System
+            .import('src/geometry/Point')
+            .then(function(t) {
+                Point = t.Point; //when exporting a default class , key is 'default'
+                //done();
+            })
+            .catch(function(e) {
+                console.log('>>> error loading class', e);
+                done();
+            });
+        System
+            .import('src/geometry/Bounds')
+            .then(function(t) {
+                Bounds = t.Bounds; //when exporting a default class , key is 'default'
+                done();
+            })
+            .catch(function(e) {
+                console.log('>>> error loading class', e);
+                done();
+            });
+    });
 
-        it("creates a Bounds with the given array of points", () =>
-          {
-            let p = new Point(10,20);
-            let q = new Point(-20,-5);
-            let b = new Bounds([p,q]);
-            expect(b.min.x).toEqual(-20);
-            expect(b.min.y).toEqual(-5);
-            expect(b.max.x).toEqual(10);
-            expect(b.max.y).toEqual(20);
-          }
-        )
 
-      }
+    after(function() {
+        Point, Bounds = null;
+    });
 
-    )
+	var a, b, c;
 
-    describe('factory', () =>
-      {
-        it("leaves Point instances as is", () =>
-          {
-            let origin = new Point(50, 30);
-            let result = Point.point(origin);
-            expect(origin).toEqual(result);
-          }
-        )
+	beforeEach(function () {
+		a = new Bounds(
+			new Point(14, 12),
+			new Point(30, 40));
+		b = new Bounds([
+			new Point(20, 12),
+			new Point(14, 20),
+			new Point(30, 40)
+		]);
+		c = new Bounds();
+	});
 
-        it("creates a point out of three arguments", () =>
-          {
-            let origin = Point.point(50.1, 29.9, true);
-            let result = new Point(50,30);
-            expect(origin).toEqual(result);
-          }
-        )
+	describe('constructor', function () {
+		it('creates bounds with proper min & max on (Point, Point)', function () {
+			expect(a.min).to.eql(new Point(14, 12));
+			expect(a.max).to.eql(new Point(30, 40));
+		});
+		it('creates bounds with proper min & max on (Point[])', function () {
+			expect(b.min).to.eql(new Point(14, 12));
+			expect(b.max).to.eql(new Point(30, 40));
+		});
+	});
 
-        it("creates a point from array of coordinates", () =>
-          {
-            let origin = Point.point([-35.2,557.89]);
-            let result = new Point(-35.2,557.89);
-            expect(origin).toEqual(result);
-          }
-        )
+	describe('#extend', function () {
+		it('extends the bounds to contain the given point', function () {
+			a.extend(new Point(50, 20));
+			expect(a.min).to.eql(new Point(14, 12));
+			expect(a.max).to.eql(new Point(50, 40));
 
-        it("does not fail on invalid arguments", () =>
-          {
-            expect(Point.point(undefined)).toBe(undefined);
-            expect(Point.point(null)).toBe(null);
-          }
-        )
-      }
+			b.extend(new Point(25, 50));
+			expect(b.min).to.eql(new Point(14, 12));
+			expect(b.max).to.eql(new Point(30, 50));
+		});
+	});
 
-    )
+	describe('#getCenter', function () {
+		it('returns the center point', function () {
+			expect(a.getCenter()).to.eql(new Point(22, 26));
+		});
+	});
 
-    describe('#add', () =>
-      {
+	describe('#contains', function () {
+		it('contains other bounds or point', function () {
+			a.extend(new Point(50, 10));
+			expect(a.contains(b)).to.be.ok();
+			expect(b.contains(a)).to.not.be.ok();
+			expect(a.contains(new Point(24, 25))).to.be.ok();
+			expect(a.contains(new Point(54, 65))).to.not.be.ok();
+		});
+	});
 
-        it("adds given point to this one", () =>
-          {
-            let origin = new Point(50, 30);
-            let addend = new Point(20, 10);
-            let result = new Point(70, 40);
-            expect(origin.add(addend)).toEqual(result);
-          }
-        )
-      }
+	describe('#isValid', function () {
+		it('returns true if properly set up', function () {
+			expect(a.isValid()).to.be.ok();
+		});
+		it('returns false if is invalid', function () {
+			expect(c.isValid()).to.not.be.ok();
+		});
+		it('returns true if extended', function () {
+			c.extend([0, 0]);
+			expect(c.isValid()).to.be.ok();
+		});
+	});
 
-    )
+	describe('#getSize', function () {
+		it('returns the size of the bounds as point', function () {
+			expect(a.getSize()).to.eql(new Point(16, 28));
+		});
+	});
 
-    describe('#subtract', () =>
-      {
+	describe('#intersects', function () {
+		it('returns true if bounds intersect', function () {
+			expect(a.intersects(b)).to.be(true);
+			expect(a.intersects(new Bounds(new Point(100, 100), new Point(120, 120)))).to.eql(false);
+		});
+	});
 
-        it("subtracts given point to this one", () =>
-          {
-            let origin = new Point(50, 30);
-            let addend = new Point(20, 10);
-            let result = new Point(30, 20);
-            expect(origin.subtract(addend)).toEqual(result);
-          }
-        )
-      }
-
-    )
-
-    describe('#divideBy', () =>
-      {
-
-        it("divides this point by amount", () =>
-          {
-            let origin = new Point(50, 30);
-            let operand = 5;
-            let result = new Point(10, 6);
-            expect(origin.divideBy(operand)).toEqual(result);
-          }
-        )
-      }
-
-    )
-
-    describe('#multiplyBy', () =>
-      {
-
-        it("multiplies this point by amount", () =>
-          {
-            let origin = new Point(50, 30);
-            let operand = 5;
-            let result = new Point(250, 150);
-            expect(origin.multiplyBy(operand)).toEqual(result);
-          }
-        )
-      }
-
-    )
-
-    describe('#floor', () =>
-      {
-
-        it("returns new point with floored coordinates", () =>
-          {
-            let origin = new Point(50.56, 30.123);
-            let result = new Point(50, 30);
-            expect(origin.floor()).toEqual(result);
-          }
-        )
-      }
-
-    )
-
-    describe('#ceil', () =>
-      {
-
-        it("returns new point with ceilinged coordinates", () =>
-          {
-            let origin = new Point(50.56, 30.123);
-            let result = new Point(51, 31);
-            expect(origin.ceil()).toEqual(result);
-          }
-        )
-      }
-
-    )
-
-    describe('#distanceTo', () =>
-      {
-
-        it("returns distance between this point and given point", () =>
-          {
-            let origin = new Point(0,30);
-            let result = new Point(40,0);
-            expect(origin.distanceTo(result)).toEqual(50.0);
-          }
-        )
-      }
-
-    )
-
-    describe('#equals', () =>
-      {
-
-        it("checks equality of values or this point and given point", () =>
-          {
-            let origin = new Point(123.45,89.0123);
-            let result = new Point(123.45,89.0123);
-            expect(origin.equals(result)).toBe(true);
-            expect(origin.equals([123.45,89.0123])).toBe(true);
-          }
-        )
-      }
-
-    )
-
-    describe('#contains', () =>
-      {
-
-        it("checks that given point is closer to origin than this point", () =>
-          {
-            let pt = new Point(123.45,89.0123);
-            let given = new Point(-23.45,59.0123);
-            expect(pt.contains(given)).toBe(true);
-          }
-        )
-      }
-
-    )
-
-    describe('#toString', () =>
-      {
-
-        it("returns string representaion of this point", () =>
-          {
-            let pt = new Point(123.45,89.0123);
-            let result = "Point(123.45,89.0123)";
-            expect(pt.toString()).toEqual(result);
-          }
-        )
-      }
-
-    )
-
-  }
-)
-
+	describe('Bounds factory', function () {
+		it('creates bounds from array of number arrays', function () {
+			var bounds = Bounds.bounds([[14, 12], [30, 40]]);
+			expect(bounds).to.eql(a);
+		});
+	});
+});

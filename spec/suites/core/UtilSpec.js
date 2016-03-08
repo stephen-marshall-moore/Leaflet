@@ -10,7 +10,7 @@ describe('Util', () => {
 
 			let fn2 = Util.bind(fn, {foo: 'bar'});
 
-			expect(fn2()).toEqual({foo: 'bar'});
+			expect(fn2()).to.eql({foo: 'bar'});
 		})
   })
 

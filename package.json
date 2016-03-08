@@ -5,9 +5,15 @@
   "devDependencies": {
     "babel": "^6.5.1",
     "babel-cli": "^6.5.1",
-		"babel-preset-es2015": "^6.5.0",
+		"babel-plugin-transform-es2015-modules-systemjs": "^6.5.0",
+		"babel-preset-es2015-native-modules": "^6.5.0",
     "eslint": "^2.2.0",
     "eslint-config-mourner": "^2.0.0",
+    "expect.js": "^0.3.1",
+    "gulp": "^3.8.11",
+    "gulp-compile": "^1.0.0",
+    "gulp-sourcemaps": "^1.5.2",
+    "gulp-uglifyjs": "^0.6.2",
     "happen": "~0.2.0",
     "jake": "~8.0.12",
     "karma": "~0.13.9",
@@ -17,19 +23,32 @@
     "karma-mocha": "~0.2.0",
     "karma-phantomjs-launcher": "^0.2.0",
     "karma-safari-launcher": "~0.1.1",
+    "karma-spec-reporter": "0.0.18",
+		"systemjs": "^0.19.23",
     "magic-string": "^0.7.0",
     "mocha": "~2.3.0",
     "phantomjs": "^1.9.18",
     "uglify-js": "~2.4.23"
   },
+  "dependencies": {
+    "express": "^4.12.2"
+  },
 	"babel": {
-		"presets": ["es2015"]
+		"presets": ["es2015-native-modules"],
+		"plugins": ["transform-es2015-modules-systemjs"]
 	},
   "main": "dist/leaflet-src.js",
   "style": "dist/leaflet.css",
   "scripts": {
+    "karmatest": "./node_modules/karma/bin/karma start",
+    "start": "node server.js",
     "mtest": "mocha src/index.js -w --compilers js:babel/register",
-    "bubble": "babel src/geometry --out-dir lib/geometry",
+    "prep": "babel app/src --out-dir app/lib",
+    "prepPoint": "babel src/geometry/Point.js --out-file lib/geometry/Point.js",
+    "prepPointSpec": "babel spec/suites/geometry/PointSpec.js  --out-file lib/suites/geometry/PointSpec.js",
+    "bubble": "babel src/core --out-dir es5/src/core",
+    "bubblepre": "babel spec --out-dir es5/spec",
+    "bubbletea": "babel --modules amd spec/suites/core --out-dir es5/spec/suites/core",
     "test": "jake test",
     "build": "jake build",
     "release": "./build/publish.sh"

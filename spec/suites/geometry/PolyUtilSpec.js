@@ -1,11 +1,54 @@
-import { Point } from '../../../src/geometry/Point';
-import { Bounds } from '../../../src/geometry/Bounds';
-import { PolyUtil } from '../../../src/geometry/PolyUtil';
+//import { Point } from '../../../src/geometry/Point';
+//import { Bounds } from '../../../src/geometry/Bounds';
+//import { PolyUtil } from '../../../src/geometry/PolyUtil';
+"use strict";
 
-describe('PolyUtil', () => {
+describe('PolyUtil', function () {
 
-	describe('#clipPolygon', () => {
-		it('clips polygon by bounds', () => {
+		let Point, Bounds, PolyUtil = null;
+
+    before(function(done) {
+        System
+            .import('src/geometry/Point')
+            .then(function(t) {
+                Point = t.Point; //when exporting a default class , key is 'default'
+                //done();
+            })
+            .catch(function(e) {
+                console.log('>>> error loading class', e);
+                done();
+            });
+        System
+            .import('src/geometry/Bounds')
+            .then(function(t) {
+                Bounds = t.Bounds; //when exporting a default class , key is 'default'
+                //done();
+            })
+            .catch(function(e) {
+                console.log('>>> error loading class', e);
+                done();
+            });
+        System
+            .import('src/geometry/PolyUtil')
+            .then(function(t) {
+                PolyUtil = t.PolyUtil; //when exporting a default class , key is 'default'
+                done();
+            })
+            .catch(function(e) {
+                console.log('>>> error loading class', e);
+                done();
+            });
+    });
+
+
+    after(function() {
+        Point = null;
+				Bounds = null;
+				PolyUtil = null;
+    });
+
+	describe('#clipPolygon', function () {
+		it('clips polygon by bounds', function () {
 			let bounds = Bounds.bounds([0, 0], [10, 10]);
 
 			let points = [
@@ -21,7 +64,7 @@ describe('PolyUtil', () => {
 				delete clipped[i]._code;
 			}
 
-			expect(clipped).toEqual([
+			expect(clipped).to.eql([
 				new Point(7.5, 10),
 				new Point(5, 5),
 				new Point(10, 7.5),
@@ -35,7 +78,7 @@ describe('PolyUtil', () => {
 				delete clippedRounded[i]._code;
 			}
 
-			expect(clippedRounded).toEqual([
+			expect(clippedRounded).to.eql([
 				new Point(8, 10),
 				new Point(5, 5),
 				new Point(10, 8),

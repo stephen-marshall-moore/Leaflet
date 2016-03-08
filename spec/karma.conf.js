@@ -1,22 +1,39 @@
 // Karma configuration
 module.exports = function (config) {
 
-	var libSources = require(__dirname+'/../build/build.js').getFiles();
+	var libSources = []; //require(__dirname+'/../build/build.js').getFiles();
 
 	var files = [
+		'public/vendors/traceur/traceur.min.js',
+		'public/vendors/es6-shim/es6-shim.min.js',
+		'public/vendors/es6-module-loader/dist/es6-module-loader.js',
+		'public/vendors/fetch/fetch.js',
+		//'lib/es6-starter.min.js', //compiled version of all of the above
 		"spec/sinon.js",
 		"spec/expect.js"
 	].concat(libSources, [
-		"spec/after.js",
+		//"spec/after.js",
 		"node_modules/happen/happen.js",
+		{pattern: "src/geometry/Point.js", served: true, included: false, watched: true},
+		{pattern: "src/geometry/Bounds.js", served: true, included: false, watched: true},
+		{pattern: "src/geometry/LineUtil.js", served: true, included: false, watched: true},
+		{pattern: "src/geometry/PolyUtil.js", served: true, included: false, watched: true},
+		{pattern: "src/geometry/Transformation.js", served: true, included: false, watched: true},
+    "spec/suites/system.test-config.js",
 		"spec/suites/SpecHelper.js",
-		"spec/suites/**/*.js",
+		//"spec/suites/geometry/PointSpec.js",
+		//"spec/suites/geometry/BoundsSpec.js",
+		//"spec/suites/geometry/LineUtilSpec.js",
+		"spec/suites/geometry/PolyUtilSpec.js",
+		//"spec/suites/geometry/TransformationSpec.js",
+		//"spec/suites/**/*.js",
 		{pattern: "dist/images/*.png", included: false}
 	]);
 
 	config.set({
 		// base path, that will be used to resolve files and exclude
 		basePath: '../',
+		//basePath: '',
 
 		plugins: [
 			'karma-mocha',
@@ -36,19 +53,27 @@ module.exports = function (config) {
 		// test results reporter to use
 		// possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
 		reporters: ['dots'],
+    //reporters: ['spec'/*, 'coverage'*/],
 
 		// web server port
 		port: 9876,
 
 		// level of logging
 		// possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-		logLevel: config.LOG_WARN,
+		logLevel: config.LOG_INFO,
 
 		// enable / disable colors in the output (reporters and logs)
 		colors: true,
 
 		// enable / disable watching file and executing tests whenever any file changes
 		autoWatch: false,
+
+		customLaunchers: {
+			'Custom_Chrome': {
+				base: 'Chrome',
+				flags: ['--enable-javascript-harmony', '--enable-web-midi']
+			}
+		},
 
 		// Start these browsers, currently available:
 		// - Chrome
@@ -58,10 +83,11 @@ module.exports = function (config) {
 		// - Safari (only Mac)
 		// - PhantomJS
 		// - IE (only Windows)
-		browsers: ['PhantomJS'],
+		//browsers: ['PhantomJS'],
+		browsers: ['Custom_Chrome'],
 
 		// If browser does not capture in given timeout [ms], kill it
-		captureTimeout: 5000,
+		captureTimeout: 100000,
 
 		// Workaround for PhantomJS random DISCONNECTED error
 		browserDisconnectTimeout: 10000, // default 2000
