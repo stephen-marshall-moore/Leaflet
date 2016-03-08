@@ -16,12 +16,13 @@ module.exports = function (config) {
 		"node_modules/happen/happen.js",
     "spec/suites/system.test-config.js",
 		"spec/suites/SpecHelper.js",
+		// source
 		{pattern: "src/core/Util.js", served: true, included: false, watched: true},
 		{pattern: "src/geometry/*.js", served: true, included: false, watched: true},
 		{pattern: "src/geo/*.js", served: true, included: false, watched: true},
 		{pattern: "src/geo/crs/*.js", served: true, included: false, watched: true},
 		{pattern: "src/geo/projection/*.js", served: true, included: false, watched: true},
-		//{pattern: "src/geo/crs/CRS.Earth.js", served: true, included: false, watched: true},
+		// specs
 		"spec/suites/geometry/*Spec.js",
 		"spec/suites/geo/*Spec.js",
 		//"spec/suites/geo/LatLngSpec.js",
@@ -39,7 +40,6 @@ module.exports = function (config) {
 	config.set({
 		// base path, that will be used to resolve files and exclude
 		basePath: '../',
-		//basePath: '',
 
 		plugins: [
 			'karma-mocha',
