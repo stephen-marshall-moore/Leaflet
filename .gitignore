@@ -9,6 +9,7 @@ _site
 dist/*.js
 dist/*.map
 coverage/
+public/
 *.js.html
 index.html
 .mailmap
