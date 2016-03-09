@@ -7,6 +7,19 @@ export class Util {
 	constructor() {
 	}
 
+	// extend an object with properties of one or more other objects
+	static extend(dest) {
+		let i, j, len, src;
+
+		for (j = 1, len = arguments.length; j < len; j++) {
+			src = arguments[j];
+			for (i in src) {
+				dest[i] = src[i];
+			}
+		}
+		return dest;
+	}
+
 	// return unique ID of an object
 	static stamp(obj) {
 		/*eslint-disable */

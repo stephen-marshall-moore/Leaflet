@@ -17,13 +17,13 @@ module.exports = function (config) {
     "spec/suites/system.test-config.js",
 		"spec/suites/SpecHelper.js",
 		// source
-		{pattern: "src/core/Util.js", served: true, included: false, watched: true},
+		{pattern: "src/core/*.js", served: true, included: false, watched: true},
 		{pattern: "src/geometry/*.js", served: true, included: false, watched: true},
 		{pattern: "src/geo/*.js", served: true, included: false, watched: true},
 		{pattern: "src/geo/crs/*.js", served: true, included: false, watched: true},
 		{pattern: "src/geo/projection/*.js", served: true, included: false, watched: true},
 		// specs
-		"spec/suites/core/UtilSpec.js",
+		"spec/suites/core/*Spec.js",
 		"spec/suites/geometry/*Spec.js",
 		"spec/suites/geo/*Spec.js",
 		//"spec/suites/**/*.js",

@@ -18,7 +18,7 @@ export class Evented {
 
 		// types can be a map of types/handlers
 		if (typeof types === 'object') {
-			for (let type of types) {
+			for (let type in types) {
 				// we don't process space-separated events here for performance;
 				// it's a hot path since Layer uses the on(obj) syntax
 				this._on(type, types[type], fn);
@@ -43,7 +43,7 @@ export class Evented {
 			delete this._events;
 
 		} else if (typeof types === 'object') {
-			for (let type of types) {
+			for (let type in types) {
 				this._off(type, types[type], fn);
 			}
 
@@ -140,7 +140,7 @@ export class Evented {
 	fire(type, data, propagate) {
 		if (!this.listens(type, propagate)) { return this; }
 
-		let event = L.Util.extend({}, data, {type: type, target: this}),
+		let event = Util.extend({}, data, {type: type, target: this}),
 		    events = this._events;
 
 		if (events) {
@@ -177,7 +177,7 @@ export class Evented {
 
 		if (propagate) {
 			// also check parents for listeners if event propagates
-			for (let id of this._eventParents) {
+			for (let id in this._eventParents) {
 				if (this._eventParents[id].listens(type, propagate)) { return true; }
 			}
 		}
@@ -187,7 +187,7 @@ export class Evented {
 	once(types, fn, context) {
 
 		if (typeof types === 'object') {
-			for (let type of types) {
+			for (let type in types) {
 				this.once(type, types[type], fn);
 			}
 			return this;
@@ -220,8 +220,8 @@ export class Evented {
 	}
 
 	_propagateEvent(e) {
-		for (let id of this._eventParents) {
-			this._eventParents[id].fire(e.type, L.extend({layer: e.target}, e), true);
+		for (let id in this._eventParents) {
+			this._eventParents[id].fire(e.type, Util.extend({layer: e.target}, e), true);
 		}
 	}
 }
