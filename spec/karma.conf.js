@@ -23,16 +23,9 @@ module.exports = function (config) {
 		{pattern: "src/geo/crs/*.js", served: true, included: false, watched: true},
 		{pattern: "src/geo/projection/*.js", served: true, included: false, watched: true},
 		// specs
+		"spec/suites/core/UtilSpec.js",
 		"spec/suites/geometry/*Spec.js",
 		"spec/suites/geo/*Spec.js",
-		//"spec/suites/geo/LatLngSpec.js",
-		//"spec/suites/geo/LatLngBoundsSpec.js",
-		//"spec/suites/geo/ProjectionSpec.js",
-		//"spec/suites/geo/CRSSpec.js",
-		//"spec/suites/geometry/BoundsSpec.js",
-		//"spec/suites/geometry/LineUtilSpec.js",
-		//"spec/suites/geometry/PolyUtilSpec.js",
-		//"spec/suites/geometry/TransformationSpec.js",
 		//"spec/suites/**/*.js",
 		{pattern: "dist/images/*.png", included: false}
 	]);

@@ -1,9 +1,29 @@
-import { Util } from '../../../src/core/Util';
+//import { Util } from '../../../src/core/Util';
+"use strict";
 
-describe('Util', () => {
+describe("Projection", function () {
 
-	describe('#bind', () => {
-		it('returns the given function with the given context', () => {
+	let Util = null;
+
+  before(function(done) {
+    System
+      .import('src/core/Util')
+      .then(function(t) {
+				Util = t.Util;
+				done();
+      })
+      .catch(function(e) {
+          console.log('>>> error loading class', e);
+          done();
+      });
+  });
+
+  after(function() {
+    Util = null;
+  });
+
+	describe('#bind', function () {
+		it('returns the given function with the given context', function () {
 			let fn = function () {
 				return this;
 			};
@@ -14,7 +34,7 @@ describe('Util', () => {
 		})
   })
 
-	describe('#bind2', () => {
+	describe('#bind2', function () {
     let goo, bar = null;
 
 	  let foo = {},
@@ -22,49 +42,48 @@ describe('Util', () => {
 	      b = {},
 	      c = {};
 
-    beforeEach( () => {
+    beforeEach( function () {
       goo = {
         fn: function () {
           bar = 'bogon';
         }
       }
 
-      spyOn(goo, 'fn');
+      sinon.spy(goo, 'fn');
 
 		  let fn2 = Util.bind(goo.fn, foo, a, b);
 		  fn2(c);
     })
 
-		it('passes additional arguments to the bound function', () => {
-
-			expect(goo.fn).toHaveBeenCalledWith(a, b, c);
+		it('passes additional arguments to the bound function', function () {
+			expect(goo.fn.calledWith(a, b, c)).to.be(true);
 		})
 	})
 
-	describe('#stamp', () => {
-		it('sets a unique id on the given object and returns it', () => {
+	describe('#stamp', function () {
+		it('sets a unique id on the given object and returns it', function () {
 			let a = {},
 			    id = Util.stamp(a);
 
-			expect(typeof id).toEqual('number');
-			expect(Util.stamp(a)).toEqual(id);
+			expect(typeof id).to.eql('number');
+			expect(Util.stamp(a)).to.eql(id);
 
 			let b = {},
 			    id2 = Util.stamp(b);
 
-			expect(id2).not.toEqual(id);
+			expect(id2).not.to.eql(id);
 		})
 	})
 
-	describe('#falseFn', () => {
-		it('returns false', () => {
-			expect(Util.falseFn()).toBe(false);
+	describe('#falseFn', function () {
+		it('returns false', function () {
+			expect(Util.falseFn()).to.be(false);
 		})
 	})
 
-	describe('#splitWords', () => {
-		it('splits words into an array', () => {
-			expect(Util.splitWords('foo bar baz')).toEqual(['foo', 'bar', 'baz']);
+	describe('#splitWords', function () {
+		it('splits words into an array', function () {
+			expect(Util.splitWords('foo bar baz')).to.eql(['foo', 'bar', 'baz']);
 		})
 	})
 
