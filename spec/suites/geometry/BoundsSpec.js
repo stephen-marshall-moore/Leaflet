@@ -12,7 +12,7 @@ describe('Bounds', function () {
                 //done();
             })
             .catch(function(e) {
-                console.log('>>> error loading class (Point)', e);
+                console.log('>>> error loading class', e);
                 done();
             });
         System

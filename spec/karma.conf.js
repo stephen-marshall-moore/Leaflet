@@ -23,11 +23,9 @@ module.exports = function (config) {
 		{pattern: "src/geo/crs/*.js", served: true, included: false, watched: true},
 		{pattern: "src/geo/projection/*.js", served: true, included: false, watched: true},
 		// specs
-		"spec/suites/test-main.js",
-		//"spec/suites/core/*Spec.js",
-		//"spec/suites/geometry/*Spec.js",
-		//"spec/suites/geo/*Spec.js",
-		{pattern: "spec/suites/geometry/*Spec.js", served: true, included: false, watched: true},
+		"spec/suites/core/*Spec.js",
+		"spec/suites/geometry/*Spec.js",
+		"spec/suites/geo/*Spec.js",
 		//"spec/suites/**/*.js",
 		{pattern: "dist/images/*.png", included: false}
 	]);
@@ -61,7 +59,7 @@ module.exports = function (config) {
 
 		// level of logging
 		// possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-		logLevel: config.LOG_DEBUG,
+		logLevel: config.LOG_INFO,
 
 		// enable / disable colors in the output (reporters and logs)
 		colors: true,
