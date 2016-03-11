@@ -1,3 +1,5 @@
+import expect from 'spec/expect.js'
+
 if (!Array.prototype.map) {
 	Array.prototype.map = function (fun) {
 		"use strict";

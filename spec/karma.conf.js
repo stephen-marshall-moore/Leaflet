@@ -4,13 +4,13 @@ module.exports = function (config) {
 	var libSources = []; //require(__dirname+'/../build/build.js').getFiles();
 
 	var files = [
-		'public/vendors/traceur/traceur.min.js',
+		//'public/vendors/traceur/traceur.min.js',
 		'public/vendors/es6-shim/es6-shim.min.js',
 		'public/vendors/es6-module-loader/dist/es6-module-loader.js',
 		'public/vendors/fetch/fetch.js',
 		//'lib/es6-starter.min.js', //compiled version of all of the above
-		"spec/sinon.js",
-		"spec/expect.js"
+		//"spec/sinon.js",
+		{pattern: "spec/expect.js", served: true, included: false, watched: true}
 	].concat(libSources, [
 		//"spec/after.js",
 		"node_modules/happen/happen.js",
@@ -38,14 +38,36 @@ module.exports = function (config) {
 
 		plugins: [
 			'karma-mocha',
+			'karma-sinon',
+			'karma-systemjs',
 			'karma-coverage',
 			'karma-phantomjs-launcher',
 			'karma-chrome-launcher',
 			'karma-safari-launcher',
 			'karma-firefox-launcher'],
 
+		systemjs: {
+			// Path to your SystemJS configuration file 
+			configFile: 'system.conf.js',
+		 
+			// Patterns for files that you want Karma to make available, but not loaded until a module requests them. eg. Third-party libraries. 
+			serveFiles: [
+				//'spec/expect.js',
+				//'spec/sinon.js'
+				//'lib/**/*.js'
+			],
+		 
+			// SystemJS configuration specifically for tests, added after your config file. 
+			// Good for adding test libraries and mock modules 
+			config: {
+				paths: {
+				//	'angular-mocks': 'bower_components/angular-mocks/angular-mocks.js'
+				}
+			}
+		},
+
 		// frameworks to use
-		frameworks: ['mocha'],
+		frameworks: ['systemjs', 'sinon', 'mocha'],
 
 		// list of files / patterns to load in the browser
 		files: files,

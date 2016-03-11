@@ -1,25 +1,44 @@
-var tests = [];
+"use strict";
 
-for (var file in window.__karma__.files) {
-	if (window.__karma__.files.hasOwnProperty(file)) {
-		if (/Spec\.js$/.test(file)) {
-			console.log(file.substring(18));
-			tests.push(file.substring(18));
-		}
-	}
-}
+var allTestFiles = [];
+var TEST_REGEXP = /geometry\/\w+(spec|test).js$/i;
+//var TEST_REGEXP = /geometry\/Point(spec|test).js$/i;
 
-for (var i = 0; i < tests.length; ++i) {
-	console.log( "importing ... ", tests[i] );
-  System
-      .import(tests[i])
-      .then(function() {
-          console.log("thenned");
-          //done();
-      })
-      .catch(function(e) {
-          console.log('>>> ', e.message);
-          done();
-      });
-}
+// Get a list of all the test files to include
+Object.keys(window.__karma__.files).forEach(function(file) {
+  if (TEST_REGEXP.test(file)) {
+    // Normalize paths to RequireJS module names.
+    // If you require sub-dependencies of test files to be loaded as-is (requiring file extension)
+    // then do not normalize the paths
+    var normalizedTestModule = file.replace(/^\/base\/|\.js$/g, '');
+    allTestFiles.push(normalizedTestModule);
+		console.log(normalizedTestModule);
+		System.import(normalizedTestModule)
+		//window.__karma__.start()
+  }
+})
+
+System.config({
+  // Karma serves files under /base, which is the basePath from your config file
+  //baseUrl: '/base',
+  baseUrl: '/',
+
+  // dynamically load all test files
+  deps: allTestFiles,
+
+  // we have to kickoff jasmine, as it is asynchronous
+  callback: window.__karma__.start
+})
+
+/**/
+System.import('spec/expect.js')
+
+describe( "main", function() {
+		it("expected number of tests", function () {
+			expect(allTestFiles.length).to.eql(5);
+		})
+})
+/**/
+console.log("what are you expecting? and when?")
+
 

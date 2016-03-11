@@ -1,5 +1,7 @@
 "use strict";
 
+System.import('spec/expect.js')
+
 describe('Bounds', function () {
 
 		let Point, Bounds = null;
