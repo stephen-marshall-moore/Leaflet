@@ -28,7 +28,7 @@ module.exports = function (config) {
 		//"spec/suites/geometry/*Spec.js",
 		//"spec/suites/geo/*Spec.js",
 		{pattern: "spec/suites/geo/*Spec.js", served: true, included: false, watched: true},
-		{pattern: "spec/suites/geometry/*Spec.js", served: true, included: false, watched: true},
+		{pattern: "spec/suites/geometry/*Spec.js", served: true, included: false, watched: true, nocache: true},
 		//"spec/suites/**/*.js",
 		{pattern: "dist/images/*.png", included: false}
 	]);

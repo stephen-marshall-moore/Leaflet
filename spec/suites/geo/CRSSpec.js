@@ -9,8 +9,6 @@ import{ EPSG3857 } from 'src/geo/crs/CRS.EPSG3857'
 import{ EPSG4326 } from 'src/geo/crs/CRS.EPSG4326'
 import{ EPSG3395 } from 'src/geo/crs/CRS.EPSG3395'
 
-describe("Coordinate Reference Systems", function () {
-
 describe("CRS.EPSG3857", function () {
 
 	describe("#latLngToPoint", function () {
@@ -58,10 +56,8 @@ describe("CRS.EPSG3857", function () {
 	describe("#getProjectedBounds", function () {
 		it("gives correct size", function () {
 			let crs = new EPSG3857()
-			let i,
-			    worldSize = 256,
-			    crsSize
-			for (i = 0 i <= 22 i++) {
+			let worldSize = 256, crsSize = 0
+			for (let i = 0; i <= 22; i++) {
 				crsSize = crs.getProjectedBounds(i).getSize()
 				expect(crsSize.x).to.eql(worldSize)
 				expect(crsSize.y).to.eql(worldSize)
@@ -101,10 +97,8 @@ describe("CRS.EPSG4326", function () {
 	describe("#getSize", function () {
 		it("gives correct size", function () {
 			let crs = new EPSG4326()
-			let i,
-			    worldSize = 256,
-			    crsSize
-			for (i = 0 i <= 22 i++) {
+			let worldSize = 256, crsSize = 0
+			for (let i = 0; i <= 22; i++) {
 				crsSize = crs.getProjectedBounds(i).getSize()
 				expect(crsSize.x).to.eql(worldSize * 2)
 				// Lat bounds are half as high (-90/+90 compared to -180/+180)
@@ -192,7 +186,5 @@ describe("CRS", function () {
 			expect(crs.zoom(scale)).to.eql(zoom)
 		})
 	})
-})
-
 })
 
