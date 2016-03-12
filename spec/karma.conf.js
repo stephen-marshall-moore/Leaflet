@@ -10,7 +10,7 @@ module.exports = function (config) {
 		'public/vendors/fetch/fetch.js',
 		//'lib/es6-starter.min.js', //compiled version of all of the above
 		//"spec/sinon.js",
-		{pattern: "spec/expect.js", served: true, included: false, watched: true}
+		//{pattern: "spec/expect.js", served: true, included: false, watched: true}
 	].concat(libSources, [
 		//"spec/after.js",
 		"node_modules/happen/happen.js",
@@ -23,12 +23,12 @@ module.exports = function (config) {
 		{pattern: "src/geo/crs/*.js", served: true, included: false, watched: true},
 		{pattern: "src/geo/projection/*.js", served: true, included: false, watched: true},
 		// specs
-		"spec/suites/test-main.js",
-		//"spec/suites/core/*Spec.js",
-		//"spec/suites/geometry/*Spec.js",
-		//"spec/suites/geo/*Spec.js",
-		{pattern: "spec/suites/geo/*Spec.js", served: true, included: false, watched: true},
-		{pattern: "spec/suites/geometry/*Spec.js", served: true, included: false, watched: true, nocache: true},
+		//"spec/suites/test-main.js",
+		"spec/suites/core/*Spec.js",
+		"spec/suites/geometry/*Spec.js",
+		"spec/suites/geo/*Spec.js",
+		//{pattern: "spec/suites/geo/*Spec.js", served: true, included: true, watched: true},
+		//{pattern: "spec/suites/geometry/*Spec.js", served: true, included: true, watched: true, nocache: true},
 		//"spec/suites/**/*.js",
 		{pattern: "dist/images/*.png", included: false}
 	]);
@@ -39,6 +39,7 @@ module.exports = function (config) {
 
 		plugins: [
 			'karma-mocha',
+			'karma-expect',
 			'karma-sinon',
 			'karma-systemjs',
 //			'karma-coverage',
@@ -69,7 +70,7 @@ module.exports = function (config) {
 		},
 
 		// frameworks to use
-		frameworks: ['systemjs', 'sinon', 'mocha'],
+		frameworks: ['systemjs', 'expect', 'sinon', 'mocha'],
 
 		// list of files / patterns to load in the browser
 		files: files,

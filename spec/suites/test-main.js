@@ -31,7 +31,7 @@ System.config({
 })
 
 /**/
-System.import('spec/expect.js')
+//System.import('spec/expect.js')
 
 describe( "main", function() {
 		it("expected number of tests", function () {
