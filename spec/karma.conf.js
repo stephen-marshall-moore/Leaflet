@@ -27,6 +27,7 @@ module.exports = function (config) {
 		//"spec/suites/core/*Spec.js",
 		//"spec/suites/geometry/*Spec.js",
 		//"spec/suites/geo/*Spec.js",
+		{pattern: "spec/suites/geo/*Spec.js", served: true, included: false, watched: true},
 		{pattern: "spec/suites/geometry/*Spec.js", served: true, included: false, watched: true},
 		//"spec/suites/**/*.js",
 		{pattern: "dist/images/*.png", included: false}
@@ -40,11 +41,12 @@ module.exports = function (config) {
 			'karma-mocha',
 			'karma-sinon',
 			'karma-systemjs',
-			'karma-coverage',
-			'karma-phantomjs-launcher',
-			'karma-chrome-launcher',
-			'karma-safari-launcher',
-			'karma-firefox-launcher'],
+//			'karma-coverage',
+//			'karma-phantomjs-launcher',
+//			'karma-chrome-launcher',
+//			'karma-safari-launcher',
+//			'karma-firefox-launcher',
+			'karma-chrome-launcher'],
 
 		systemjs: {
 			// Path to your SystemJS configuration file 

@@ -1,28 +1,9 @@
-//import {Point} from '/lib/geometry/Point.js'
 "use strict";
+
+import {Point} from 'src/geometry/Point';
 
 describe("Point", function ()
   {
-
-		let Point = null;
-
-    before(function(done) {
-        System
-            .import('src/geometry/Point')
-            .then(function(t) {
-                Point = t.Point; //when exporting a default class , key is 'default'
-                done();
-            })
-            .catch(function(e) {
-                console.log('>>> error loading class', e);
-                done();
-            });
-    });
-
-
-    after(function() {
-        Point = null;
-    });
 
     describe('constructor', function ()
       {

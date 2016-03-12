@@ -1,7 +1,7 @@
 "use strict";
 
 var allTestFiles = [];
-var TEST_REGEXP = /geometry\/\w+(spec|test).js$/i;
+var TEST_REGEXP = /geo\w*\/\w+(spec|test).js$/i;
 //var TEST_REGEXP = /geometry\/Point(spec|test).js$/i;
 
 // Get a list of all the test files to include
@@ -35,7 +35,7 @@ System.import('spec/expect.js')
 
 describe( "main", function() {
 		it("expected number of tests", function () {
-			expect(allTestFiles.length).to.eql(5);
+			expect(allTestFiles.length).to.eql(9);
 		})
 })
 /**/

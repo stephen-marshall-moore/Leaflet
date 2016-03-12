@@ -1,38 +1,9 @@
 "use strict";
 
-System.import('spec/expect.js')
+import {Point} from 'src/geometry/Point';
+import {Bounds} from 'src/geometry/Bounds';
 
 describe('Bounds', function () {
-
-		let Point, Bounds = null;
-
-    before(function(done) {
-        System
-            .import('src/geometry/Point')
-            .then(function(t) {
-                Point = t.Point; //when exporting a default class , key is 'default'
-                //done();
-            })
-            .catch(function(e) {
-                console.log('>>> error loading class (Point)', e);
-                done();
-            });
-        System
-            .import('src/geometry/Bounds')
-            .then(function(t) {
-                Bounds = t.Bounds; //when exporting a default class , key is 'default'
-                done();
-            })
-            .catch(function(e) {
-                console.log('>>> error loading class', e);
-                done();
-            });
-    });
-
-
-    after(function() {
-        Point, Bounds = null;
-    });
 
 	var a, b, c;
 
