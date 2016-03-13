@@ -1,165 +1,169 @@
-import {Evented} from '../../core/Events';
+import {Evented} from '../../core/Events'
+import {Util} from '../../core/Util'
 
 export class Layer extends Evented {
 
-	options: {
-		pane: 'overlayPane',
-		nonBubblingEvents: []  // Array of events that should not be bubbled to DOM parents (like the map)
-	},
 
-	addTo: function (map) {
-		map.addLayer(this);
-		return this;
-	},
-
-	remove() => {
-		return this.removeFrom(this._map || this._mapToAdd);
-	}
-
-	removeFrom(obj) => {
-		if (obj) {
-			obj.removeLayer(this);
+	constructor() {
+		this.options = {
+			pane: 'overlayPane',
+			nonBubblingEvents: []  // Array of events that should not be bubbled to DOM parents (like the map)
 		}
-		return this;
 	}
 
-	getPane(name) => {
-		return this._map.getPane(name ? (this.options[name] || name) : this.options.pane);
+	addTo(map) {
+		map.addLayer(this)
+		return this
 	}
 
-	addInteractiveTarget(targetEl) => {
-		this._map._targets[Util.stamp(targetEl)] = this;
-		return this;
+	remove(){
+		return this.removeFrom(this._map || this._mapToAdd)
 	}
 
-	removeInteractiveTarget(targetEl) => {
-		delete this._map._targets[Util.stamp(targetEl)];
-		return this;
+	removeFrom(obj) {
+		if (obj) {
+			obj.removeLayer(this)
+		}
+		return this
 	}
 
-	_layerAdd(e) => {
-		let map = e.target;
+	getPane(name) {
+		return this._map.getPane(name ? (this.options[name] || name) : this.options.pane)
+	}
+
+	addInteractiveTarget(targetEl) {
+		this._map._targets[Util.stamp(targetEl)] = this
+		return this
+	}
+
+	removeInteractiveTarget(targetEl) {
+		delete this._map._targets[Util.stamp(targetEl)]
+		return this
+	}
+
+	_layerAdd(e) {
+		let map = e.target
 
 		// check in case layer gets added and then removed before the map is ready
-		if (!map.hasLayer(this)) { return; }
+		if (!map.hasLayer(this)) { return }
 
-		this._map = map;
-		this._zoomAnimated = map._zoomAnimated;
+		this._map = map
+		this._zoomAnimated = map._zoomAnimated
 
 		if (this.getEvents) {
-			map.on(this.getEvents(), this);
+			map.on(this.getEvents(), this)
 		}
 
-		this.onAdd(map);
+		this.onAdd(map)
 
 		if (this.getAttribution && this._map.attributionControl) {
-			this._map.attributionControl.addAttribution(this.getAttribution());
+			this._map.attributionControl.addAttribution(this.getAttribution())
 		}
 
-		this.fire('add');
-		map.fire('layeradd', {layer: this});
+		this.fire('add')
+		map.fire('layeradd', {layer: this})
 	}
 }
 
 
 L.Map.include({
 	addLayer: function (layer) {
-		var id = L.stamp(layer);
-		if (this._layers[id]) { return layer; }
-		this._layers[id] = layer;
+		var id = L.stamp(layer)
+		if (this._layers[id]) { return layer }
+		this._layers[id] = layer
 
-		layer._mapToAdd = this;
+		layer._mapToAdd = this
 
 		if (layer.beforeAdd) {
-			layer.beforeAdd(this);
+			layer.beforeAdd(this)
 		}
 
-		this.whenReady(layer._layerAdd, layer);
+		this.whenReady(layer._layerAdd, layer)
 
-		return this;
+		return this
 	},
 
 	removeLayer: function (layer) {
-		var id = L.stamp(layer);
+		var id = L.stamp(layer)
 
-		if (!this._layers[id]) { return this; }
+		if (!this._layers[id]) { return this }
 
 		if (this._loaded) {
-			layer.onRemove(this);
+			layer.onRemove(this)
 		}
 
 		if (layer.getAttribution && this.attributionControl) {
-			this.attributionControl.removeAttribution(layer.getAttribution());
+			this.attributionControl.removeAttribution(layer.getAttribution())
 		}
 
 		if (layer.getEvents) {
-			this.off(layer.getEvents(), layer);
+			this.off(layer.getEvents(), layer)
 		}
 
-		delete this._layers[id];
+		delete this._layers[id]
 
 		if (this._loaded) {
-			this.fire('layerremove', {layer: layer});
-			layer.fire('remove');
+			this.fire('layerremove', {layer: layer})
+			layer.fire('remove')
 		}
 
-		layer._map = layer._mapToAdd = null;
+		layer._map = layer._mapToAdd = null
 
-		return this;
+		return this
 	},
 
 	hasLayer: function (layer) {
-		return !!layer && (L.stamp(layer) in this._layers);
+		return !!layer && (L.stamp(layer) in this._layers)
 	},
 
 	eachLayer: function (method, context) {
 		for (var i in this._layers) {
-			method.call(context, this._layers[i]);
+			method.call(context, this._layers[i])
 		}
-		return this;
+		return this
 	},
 
 	_addLayers: function (layers) {
-		layers = layers ? (L.Util.isArray(layers) ? layers : [layers]) : [];
+		layers = layers ? (L.Util.isArray(layers) ? layers : [layers]) : []
 
 		for (var i = 0, len = layers.length; i < len; i++) {
-			this.addLayer(layers[i]);
+			this.addLayer(layers[i])
 		}
 	},
 
 	_addZoomLimit: function (layer) {
 		if (isNaN(layer.options.maxZoom) || !isNaN(layer.options.minZoom)) {
-			this._zoomBoundLayers[L.stamp(layer)] = layer;
-			this._updateZoomLevels();
+			this._zoomBoundLayers[L.stamp(layer)] = layer
+			this._updateZoomLevels()
 		}
 	},
 
 	_removeZoomLimit: function (layer) {
-		var id = L.stamp(layer);
+		var id = L.stamp(layer)
 
 		if (this._zoomBoundLayers[id]) {
-			delete this._zoomBoundLayers[id];
-			this._updateZoomLevels();
+			delete this._zoomBoundLayers[id]
+			this._updateZoomLevels()
 		}
 	},
 
 	_updateZoomLevels: function () {
 		var minZoom = Infinity,
 		    maxZoom = -Infinity,
-		    oldZoomSpan = this._getZoomSpan();
+		    oldZoomSpan = this._getZoomSpan()
 
 		for (var i in this._zoomBoundLayers) {
-			var options = this._zoomBoundLayers[i].options;
+			var options = this._zoomBoundLayers[i].options
 
-			minZoom = options.minZoom === undefined ? minZoom : Math.min(minZoom, options.minZoom);
-			maxZoom = options.maxZoom === undefined ? maxZoom : Math.max(maxZoom, options.maxZoom);
+			minZoom = options.minZoom === undefined ? minZoom : Math.min(minZoom, options.minZoom)
+			maxZoom = options.maxZoom === undefined ? maxZoom : Math.max(maxZoom, options.maxZoom)
 		}
 
-		this._layersMaxZoom = maxZoom === -Infinity ? undefined : maxZoom;
-		this._layersMinZoom = minZoom === Infinity ? undefined : minZoom;
+		this._layersMaxZoom = maxZoom === -Infinity ? undefined : maxZoom
+		this._layersMinZoom = minZoom === Infinity ? undefined : minZoom
 
 		if (oldZoomSpan !== this._getZoomSpan()) {
-			this.fire('zoomlevelschange');
+			this.fire('zoomlevelschange')
 		}
 	}
-});
+})
