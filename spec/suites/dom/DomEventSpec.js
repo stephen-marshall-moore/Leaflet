@@ -96,6 +96,7 @@ describe('DomEvent', function () {
 			el.removeChild(child)
 		})
 	})
+
 	describe('#preventDefault', function () {
 		it('prevents the default action of event', function () {
 			DomEvent.addListener(el, 'click', DomEvent.preventDefault)

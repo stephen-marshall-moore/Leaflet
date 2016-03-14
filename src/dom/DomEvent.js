@@ -11,9 +11,10 @@ import {Point} from 'src/geometry/Point'
 export class DomEvent {
 
 	constructor() {
+		this._skipEvents = {}
 	}
 
-	static on(obj, types, fn, context) {
+	on(obj, types, fn, context) {
 
 		if (typeof types === 'object') {
 			for (let type in types) {
@@ -30,7 +31,7 @@ export class DomEvent {
 		return this
 	}
 
-	static off(obj, types, fn, context) {
+	off(obj, types, fn, context) {
 
 		if (typeof types === 'object') {
 			for (let type in types) {
@@ -47,7 +48,7 @@ export class DomEvent {
 		return this
 	}
 
-	static _on(obj, type, fn, context) {
+	_on(obj, type, fn, context) {
 		let id = type + Util.stamp(fn) + (context ? '_' + Util.stamp(context) : '')
 
 		if (obj[DomEvent.eventsKey] && obj[DomEvent.eventsKey][id]) { return this }
@@ -97,7 +98,7 @@ export class DomEvent {
 		return this
 	}
 
-	static _off(obj, type, fn, context) {
+	_off(obj, type, fn, context) {
 
 		let id = type + Util.stamp(fn) + (context ? '_' + Util.stamp(context) : ''),
 		    handler = obj[DomEvent.eventsKey] && obj[DomEvent.eventsKey][id]
@@ -130,7 +131,7 @@ export class DomEvent {
 		return this
 	}
 
-	static stopPropagation(e) {
+	stopPropagation(e) {
 
 		if (e.stopPropagation) {
 			e.stopPropagation()
@@ -144,22 +145,22 @@ export class DomEvent {
 		return this
 	}
 
-	static disableScrollPropagation(el) {
+	disableScrollPropagation(el) {
 		return DomEvent.on(el, 'mousewheel', DomEvent.stopPropagation)
 	}
 
-	static disableClickPropagation(el) {
-		let stop = DomEvent.stopPropagation
+	disableClickPropagation(el) {
+		let stop = this.stopPropagation
 
-		DomEvent.on(el, L.Draggable.START.join(' '), stop)
+		this.on(el, L.Draggable.START.join(' '), stop)
 
-		return DomEvent.on(el, {
+		return this.on(el, {
 			click: DomEvent._fakeStop,
 			dblclick: stop
 		})
 	}
 
-	static preventDefault(e) {
+	preventDefault(e) {
 
 		if (e.preventDefault) {
 			e.preventDefault()
@@ -169,13 +170,13 @@ export class DomEvent {
 		return this
 	}
 
-	static stop(e) {
+	stop(e) {
 		return DomEvent
 			.preventDefault(e)
 			.stopPropagation(e)
 	}
 
-	static getMousePosition(e, container) {
+	getMousePosition(e, container) {
 		if (!container) {
 			return new Point(e.clientX, e.clientY)
 		}
@@ -187,7 +188,7 @@ export class DomEvent {
 			e.clientY - rect.top - container.clientTop)
 	}
 
-	static getWheelDelta(e) {
+	getWheelDelta(e) {
 		return (e.deltaY && e.deltaMode === 0) ? -e.deltaY :        // Pixels
 		       (e.deltaY && e.deltaMode === 1) ? -e.deltaY * 18 :   // Lines
 		       (e.deltaY && e.deltaMode === 2) ? -e.deltaY * 52 :   // Pages
@@ -198,14 +199,12 @@ export class DomEvent {
 		       0
 	}
 
-	_skipEvents: {}
-
-	static _fakeStop(e) {
+	_fakeStop(e) {
 		// fakes stopPropagation by setting a special event flag, checked/reset with DomEvent._skipped(e)
 		DomEvent._skipEvents[e.type] = true
 	}
 
-	static _skipped(e) {
+	_skipped(e) {
 		let skipped = this._skipEvents[e.type]
 		// reset when checking, as it's only used in map container and propagates outside of the map
 		this._skipEvents[e.type] = false
@@ -213,7 +212,7 @@ export class DomEvent {
 	}
 
 	// check if element really left/entered the event target (for mouseenter/mouseleave)
-	static _isExternalTarget(el, e) {
+	_isExternalTarget(el, e) {
 
 		let related = e.relatedTarget
 
@@ -230,7 +229,7 @@ export class DomEvent {
 	}
 
 	// this is a horrible workaround for a bug in Android where a single touch triggers two click events
-	static _filterClick(e, handler) {
+	_filterClick(e, handler) {
 		let timeStamp = (e.timeStamp || e.originalEvent.timeStamp),
 		    elapsed = DomEvent._lastClick && (timeStamp - DomEvent._lastClick)
 
@@ -240,24 +239,25 @@ export class DomEvent {
 		// or check if click is simulated on the element, and if it is, reject any non-simulated events
 
 		if ((elapsed && elapsed > 100 && elapsed < 500) || (e.target._simulatedClick && !e._simulated)) {
-			DomEvent.stop(e)
+			this.stop(e)
 			return
 		}
-		DomEvent._lastClick = timeStamp
+
+		this._lastClick = timeStamp
 
 		handler(e)
 	}
 
-	static addListener(e) {
-		return DomEvent.on(e)
+	addListener(e) {
+		return this.on(e)
 	}
 
-	static removeListener(e) {
-		return DomEvent.off(e)
+	removeListener(e) {
+		return this.off(e)
 	}
 }
 
-
+let DomEvent._skipEvents = {}
 let DomEvent.eventsKey = '_leaflet_events'
 
 
