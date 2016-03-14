@@ -1,3 +1,5 @@
+//import expect from 'spec/expect.js'
+
 if (!Array.prototype.map) {
 	Array.prototype.map = function (fun) {
 		"use strict";
@@ -40,6 +42,7 @@ expect.Assertion.prototype.nearLatLng = function (expected, delta) {
 		.be.within(expected.lng - delta, expected.lng + delta);
 };
 
+/***
 happen.at = function (what, x, y, props) {
 	this.once(document.elementFromPoint(x, y), L.Util.extend({
 		type: what,
@@ -74,6 +77,7 @@ happen.drag = function (fromX, fromY, toX, toY, then, duration) {
 		if (then) { then(); }
 	}, duration || 100);
 };
+***/
 
 // We'll want to skip a couple of things when in PhantomJS :-/
 //it.skipInPhantom = L.Browser.any3d ? it : it.skip;

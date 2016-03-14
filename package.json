@@ -5,8 +5,8 @@
   "devDependencies": {
     "babel": "^6.5.1",
     "babel-cli": "^6.5.1",
-		"babel-plugin-transform-es2015-modules-systemjs": "^6.5.0",
-		"babel-preset-es2015-native-modules": "^6.5.0",
+    "babel-plugin-transform-es2015-modules-systemjs": "^6.5.0",
+    "babel-preset-es2015-native-modules": "^6.5.0",
     "eslint": "^2.2.0",
     "eslint-config-mourner": "^2.0.0",
     "expect.js": "^0.3.1",
@@ -19,24 +19,32 @@
     "karma": "~0.13.9",
     "karma-chrome-launcher": "^0.2.0",
     "karma-coverage": "~0.5.1",
+    "karma-expect": "~1.1.2",
     "karma-firefox-launcher": "~0.1.6",
     "karma-mocha": "~0.2.0",
     "karma-phantomjs-launcher": "^0.2.0",
     "karma-safari-launcher": "~0.1.1",
+    "karma-sinon": "~1.0.4",
     "karma-spec-reporter": "0.0.18",
-		"systemjs": "^0.19.23",
+    "karma-systemjs": "~0.12.0",
     "magic-string": "^0.7.0",
     "mocha": "~2.3.0",
     "phantomjs": "^1.9.18",
+		"sinon": "^1.17.3",
+    "systemjs": "^0.19.23",
     "uglify-js": "~2.4.23"
   },
   "dependencies": {
     "express": "^4.12.2"
   },
-	"babel": {
-		"presets": ["es2015-native-modules"],
-		"plugins": ["transform-es2015-modules-systemjs"]
-	},
+  "babel": {
+    "presets": [
+      "es2015-native-modules"
+    ],
+    "plugins": [
+      "transform-es2015-modules-systemjs"
+    ]
+  },
   "main": "dist/leaflet-src.js",
   "style": "dist/leaflet.css",
   "scripts": {

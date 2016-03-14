@@ -1,52 +1,10 @@
-//import { Point } from '../../../src/geometry/Point';
-//import { Bounds } from '../../../src/geometry/Bounds';
-//import { LineUtil } from '../../../src/geometry/LineUtil';
 "use strict";
 
-describe("LineUtil", function ()
-  {
+import {Point} from 'src/geometry/Point';
+import {Bounds} from 'src/geometry/Bounds';
+import {LineUtil} from 'src/geometry/LineUtil';
 
-		let Point, Bounds, LineUtil = null;
-
-    before(function(done) {
-        System
-            .import('src/geometry/Point')
-            .then(function(t) {
-                Point = t.Point; //when exporting a default class , key is 'default'
-                //done();
-            })
-            .catch(function(e) {
-                console.log('>>> error loading class', e);
-                done();
-            });
-        System
-            .import('src/geometry/Bounds')
-            .then(function(t) {
-                Bounds = t.Bounds; //when exporting a default class , key is 'default'
-                //done();
-            })
-            .catch(function(e) {
-                console.log('>>> error loading class', e);
-                done();
-            });
-        System
-            .import('src/geometry/LineUtil')
-            .then(function(t) {
-                LineUtil = t.LineUtil; //when exporting a default class , key is 'default'
-                done();
-            })
-            .catch(function(e) {
-                console.log('>>> error loading class', e);
-                done();
-            });
-    });
-
-
-    after(function() {
-        Point = null;
-				Bounds = null;
-				LineUtil = null;
-    });
+describe("LineUtil", function () {
 
 	describe('#clipSegment', function () {
 

@@ -1,177 +1,181 @@
+"use strict"
+
+import {Util} from 'src/core/Util'
+
 /*
  * L.DomUtil contains various utility functions for working with DOM.
  */
 
-L.DomUtil = {
-	get: function (id) {
-		return typeof id === 'string' ? document.getElementById(id) : id;
-	},
+export class DomUtil {
 
-	getStyle: function (el, style) {
+	static getById(id) {
+		return typeof id === 'string' ? document.getElementById(id) : id
+	}
 
-		var value = el.style[style] || (el.currentStyle && el.currentStyle[style]);
+	static getStyle(el, style) {
+
+		let value = el.style[style] || (el.currentStyle && el.currentStyle[style])
 
 		if ((!value || value === 'auto') && document.defaultView) {
-			var css = document.defaultView.getComputedStyle(el, null);
-			value = css ? css[style] : null;
+			let css = document.defaultView.getComputedStyle(el, null)
+			value = css ? css[style] : null
 		}
 
-		return value === 'auto' ? null : value;
-	},
+		return value === 'auto' ? null : value
+	}
 
-	create: function (tagName, className, container) {
+	static create(tagName, className, container) {
 
-		var el = document.createElement(tagName);
-		el.className = className;
+		let el = document.createElement(tagName)
+		el.className = className
 
 		if (container) {
-			container.appendChild(el);
+			container.appendChild(el)
 		}
 
-		return el;
-	},
+		return el
+	}
 
-	remove: function (el) {
+	static remove(el) {
 		var parent = el.parentNode;
 		if (parent) {
 			parent.removeChild(el);
 		}
-	},
+	}
 
-	empty: function (el) {
+	static empty(el) {
 		while (el.firstChild) {
 			el.removeChild(el.firstChild);
 		}
-	},
+	}
 
-	toFront: function (el) {
+	static toFront(el) {
 		el.parentNode.appendChild(el);
-	},
+	}
 
-	toBack: function (el) {
+	static toBack(el) {
 		var parent = el.parentNode;
 		parent.insertBefore(el, parent.firstChild);
-	},
+	}
 
-	hasClass: function (el, name) {
+	static hasClass(el, name) {
 		if (el.classList !== undefined) {
 			return el.classList.contains(name);
 		}
-		var className = L.DomUtil.getClass(el);
+		let className = DomUtil.getClass(el);
 		return className.length > 0 && new RegExp('(^|\\s)' + name + '(\\s|$)').test(className);
-	},
+	}
 
-	addClass: function (el, name) {
+	static addClass(el, name) {
 		if (el.classList !== undefined) {
-			var classes = L.Util.splitWords(name);
+			let classes = Util.splitWords(name);
 			for (var i = 0, len = classes.length; i < len; i++) {
 				el.classList.add(classes[i]);
 			}
-		} else if (!L.DomUtil.hasClass(el, name)) {
-			var className = L.DomUtil.getClass(el);
-			L.DomUtil.setClass(el, (className ? className + ' ' : '') + name);
+		} else if (!DomUtil.hasClass(el, name)) {
+			let className = DomUtil.getClass(el);
+			DomUtil.setClass(el, (className ? className + ' ' : '') + name)
 		}
-	},
+	}
 
-	removeClass: function (el, name) {
+	static removeClass(el, name) {
 		if (el.classList !== undefined) {
 			el.classList.remove(name);
 		} else {
-			L.DomUtil.setClass(el, L.Util.trim((' ' + L.DomUtil.getClass(el) + ' ').replace(' ' + name + ' ', ' ')));
+			DomUtil.setClass(el, Util.trim((' ' + DomUtil.getClass(el) + ' ').replace(' ' + name + ' ', ' ')));
 		}
-	},
+	}
 
-	setClass: function (el, name) {
+	static setClass(el, name) {
 		if (el.className.baseVal === undefined) {
-			el.className = name;
+			el.className = name
 		} else {
 			// in case of SVG element
-			el.className.baseVal = name;
+			el.className.baseVal = name
 		}
-	},
+	}
 
-	getClass: function (el) {
+	static getClass(el) {
 		return el.className.baseVal === undefined ? el.className : el.className.baseVal;
-	},
+	}
 
-	setOpacity: function (el, value) {
+	static setOpacity(el, value) {
 
 		if ('opacity' in el.style) {
-			el.style.opacity = value;
+			el.style.opacity = value
 
 		} else if ('filter' in el.style) {
-			L.DomUtil._setOpacityIE(el, value);
+			DomUtil._setOpacityIE(el, value)
 		}
-	},
+	}
 
-	_setOpacityIE: function (el, value) {
-		var filter = false,
-		    filterName = 'DXImageTransform.Microsoft.Alpha';
+	static _setOpacityIE(el, value) {
+		let filter = false,
+		    filterName = 'DXImageTransform.Microsoft.Alpha'
 
 		// filters collection throws an error if we try to retrieve a filter that doesn't exist
 		try {
-			filter = el.filters.item(filterName);
+			filter = el.filters.item(filterName)
 		} catch (e) {
 			// don't set opacity to 1 if we haven't already set an opacity,
 			// it isn't needed and breaks transparent pngs.
-			if (value === 1) { return; }
+			if (value === 1) { return }
 		}
 
-		value = Math.round(value * 100);
+		value = Math.round(value * 100)
 
 		if (filter) {
-			filter.Enabled = (value !== 100);
-			filter.Opacity = value;
+			filter.Enabled = (value !== 100)
+			filter.Opacity = value
 		} else {
-			el.style.filter += ' progid:' + filterName + '(opacity=' + value + ')';
+			el.style.filter += ' progid:' + filterName + '(opacity=' + value + ')'
 		}
-	},
+	}
 
-	testProp: function (props) {
+	static testProp(props) {
+		let style = document.documentElement.style;
 
-		var style = document.documentElement.style;
-
-		for (var i = 0; i < props.length; i++) {
+		for (let i = 0; i < props.length; i++) {
 			if (props[i] in style) {
-				return props[i];
+				return props[i]
 			}
 		}
-		return false;
-	},
+		return false
+	}
 
-	setTransform: function (el, offset, scale) {
-		var pos = offset || new L.Point(0, 0);
+	static setTransform(el, offset, scale) {
+		let pos = offset || new Point(0, 0)
 
-		el.style[L.DomUtil.TRANSFORM] =
-			(L.Browser.ie3d ?
+		el.style[DomUtil.TRANSFORM] =
+			(Browser.ie3d ?
 				'translate(' + pos.x + 'px,' + pos.y + 'px)' :
 				'translate3d(' + pos.x + 'px,' + pos.y + 'px,0)') +
 			(scale ? ' scale(' + scale + ')' : '');
-	},
+	}
 
-	setPosition: function (el, point) { // (HTMLElement, Point[, Boolean])
+	static setPosition(el, point) { // (HTMLElement, Point[, Boolean])
 
 		/*eslint-disable */
-		el._leaflet_pos = point;
+		el._leaflet_pos = point
 		/*eslint-enable */
 
-		if (L.Browser.any3d) {
-			L.DomUtil.setTransform(el, point);
+		if (Browser.any3d) {
+			DomUtil.setTransform(el, point)
 		} else {
-			el.style.left = point.x + 'px';
-			el.style.top = point.y + 'px';
+			el.style.left = point.x + 'px'
+			el.style.top = point.y + 'px'
 		}
-	},
+	}
 
-	getPosition: function (el) {
+	static getPosition(el) {
 		// this method is only used for elements previously positioned using setPosition,
 		// so it's safe to cache the position for performance
 
-		return el._leaflet_pos || new L.Point(0, 0);
+		return el._leaflet_pos || new L.Point(0, 0)
 	}
-};
+}
 
-
+/***
 (function () {
 	// prefix style property names
 
@@ -242,3 +246,4 @@ L.DomUtil = {
 		L.DomEvent.off(window, 'keydown', L.DomUtil.restoreOutline, this);
 	};
 })();
+***/

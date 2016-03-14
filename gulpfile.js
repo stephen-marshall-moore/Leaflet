@@ -10,6 +10,13 @@ gulp.task('test', function(done) {
     }, done).start();
 });
 
+gulp.task('start', function(done) {
+    new Server({
+        configFile: __dirname + '/spec/karma.conf.js',
+        singleRun: false
+    }, done).start();
+});
+
 gulp.task('compile:polyfills', function() {
     gulp
         .src([

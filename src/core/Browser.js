@@ -2,59 +2,45 @@
  * L.Browser handles different browser and feature detections for internal Leaflet use.
  */
 
-(function () {
+class BrowserClass {
+	constructor() {
+		let ua = navigator.userAgent.toLowerCase()
+	  let doc = document.documentElement
 
-	var ua = navigator.userAgent.toLowerCase(),
-	    doc = document.documentElement,
+		this.ie			= 'ActiveXObject' in window
+		this.ielt9	= this.ie && !document.addEventListener
+		this.edge		= 'msLaunchUri' in navigator && !('documentMode' in document)
 
-	    ie = 'ActiveXObject' in window,
+		this.webkit			= ua.indexOf('webkit') !== -1
+	  this.gecko			= ua.indexOf('gecko') !== -1  && !this.webkit && !window.opera && !this.ie
+		this.android		= ua.indexOf('android') !== -1
+		this.android23	= ua.search('android [23]') !== -1
+	  this.chrome			= ua.indexOf('chrome') !== -1
+		this.safari			= !chrome && ua.indexOf('safari') !== -1
+	  this.phantomjs	= ua.indexOf('phantom') !== -1
 
-	    webkit    = ua.indexOf('webkit') !== -1,
-	    phantomjs = ua.indexOf('phantom') !== -1,
-	    android23 = ua.search('android [23]') !== -1,
-	    chrome    = ua.indexOf('chrome') !== -1,
-	    gecko     = ua.indexOf('gecko') !== -1  && !webkit && !window.opera && !ie,
+		this.ie3d			= this.ie && ('transition' in doc.style)
+		this.webkit3d	= ('WebKitCSSMatrix' in window) && ('m11' in new window.WebKitCSSMatrix()) && !this.android23
+		this.gecko3d	= 'MozPerspective' in doc.style
+		this.opera12	= 'OTransition' in doc.style
+		this.any3d		= !window.L_DISABLE_3D && (this.ie3d || this.webkit3d || this.gecko3d) && !this.opera12 && !this.phantomjs
 
-	    mobile = typeof orientation !== 'undefined' || ua.indexOf('mobile') !== -1,
-	    msPointer = !window.PointerEvent && window.MSPointerEvent,
-	    pointer = (window.PointerEvent && navigator.pointerEnabled) || msPointer,
+		this.mobile					= typeof orientation !== 'undefined' || ua.indexOf('mobile') !== -1
+		this.mobileWebkit		= this.mobile && this.webkit
+		this.mobileWebkit3d	= this.mobile && this.webkit3d
+		this.mobileOpera		= this.mobile && window.opera
+		this.mobileGecko		= this.mobile && this.gecko
 
-	    ie3d = ie && ('transition' in doc.style),
-	    webkit3d = ('WebKitCSSMatrix' in window) && ('m11' in new window.WebKitCSSMatrix()) && !android23,
-	    gecko3d = 'MozPerspective' in doc.style,
-	    opera12 = 'OTransition' in doc.style;
+		this.msPointer	= !window.PointerEvent && window.MSPointerEvent
+		this.pointer		= (window.PointerEvent && navigator.pointerEnabled) || this.msPointer
 
-	var touch = !window.L_NO_TOUCH && !phantomjs && (pointer || 'ontouchstart' in window ||
-			(window.DocumentTouch && document instanceof window.DocumentTouch));
+		this.touch			= !window.L_NO_TOUCH && !this.phantomjs && (this.pointer || 'ontouchstart' in window ||
+			(window.DocumentTouch && document instanceof window.DocumentTouch))
 
-	L.Browser = {
-		ie: ie,
-		ielt9: ie && !document.addEventListener,
-		edge: 'msLaunchUri' in navigator && !('documentMode' in document),
-		webkit: webkit,
-		gecko: gecko,
-		android: ua.indexOf('android') !== -1,
-		android23: android23,
-		chrome: chrome,
-		safari: !chrome && ua.indexOf('safari') !== -1,
+		this.retina = (window.devicePixelRatio || (window.screen.deviceXDPI / window.screen.logicalXDPI)) > 1
+	}
+}
 
-		ie3d: ie3d,
-		webkit3d: webkit3d,
-		gecko3d: gecko3d,
-		opera12: opera12,
-		any3d: !window.L_DISABLE_3D && (ie3d || webkit3d || gecko3d) && !opera12 && !phantomjs,
+const Browser = new BrowserClass()
 
-		mobile: mobile,
-		mobileWebkit: mobile && webkit,
-		mobileWebkit3d: mobile && webkit3d,
-		mobileOpera: mobile && window.opera,
-		mobileGecko: mobile && gecko,
-
-		touch: !!touch,
-		msPointer: !!msPointer,
-		pointer: !!pointer,
-
-		retina: (window.devicePixelRatio || (window.screen.deviceXDPI / window.screen.logicalXDPI)) > 1
-	};
-
-}());
+export {Browser}

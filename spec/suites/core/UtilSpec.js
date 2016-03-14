@@ -1,26 +1,7 @@
-//import { Util } from '../../../src/core/Util';
-"use strict";
+"use strict"
+import { Util } from 'src/core/Util'
 
 describe("Projection", function () {
-
-	let Util = null;
-
-  before(function(done) {
-    System
-      .import('src/core/Util')
-      .then(function(t) {
-				Util = t.Util;
-				done();
-      })
-      .catch(function(e) {
-          console.log('>>> error loading class', e);
-          done();
-      });
-  });
-
-  after(function() {
-    Util = null;
-  });
 
 	describe('#bind', function () {
 		it('returns the given function with the given context', function () {
@@ -35,7 +16,7 @@ describe("Projection", function () {
   })
 
 	describe('#bind2', function () {
-    let goo, bar = null;
+    let goo, bar = null
 
 	  let foo = {},
 	      a = {},
@@ -45,18 +26,18 @@ describe("Projection", function () {
     beforeEach( function () {
       goo = {
         fn: function () {
-          bar = 'bogon';
+          bar = 'bogon'
         }
       }
 
-      sinon.spy(goo, 'fn');
+      sinon.spy(goo, 'fn')
 
-		  let fn2 = Util.bind(goo.fn, foo, a, b);
+		  let fn2 = Util.bind(goo.fn, foo, a, b)
 		  fn2(c);
     })
 
 		it('passes additional arguments to the bound function', function () {
-			expect(goo.fn.calledWith(a, b, c)).to.be(true);
+			expect(goo.fn.calledWith(a, b, c)).to.be(true)
 		})
 	})
 
