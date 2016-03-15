@@ -22,6 +22,12 @@ describe('LatLng', function () {
 			}).to.throwError()
 		})
 
+		it('throws an error if invalid lat is not number', function () {
+			expect(function () {
+				let a = new LatLng('ponyfoo', 25)
+			}).to.throwError()
+		})
+
 		it('does not set altitude if undefined', function () {
 			let a = new LatLng(25, 74)
 			expect(typeof a.alt).to.eql('undefined')
