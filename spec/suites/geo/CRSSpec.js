@@ -26,12 +26,12 @@ describe("CRS.EPSG3857", function () {
 	describe("#pointToLatLng", function () {
 		it("reprojects a center point", function () {
 			let crs = new EPSG3857()
-			expect(crs.pointToLatLng(new Point(128, 128), 0).distanceTo(crs,new LatLng(0, 0))).below(0.01)
+			expect(crs.pointToLatLng(new Point(128, 128), 0).distanceTo(new LatLng(0, 0))).below(0.01)
     })
 
 		it("reprojects the northeast corner of the world", function () {
 			let crs = new EPSG3857()
-			expect(crs.pointToLatLng(new Point(256, 0), 0).distanceTo(crs,new LatLng(85.0511287798, 180))).below(0.01)
+			expect(crs.pointToLatLng(new Point(256, 0), 0).distanceTo(new LatLng(85.0511287798, 180))).below(0.01)
 		})
 	})
 
@@ -47,9 +47,9 @@ describe("CRS.EPSG3857", function () {
 	describe("unproject", function () {
 		it('unprojects meter coords into geo coords correctly', function () {
 			let crs = new EPSG3857()
-			expect(crs.unproject(new Point(3339584.7238, 6446275.84102)).distanceTo(crs,new LatLng(50, 30))).below(0.01)
-			expect(crs.unproject(new Point(20037508.34279, 20037508.34278)).distanceTo(crs,new LatLng(85.051129, 180))).below(0.01)
-			expect(crs.unproject(new Point(-20037508.34279, -20037508.34278)).distanceTo(crs,new LatLng(-85.051129, -180))).below(0.01)
+			expect(crs.unproject(new Point(3339584.7238, 6446275.84102)).distanceTo(new LatLng(50, 30))).below(0.01)
+			expect(crs.unproject(new Point(20037508.34279, 20037508.34278)).distanceTo(new LatLng(85.051129, 180))).below(0.01)
+			expect(crs.unproject(new Point(-20037508.34279, -20037508.34278)).distanceTo(new LatLng(-85.051129, -180))).below(0.01)
 		})
 	})
 
@@ -126,12 +126,12 @@ describe("CRS.EPSG3395", function () {
 	describe("#pointToLatLng", function () {
 		it("reprojects a center point", function () {
 			let crs = new EPSG3395()
-			expect(crs.pointToLatLng(new Point(128, 128), 0).distanceTo(crs,new LatLng(0, 0))).below(0.01)
+			expect(crs.pointToLatLng(new Point(128, 128), 0).distanceTo(new LatLng(0, 0))).below(0.01)
 		})
 
 		it("reprojects the northeast corner of the world", function () { // how close should be expected??
 			let crs = new EPSG3395()
-			expect(crs.pointToLatLng(new Point(256, 0), 0).distanceTo(crs,new LatLng(85.0840591556, 180))).below(0.1)
+			expect(crs.pointToLatLng(new Point(256, 0), 0).distanceTo(new LatLng(85.0840591556, 180))).below(0.1)
 		})
 	})
 })
@@ -150,9 +150,9 @@ describe("CRS.Simple", function () {
 	describe("#pointToLatLng", function () {
 		it("converts pixels to LatLng coords", function () {
 			let crs = new Simple()
-			expect(crs.pointToLatLng(new Point(0, 0), 0).distanceTo(crs,new LatLng(0, 0))).below(0.01)
-			expect(crs.pointToLatLng(new Point(300, -700), 0).distanceTo(crs,new LatLng(700, 300))).below(0.01)
-			expect(crs.pointToLatLng(new Point(2000, 400), 1).distanceTo(crs,new LatLng(-200, 1000))).below(0.01)
+			expect(crs.pointToLatLng(new Point(0, 0), 0).distanceTo(new LatLng(0, 0))).below(0.01)
+			expect(crs.pointToLatLng(new Point(300, -700), 0).distanceTo(new LatLng(700, 300))).below(0.1)
+			expect(crs.pointToLatLng(new Point(2000, 400), 1).distanceTo(new LatLng(-200, 1000))).below(0.01)
 		})
 	})
 
@@ -171,7 +171,7 @@ describe("CRS.Simple", function () {
 		it("wraps coords if configured", function () {
 			let crs = new Simple([-200, 200], [-200, 200])
 
-			expect(crs.wrapLatLng(new LatLng(300, -250)).distanceTo(crs,new LatLng(-100, 150))).below(0.01)
+			expect(crs.wrapLatLng(new LatLng(300, -250)).distanceTo(new LatLng(-100, 150))).below(0.1)
 		})
 	})
 })
