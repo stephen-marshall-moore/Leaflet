@@ -14,7 +14,9 @@ import {EPSG3857} from '../geo/crs/CRS.EPSG3857'
  */
 	const _default_map_options = {
 			crs: new EPSG3857(),
-
+			zoom: 5,
+			minZoom: 4,
+			maxZoom: 25,
 			/*
 			center: LatLng,
 			zoom: Number,
@@ -70,7 +72,7 @@ export class Map extends Evented {
 
 	// replaced by animation-powered implementation in Map.PanAnimation.js
 	setView(center, zoom) {
-		zoom = zoom === undefined ? this.zoom() : zoom
+		zoom = zoom === undefined ? this.zoom : zoom
 		this._resetView(LatLng.latLng(center), zoom)
 		return this
 	}
@@ -79,12 +81,14 @@ export class Map extends Evented {
 		return this._zoom
 	}
 
-	set zoom({zoom: zoom, options: options = {}}) {
-		if (!this._loaded) {
-			this._zoom = zoom;
-			return this;
-		}
-		return this.view = {center: this.center, zoom: zoom}
+	//set zoom({zoom: zoom, options: options = {}}) {
+	set zoom(zoom) {
+		//if (!this._loaded) {
+			this._zoom = zoom
+			//return this
+		//}
+		//return this.view = {center: this.center, zoom: zoom}
+		return this.zoom
 	}
 
 	zoomIn(delta, options) {
@@ -181,6 +185,22 @@ export class Map extends Evented {
 		if (this._loaded && this.zoom < this.options.minZoom) {
 			return this._zoom = zoom
 		}
+
+	}
+
+	get maxZoom() {
+		return this.options.maxZoom === undefined ?
+			(this._layersMaxZoom === undefined ? Infinity : this._layersMaxZoom) :
+			this.options.maxZoom
+	}
+
+	set maxZoom(zoom) {
+		this.options.maxZoom = zoom
+
+		if (this._loaded && this.zoom > this.options.maxZoom) {
+			return this._zoom = zoom
+		}
+
 	}
 
 	panInsideBounds(bounds, options) {
@@ -324,8 +344,8 @@ export class Map extends Evented {
 		padding = Point.point(padding || [0, 0])
 
 		let zoom = this.zoom || 0,
-		    min = this.getMinZoom(),
-		    max = this.getMaxZoom(),
+		    min = this.minZoom,
+		    max = this.maxZoom,
 		    nw = bounds.getNorthWest(),
 		    se = bounds.getSouthEast(),
 		    size = this.size,
