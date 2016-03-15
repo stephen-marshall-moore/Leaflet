@@ -63,8 +63,12 @@ describe("Projection", function () {
 	})
 
 	describe('#splitWords', function () {
+		let str = '  foo bar baz  '
 		it('splits words into an array', function () {
-			expect(Util.splitWords('foo bar baz')).to.eql(['foo', 'bar', 'baz']);
+			expect(Util.splitWords(str)).to.eql(['foo', 'bar', 'baz'])
+		})
+		it('using builtin splits words into an array', function () {
+			expect(str.trim().split(' ')).to.eql(['foo', 'bar', 'baz']);
 		})
 	})
 
