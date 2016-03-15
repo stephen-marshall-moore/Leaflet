@@ -2,12 +2,15 @@
  * L.LatLng represents a geographical point with latitude and longitude coordinates.
  */
 
-// import {CRS} from './crs/CRS'
+import {Earth} from './crs/CRS.Earth'
 import {LatLngBounds} from './LatLngBounds'
+
+let earth = new Earth()
 
 export class LatLng {
 
-	constructor(lat, lng, alt) {
+	constructor(lat, lng, alt=undefined, crs=earth) {
+		this.crs = crs
 		if (!(typeof lat === 'number' && Number.isFinite(lat) &&
 					typeof lng === 'number' && Number.isFinite(lng))) {
 			throw new Error('Invalid LatLng object: (' + lat + ', ' + lng + ')')
@@ -37,12 +40,12 @@ export class LatLng {
 		return `LatLng(${this.lat.toPrecision(precision)}, ${this.lng.toPrecision(precision)})`
 	}
 
-	distanceTo(crs, other) {
-		return crs.distance(this, LatLng.latLng(other))
+	distanceTo(other) {
+		return this.crs.distance(this, LatLng.latLng(other))
 	}
 
-	wrap(crs) { // (CoordinateReferenceSystem)
-		return crs.wrapLatLng(this)
+	wrap() { // (CoordinateReferenceSystem)
+		return this.crs.wrapLatLng(this)
 	}
 
 	toBounds(sizeInMeters) {
