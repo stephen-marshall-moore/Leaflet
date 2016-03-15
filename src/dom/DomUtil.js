@@ -1,5 +1,6 @@
 "use strict"
 
+import {Browser} from 'src/core/Browser'
 import {Util} from 'src/core/Util'
 
 /*

@@ -67,6 +67,16 @@ export class Point {
 		return this.clone()._multiplyBy(s);
 	}
 
+	_round() {
+		this.x = Math.round(this.x)
+		this.y = Math.round(this.y)
+		return this
+	}
+
+	round() {
+		return this.clone()._round()
+	}
+
 	_floor() {
 		this.x = Math.floor(this.x);
 		this.y = Math.floor(this.y);
