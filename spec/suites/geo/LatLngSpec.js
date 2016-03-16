@@ -1,7 +1,7 @@
-"use strict";
+"use strict"
 
-import { LatLng } from 'src/geo/LatLng'
-import { Earth } from 'src/geo/crs/CRS.Earth'
+import {LatLng} from 'src/geo/LatLng'
+//import { Earth } from 'src/geo/crs/CRS.Earth'
 
 describe('LatLng', function () {
 
@@ -19,6 +19,12 @@ describe('LatLng', function () {
 		it('throws an error if invalid lat or lng', function () {
 			expect(function () {
 				let a = new LatLng(NaN, NaN)
+			}).to.throwError()
+		})
+
+		it('throws an error if invalid lat is not number', function () {
+			expect(function () {
+				let a = new LatLng('ponyfoo', 25)
 			}).to.throwError()
 		})
 
@@ -65,19 +71,19 @@ describe('LatLng', function () {
 
 	describe('#distanceTo', function () {
 		it('calculates distance in meters', function () {
-    	let crs = new Earth()
+    	//let crs = new Earth()
 			let a = new LatLng(50.5, 30.5)
 			let b = new LatLng(50, 1)
 
-			expect(Math.abs(Math.round(a.distanceTo(crs, b) / 1000) - 2084) < 5).to.eql(true)
+			expect(Math.abs(Math.round(a.distanceTo(b) / 1000) - 2084) < 5).to.eql(true)
 		})
 
 		it('does not return NaN if input points are equal', function () {
-    	let crs = new Earth()
+    	//let crs = new Earth()
 			let a = new LatLng(50.5, 30.5)
 			let b = new LatLng(50.5, 30.5)
 
-			expect(a.distanceTo(crs, b)).to.eql(0)
+			expect(a.distanceTo(b)).to.eql(0)
 		})
 	})
 
