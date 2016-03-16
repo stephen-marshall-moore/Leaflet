@@ -34,9 +34,16 @@ import {EPSG3857} from '../geo/crs/CRS.EPSG3857'
 
 export class Map extends Evented {
 
-	constructor(id, options = _default_map_options) {
+	constructor(id, options = undefined) {
 		super()
-		this.options = options
+		
+		this.options = {}
+		if(options) {
+			Object.assign(this.options, _default_map_options, options)
+		} else {
+			this.options = _default_map_options
+			options = {}
+		}
 
 		this._initContainer(id)
 		this._initLayout()
@@ -46,7 +53,7 @@ export class Map extends Evented {
 
 		this._initEvents()
 
-		if (options.maxBounds) {
+		if (options.maxBounds !== undefined) {
 			this.setMaxBounds(options.maxBounds)
 		}
 

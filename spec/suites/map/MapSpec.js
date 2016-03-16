@@ -19,6 +19,24 @@ describe("Map", function () {
 		map = new Map(container)
 	});
 
+	describe("#constructor, checking options setting", function () {
+		it("tries new without options", function () {
+			let can = document.createElement('div')
+			let map2 = new Map(can)
+			expect(map2.options.minZoom).to.be(4)
+			expect(map2.options.fadeAnimation).to.be(true)
+			expect(map2.options.center).to.be.undefined
+		})
+
+		it("tries new with options", function () {
+			let can = document.createElement('div')
+			let map2 = new Map(can, {minZoom: 7, fadeAnimation: false, center: new LatLng(30,50)})
+			expect(map2.options.minZoom).to.be(7)
+			expect(map2.options.fadeAnimation).to.be(false)
+			expect(map2.options.center).to.eql(new LatLng(30,50))
+		})
+	})
+
 	describe("#remove", function () {
 		it("fires an unload event if loaded", function () {
 			var container = document.createElement('div'),
