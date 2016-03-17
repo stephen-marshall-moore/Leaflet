@@ -62,7 +62,7 @@ export class Map extends Evented {
 		}
 
 		if (options.center && options.zoom !== undefined) {
-			this.setView(LatLng.latLng(options.center), options.zoom, {reset: true})
+			this.view = {center: LatLng.latLng(options.center), zoom: options.zoom, options: {reset: true}}
 		}
 
 		this._handlers = []
@@ -78,14 +78,24 @@ export class Map extends Evented {
 	// public methods that modify map state
 
 	// replaced by animation-powered implementation in Map.PanAnimation.js
-	setView(center, zoom) {
-		zoom = zoom === undefined ? this.zoom : zoom
-		this._resetView(LatLng.latLng(center), zoom)
-		return this
+	set view({center: c, zoom: z}) {
+		this.zoom = z === undefined ? this.zoom : z
+		this.center = LatLng.latLng(c)
+		this._resetView(this.center, this.zoom)
+		return {center: this.center, zoom: this.zoom}
+	}
+
+	get view() {
+		return {center: this.center, zoom: this.zoom}
 	}
 
 	get zoom() {
 		return this._zoom
+	}
+
+	set center(latlng) {
+		this._lastCenter = LatLng.latLng(latlng)
+		return this._lastCenter
 	}
 
 	//set zoom({zoom: zoom, options: options = {}}) {
@@ -116,7 +126,7 @@ export class Map extends Evented {
 		    centerOffset = containerPoint.subtract(viewHalf).multiplyBy(1 - 1 / scale),
 		    newCenter = this.containerPointToLatLng(viewHalf.add(centerOffset))
 
-		return this.setView(newCenter, zoom, {zoom: options})
+		return this.view = { center: newCenter, zoom: zoom, options: {zoom: options}}
 	}
 
 	_getBoundsCenterZoom(bounds, options = {}) {
@@ -141,7 +151,7 @@ export class Map extends Evented {
 
 	fitBounds(bounds, options) {
 		let target = this._getBoundsCenterZoom(bounds, options)
-		return this.setView(target.center, target.zoom, options)
+		return this.view = {center: target.center, zoom: target.zoom, options: options}
 	}
 
 	fitWorld(options) {
@@ -149,7 +159,7 @@ export class Map extends Evented {
 	}
 
 	panTo(center, options) { // (LatLng)
-		return this.setView(center, this._zoom, {pan: options})
+		return this.view = {center:center, zoom: this._zoom, options: {pan: options} }
 	}
 
 	panBy(offset) { // (Point)

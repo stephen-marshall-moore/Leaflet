@@ -16,8 +16,8 @@ describe("Map", function () {
 	beforeEach(function () {
 		crs = new EPSG3857()
 		container = document.createElement('div')
-		map = new Map(container)
-	});
+		map = new Map(container, {center: new LatLng(30,50), zoom: 5})
+	})
 
 	describe("#constructor, checking options setting", function () {
 		it("tries new without options", function () {
