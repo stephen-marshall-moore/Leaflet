@@ -24,6 +24,8 @@ module.exports = function (config) {
 		{pattern: "src/geo/crs/*.js", served: true, included: false, watched: true},
 		{pattern: "src/geo/projection/*.js", served: true, included: false, watched: true},
 		{pattern: "src/map/Map.js", served: true, included: false, watched: true},
+		{pattern: "src/layer/*.js", served: true, included: false, watched: true},
+		{pattern: "src/layer/tile/*.js", served: true, included: false, watched: true},
 		// specs
 		"spec/suites/core/*Spec.js",
 		"spec/suites/dom/*Spec.js",

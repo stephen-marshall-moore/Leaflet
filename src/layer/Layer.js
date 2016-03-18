@@ -1,10 +1,10 @@
-import {Evented} from '../../core/Events'
-import {Util} from '../../core/Util'
+import {Evented} from '../core/Events'
+import {Util} from '../core/Util'
 
 export class Layer extends Evented {
 
-
 	constructor() {
+		super()
 		this.options = {
 			pane: 'overlayPane',
 			nonBubblingEvents: []  // Array of events that should not be bubbled to DOM parents (like the map)
@@ -63,12 +63,9 @@ export class Layer extends Evented {
 		this.fire('add')
 		map.fire('layeradd', {layer: this})
 	}
-}
 
-
-L.Map.include({
-	addLayer: function (layer) {
-		var id = L.stamp(layer)
+	addLayer(layer) {
+		var id = Util.stamp(layer)
 		if (this._layers[id]) { return layer }
 		this._layers[id] = layer
 
@@ -81,10 +78,10 @@ L.Map.include({
 		this.whenReady(layer._layerAdd, layer)
 
 		return this
-	},
+	}
 
-	removeLayer: function (layer) {
-		var id = L.stamp(layer)
+	removeLayer(layer) {
+		var id = Util.stamp(layer)
 
 		if (!this._layers[id]) { return this }
 
@@ -110,50 +107,50 @@ L.Map.include({
 		layer._map = layer._mapToAdd = null
 
 		return this
-	},
+	}
 
-	hasLayer: function (layer) {
-		return !!layer && (L.stamp(layer) in this._layers)
-	},
+	hasLayer(layer) {
+		return !!layer && (Util.stamp(layer) in this._layers)
+	}
 
-	eachLayer: function (method, context) {
+	eachLayer(method, context) {
 		for (var i in this._layers) {
 			method.call(context, this._layers[i])
 		}
 		return this
-	},
+	}
 
-	_addLayers: function (layers) {
+	_addLayers(layers) {
 		layers = layers ? (L.Util.isArray(layers) ? layers : [layers]) : []
 
 		for (var i = 0, len = layers.length; i < len; i++) {
 			this.addLayer(layers[i])
 		}
-	},
+	}
 
-	_addZoomLimit: function (layer) {
+	_addZoomLimit(layer) {
 		if (isNaN(layer.options.maxZoom) || !isNaN(layer.options.minZoom)) {
-			this._zoomBoundLayers[L.stamp(layer)] = layer
+			this._zoomBoundLayers[Util.stamp(layer)] = layer
 			this._updateZoomLevels()
 		}
-	},
+	}
 
-	_removeZoomLimit: function (layer) {
-		var id = L.stamp(layer)
+	_removeZoomLimit(layer) {
+		var id = Util.stamp(layer)
 
 		if (this._zoomBoundLayers[id]) {
 			delete this._zoomBoundLayers[id]
 			this._updateZoomLevels()
 		}
-	},
+	}
 
-	_updateZoomLevels: function () {
-		var minZoom = Infinity,
+	_updateZoomLevels() {
+		let minZoom = Infinity,
 		    maxZoom = -Infinity,
 		    oldZoomSpan = this._getZoomSpan()
 
-		for (var i in this._zoomBoundLayers) {
-			var options = this._zoomBoundLayers[i].options
+		for (let i in this._zoomBoundLayers) {
+			let options = this._zoomBoundLayers[i].options
 
 			minZoom = options.minZoom === undefined ? minZoom : Math.min(minZoom, options.minZoom)
 			maxZoom = options.maxZoom === undefined ? maxZoom : Math.max(maxZoom, options.maxZoom)
@@ -166,4 +163,5 @@ L.Map.include({
 			this.fire('zoomlevelschange')
 		}
 	}
-})
+}
+

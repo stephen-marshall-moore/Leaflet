@@ -1,10 +1,11 @@
+import {DomUtil} from '../../dom/DomUtil'
+import {Layer} from '../Layer'
+
 /*
  * L.Marker is used to display clickable/draggable icons on the map.
  */
 
-L.Marker = L.Layer.extend({
-
-	options: {
+let _default_marker_options = {
 		pane: 'markerPane',
 		nonBubblingEvents: ['click', 'dblclick', 'mouseover', 'mouseout', 'contextmenu'],
 
@@ -18,248 +19,256 @@ L.Marker = L.Layer.extend({
 		opacity: 1,
 		// riseOnHover: false,
 		riseOffset: 250
-	},
+	}
 
-	initialize: function (latlng, options) {
-		L.setOptions(this, options);
-		this._latlng = L.latLng(latlng);
-	},
+export class Marker extends Layer {
 
-	onAdd: function (map) {
-		this._zoomAnimated = this._zoomAnimated && map.options.markerZoomAnimation;
+	constructor(latlng, options = undefined) {
+		super()
+		
+		this._latlng = LatLng.latLng(latlng) 
 
-		this._initIcon();
-		this.update();
-	},
+		this.options = {}
+		if(options) {
+			Object.assign(this.options, _default_tile_options, options)
+		} else {
+			this.options = _default_tile_options
+			options = {}
+		}
+	}
 
-	onRemove: function () {
+	onAdd(map) {
+		this._zoomAnimated = this._zoomAnimated && map.options.markerZoomAnimation
+
+		this._initIcon()
+		this.update()
+	}
+
+	onRemove() {
 		if (this.dragging && this.dragging.enabled()) {
-			this.options.draggable = true;
-			this.dragging.removeHooks();
+			this.options.draggable = true
+			this.dragging.removeHooks()
 		}
 
-		this._removeIcon();
-		this._removeShadow();
-	},
+		this._removeIcon()
+		this._removeShadow()
+	}	
 
-	getEvents: function () {
+	getEvents() {
 		var events = {
 			zoom: this.update,
 			viewreset: this.update
-		};
-
-		if (this._zoomAnimated) {
-			events.zoomanim = this._animateZoom;
 		}
 
-		return events;
-	},
+		if (this._zoomAnimated) {
+			events.zoomanim = this._animateZoom
+		}
 
-	getLatLng: function () {
-		return this._latlng;
-	},
+		return events
+	}
+	
 
-	setLatLng: function (latlng) {
-		var oldLatLng = this._latlng;
-		this._latlng = L.latLng(latlng);
-		this.update();
-		return this.fire('move', {oldLatLng: oldLatLng, latlng: this._latlng});
-	},
+	getLatLng() {
+		return this._latlng
+	}
+	
+	setLatLng(latlng) {
+		var oldLatLng = this._latlng
+		this._latlng = L.latLng(latlng)
+		this.update()
+		return this.fire('move', {oldLatLng: oldLatLng, latlng: this._latlng})
+	}
+	
+	setZIndexOffset(offset) {
+		this.options.zIndexOffset = offset
+		return this.update()
+	}
 
-	setZIndexOffset: function (offset) {
-		this.options.zIndexOffset = offset;
-		return this.update();
-	},
-
-	setIcon: function (icon) {
-
-		this.options.icon = icon;
+	setIcon(icon) {
+		this.options.icon = icon
 
 		if (this._map) {
-			this._initIcon();
-			this.update();
+			this._initIcon()
+			this.update()
 		}
 
 		if (this._popup) {
-			this.bindPopup(this._popup, this._popup.options);
+			this.bindPopup(this._popup, this._popup.options)
 		}
 
-		return this;
-	},
+		return this
+	}
+	
 
-	getElement: function () {
-		return this._icon;
-	},
+	getElement() {
+		return this._icon
+	}
 
-	update: function () {
-
+	update() {
 		if (this._icon) {
-			var pos = this._map.latLngToLayerPoint(this._latlng).round();
-			this._setPos(pos);
+			var pos = this._map.latLngToLayerPoint(this._latlng).round()
+			this._setPos(pos)
 		}
 
-		return this;
-	},
-
-	_initIcon: function () {
+		return this
+	}
+	
+	_initIcon() {
 		var options = this.options,
-		    classToAdd = 'leaflet-zoom-' + (this._zoomAnimated ? 'animated' : 'hide');
+		    classToAdd = 'leaflet-zoom-' + (this._zoomAnimated ? 'animated' : 'hide')
 
 		var icon = options.icon.createIcon(this._icon),
-		    addIcon = false;
+		    addIcon = false
 
 		// if we're not reusing the icon, remove the old one and init new one
 		if (icon !== this._icon) {
 			if (this._icon) {
-				this._removeIcon();
+				this._removeIcon()
 			}
-			addIcon = true;
+			addIcon = true
 
 			if (options.title) {
-				icon.title = options.title;
+				icon.title = options.title
 			}
 			if (options.alt) {
-				icon.alt = options.alt;
+				icon.alt = options.alt
 			}
 		}
 
-		L.DomUtil.addClass(icon, classToAdd);
+		DomUtil.addClass(icon, classToAdd)
 
 		if (options.keyboard) {
-			icon.tabIndex = '0';
+			icon.tabIndex = '0'
 		}
 
-		this._icon = icon;
+		this._icon = icon
 
 		if (options.riseOnHover) {
 			this.on({
 				mouseover: this._bringToFront,
 				mouseout: this._resetZIndex
-			});
+			})
 		}
 
 		var newShadow = options.icon.createShadow(this._shadow),
-		    addShadow = false;
+		    addShadow = false
 
 		if (newShadow !== this._shadow) {
-			this._removeShadow();
-			addShadow = true;
+			this._removeShadow()
+			addShadow = true
 		}
 
 		if (newShadow) {
-			L.DomUtil.addClass(newShadow, classToAdd);
+			DomUtil.addClass(newShadow, classToAdd)
 		}
-		this._shadow = newShadow;
+		this._shadow = newShadow
 
 
 		if (options.opacity < 1) {
-			this._updateOpacity();
+			this._updateOpacity()
 		}
 
 
 		if (addIcon) {
-			this.getPane().appendChild(this._icon);
+			this.getPane().appendChild(this._icon)
 		}
-		this._initInteraction();
+		this._initInteraction()
 		if (newShadow && addShadow) {
-			this.getPane('shadowPane').appendChild(this._shadow);
+			this.getPane('shadowPane').appendChild(this._shadow)
 		}
-	},
+	}
 
-	_removeIcon: function () {
+	_removeIcon() {
 		if (this.options.riseOnHover) {
 			this.off({
 				mouseover: this._bringToFront,
 				mouseout: this._resetZIndex
-			});
+			})
 		}
 
-		L.DomUtil.remove(this._icon);
-		this.removeInteractiveTarget(this._icon);
+		DomUtil.remove(this._icon)
+		this.removeInteractiveTarget(this._icon)
 
-		this._icon = null;
-	},
+		this._icon = null
+	}
 
-	_removeShadow: function () {
+	_removeShadow() {
 		if (this._shadow) {
-			L.DomUtil.remove(this._shadow);
+			DomUtil.remove(this._shadow)
 		}
-		this._shadow = null;
-	},
+		this._shadow = null
+	}
 
-	_setPos: function (pos) {
-		L.DomUtil.setPosition(this._icon, pos);
+	_setPos(pos) {
+		DomUtil.setPosition(this._icon, pos)
 
 		if (this._shadow) {
-			L.DomUtil.setPosition(this._shadow, pos);
+			DomUtil.setPosition(this._shadow, pos)
 		}
 
-		this._zIndex = pos.y + this.options.zIndexOffset;
+		this._zIndex = pos.y + this.options.zIndexOffset
 
-		this._resetZIndex();
-	},
+		this._resetZIndex()
+	}
 
-	_updateZIndex: function (offset) {
-		this._icon.style.zIndex = this._zIndex + offset;
-	},
+	_updateZIndex(offset) {
+		this._icon.style.zIndex = this._zIndex + offset
+	}
 
-	_animateZoom: function (opt) {
-		var pos = this._map._latLngToNewLayerPoint(this._latlng, opt.zoom, opt.center).round();
+	_animateZoom(opt) {
+		var pos = this._map._latLngToNewLayerPoint(this._latlng, opt.zoom, opt.center).round()
 
-		this._setPos(pos);
-	},
+		this._setPos(pos)
+	}
 
-	_initInteraction: function () {
+	_initInteraction() {
 
-		if (!this.options.interactive) { return; }
+		if (!this.options.interactive) { return }
 
-		L.DomUtil.addClass(this._icon, 'leaflet-interactive');
+		DomUtil.addClass(this._icon, 'leaflet-interactive')
 
-		this.addInteractiveTarget(this._icon);
+		this.addInteractiveTarget(this._icon)
 
 		if (L.Handler.MarkerDrag) {
-			var draggable = this.options.draggable;
+			var draggable = this.options.draggable
 			if (this.dragging) {
-				draggable = this.dragging.enabled();
-				this.dragging.disable();
+				draggable = this.dragging.enabled()
+				this.dragging.disable()
 			}
 
-			this.dragging = new L.Handler.MarkerDrag(this);
+			this.dragging = new L.Handler.MarkerDrag(this)
 
 			if (draggable) {
-				this.dragging.enable();
+				this.dragging.enable()
 			}
 		}
-	},
+	}
 
-	setOpacity: function (opacity) {
-		this.options.opacity = opacity;
+	setOpacity(opacity) {
+		this.options.opacity = opacity
 		if (this._map) {
-			this._updateOpacity();
+			this._updateOpacity()
 		}
 
-		return this;
-	},
+		return this
+	}
 
-	_updateOpacity: function () {
-		var opacity = this.options.opacity;
+	_updateOpacity() {
+		var opacity = this.options.opacity
 
-		L.DomUtil.setOpacity(this._icon, opacity);
+		DomUtil.setOpacity(this._icon, opacity)
 
 		if (this._shadow) {
-			L.DomUtil.setOpacity(this._shadow, opacity);
+			DomUtil.setOpacity(this._shadow, opacity)
 		}
-	},
-
-	_bringToFront: function () {
-		this._updateZIndex(this.options.riseOffset);
-	},
-
-	_resetZIndex: function () {
-		this._updateZIndex(0);
 	}
-});
 
-L.marker = function (latlng, options) {
-	return new L.Marker(latlng, options);
-};
+	_bringToFront() {
+		this._updateZIndex(this.options.riseOffset)
+	}
+
+	_resetZIndex() {
+		this._updateZIndex(0)
+	}
+})
+

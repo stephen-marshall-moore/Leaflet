@@ -1,5 +1,3 @@
-"use strict"
-
 import {Evented} from '../core/Events'
 import {Browser} from '../core/Browser'
 import {Util} from '../core/Util'
@@ -77,7 +75,7 @@ export class Map extends Evented {
 
 		//this.callInitHooks()
 
-		//this._addLayers(this.options.layers)
+		this._addLayers(this.options.layers)
 	}
 
 	// public methods that modify map state
@@ -331,7 +329,7 @@ export class Map extends Evented {
 
 	createPane(name, container) {
 		let className = 'leaflet-pane' + (name ? ' leaflet-' + name.replace('Pane', '') + '-pane' : ''),
-		    pane = DomUtil.create('div', className, container || this._mapPane)
+		    pane = DomUtil.create('div', className, container)  // || this._mapPane)
 
 		if (name) {
 			this._panes[name] = pane
@@ -407,9 +405,11 @@ export class Map extends Evented {
 		return this.options.crs.getProjectedBounds(zoom === undefined ? this.zoom : zoom)
 	}
 
+	/**
 	getPane(pane) {
 		return typeof pane === 'string' ? this._panes[pane] : pane;
 	}
+	**/
 
 	get panes() {
 		return this._panes
@@ -542,13 +542,15 @@ export class Map extends Evented {
 		let panes = this._panes
 
 		this._mapPane = this.createPane('mapPane', this._container)
-		DomUtil.setPosition(this._mapPane, new Point(0, 0))
+		let mp = this._mapPane
 
-		this.createPane('tilePane')
-		this.createPane('shadowPane')
-		this.createPane('overlayPane')
-		this.createPane('markerPane')
-		this.createPane('popupPane')
+		DomUtil.setPosition(mp, new Point(0, 0))
+
+		this.createPane('tilePane', mp)
+		this.createPane('shadowPane', mp)
+		this.createPane('overlayPane', mp)
+		this.createPane('markerPane', mp)
+		this.createPane('popupPane', mp)
 
 		if (!this.options.markerZoomAnimation) {
 			DomUtil.addClass(panes.markerPane, 'leaflet-zoom-hide')
@@ -882,5 +884,108 @@ export class Map extends Evented {
 
 		return Math.max(min, Math.min(max, zoom))
 	}
+
+	// these methods below --> L.Map.include({ previously in Layer.js 
+
+	addLayer(layer) {
+		let id = Util.stamp(layer)
+		if (this._layers[id]) { return layer }
+		this._layers[id] = layer;
+
+		layer._mapToAdd = this
+
+		if (layer.beforeAdd) {
+			layer.beforeAdd(this)
+		}
+
+		this.whenReady(layer._layerAdd, layer)
+
+		return this
+	}
+
+	removeLayer(layer) {
+		let id = Util.stamp(layer)
+
+		if (!this._layers[id]) { return this; }
+
+		if (this._loaded) {
+			layer.onRemove(this)
+		}
+
+		if (layer.getAttribution && this.attributionControl) {
+			this.attributionControl.removeAttribution(layer.getAttribution())
+		}
+
+		if (layer.getEvents) {
+			this.off(layer.getEvents(), layer);
+		}
+
+		delete this._layers[id]
+
+		if (this._loaded) {
+			this.fire('layerremove', {layer: layer})
+			layer.fire('remove')
+		}
+
+		layer._map = layer._mapToAdd = null
+
+		return this
+	}
+
+	hasLayer(layer) {
+		return !!layer && (Util.stamp(layer) in this._layers)
+	}
+
+	eachLayer(method, context) {
+		for (let i in this._layers) {
+			method.call(context, this._layers[i])
+		}
+		return this
+	}
+
+	_addLayers(layers) {
+		layers = layers ? (Array.isArray(layers) ? layers : [layers]) : []
+
+		for (let i = 0, len = layers.length; i < len; i++) {
+			this.addLayer(layers[i])
+		}
+	}
+
+	_addZoomLimit(layer) {
+		if (Number.isNaN(layer.options.maxZoom) || !Number.isNaN(layer.options.minZoom)) {
+			this._zoomBoundLayers[L.stamp(layer)] = layer
+			this._updateZoomLevels()
+		}
+	}
+
+	_removeZoomLimit(layer) {
+		let id = Util.stamp(layer)
+
+		if (this._zoomBoundLayers[id]) {
+			delete this._zoomBoundLayers[id]
+			this._updateZoomLevels()
+		}
+	}
+
+	_updateZoomLevels() {
+		let minZoom = Infinity,
+		    maxZoom = -Infinity,
+		    oldZoomSpan = this._getZoomSpan()
+
+		for (var i in this._zoomBoundLayers) {
+			var options = this._zoomBoundLayers[i].options
+
+			minZoom = options.minZoom === undefined ? minZoom : Math.min(minZoom, options.minZoom)
+			maxZoom = options.maxZoom === undefined ? maxZoom : Math.max(maxZoom, options.maxZoom)
+		}
+
+		this._layersMaxZoom = maxZoom === -Infinity ? undefined : maxZoom
+		this._layersMinZoom = minZoom === Infinity ? undefined : minZoom
+
+		if (oldZoomSpan !== this._getZoomSpan()) {
+			this.fire('zoomlevelschange')
+		}
+	}
+
 }
 

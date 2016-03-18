@@ -4,6 +4,7 @@ import {Browser} from 'src/core/Browser'
 import {LatLng} from 'src/geo/LatLng'
 import {LatLngBounds} from 'src/geo/LatLngBounds'
 import {Map} from 'src/map/Map'
+import {TileLayer} from 'src/layer/tile/TileLayer'
 // temporary, should fix distance function
 import {EPSG3857} from 'src/geo/crs/CRS.EPSG3857'
 
@@ -260,23 +261,23 @@ describe("Map", function () {
 		})
 	})
 
-	/***
+	//***
 
-	describe("#getMinZoom and #getMaxZoom", function () {
-		describe('#getMinZoom', function () {
+	describe("#get MinZoom and #get MaxZoom", function () {
+		describe('#get MinZoom', function () {
 			it('returns 0 if not set by Map options or TileLayer options', function () {
 				var map = Map(document.createElement('div'));
-				expect(map.getMinZoom()).to.be(0);
+				expect(map.minZoom()).to.be(0);
 			});
 		});
 
 		it("minZoom and maxZoom options overrides any minZoom and maxZoom set on layers", function () {
 
-			var map = Map(document.createElement('div'), {minZoom: 2, maxZoom: 20});
+			let map = Map(document.createElement('div'), {minZoom: 2, maxZoom: 20})
 
-			L.tileLayer("{z}{x}{y}", {minZoom: 4, maxZoom: 10}).addTo(map);
-			L.tileLayer("{z}{x}{y}", {minZoom: 6, maxZoom: 17}).addTo(map);
-			L.tileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 22}).addTo(map);
+			TileLayer("{z}{x}{y}", {minZoom: 4, maxZoom: 10}).addTo(map);
+			TileLayer("{z}{x}{y}", {minZoom: 6, maxZoom: 17}).addTo(map);
+			TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 22}).addTo(map);
 
 			expect(map.getMinZoom()).to.be(2);
 			expect(map.getMaxZoom()).to.be(20);
@@ -295,9 +296,9 @@ describe("Map", function () {
 
 			var map = Map(document.createElement('div'), {minZoom: 2, maxZoom: 20});
 
-			L.tileLayer("{z}{x}{y}", {minZoom: 4, maxZoom: 10}).addTo(map);
-			L.tileLayer("{z}{x}{y}", {minZoom: 6, maxZoom: 17}).addTo(map);
-			L.tileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 22}).addTo(map);
+			TileLayer("{z}{x}{y}", {minZoom: 4, maxZoom: 10}).addTo(map);
+			TileLayer("{z}{x}{y}", {minZoom: 6, maxZoom: 17}).addTo(map);
+			TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 22}).addTo(map);
 
 			expect(map.getMinZoom()).to.be(2);
 			expect(map.getMaxZoom()).to.be(20);
@@ -389,7 +390,7 @@ describe("Map", function () {
 				var spy = sinon.spy();
 				map.on("zoomlevelschange", spy);
 				expect(spy.called).not.to.be.ok();
-				L.tileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map);
+				TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map);
 				expect(spy.called).to.be.ok();
 			});
 		});
@@ -397,10 +398,10 @@ describe("Map", function () {
 		describe("when a new layer with greater zoomlevel coverage than the current layer is added to a map", function () {
 			it("fires a zoomlevelschange event", function () {
 				var spy = sinon.spy();
-				L.tileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map);
+				TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map);
 				map.on("zoomlevelschange", spy);
 				expect(spy.called).not.to.be.ok();
-				L.tileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 15}).addTo(map);
+				TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 15}).addTo(map);
 				expect(spy.called).to.be.ok();
 			});
 		});
@@ -408,12 +409,12 @@ describe("Map", function () {
 		describe("when a new layer with the same or lower zoomlevel coverage as the current layer is added to a map", function () {
 			it("fires no zoomlevelschange event", function () {
 				var spy = sinon.spy();
-				L.tileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map);
+				TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map);
 				map.on("zoomlevelschange", spy);
 				expect(spy.called).not.to.be.ok();
-				L.tileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map);
+				TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map);
 				expect(spy.called).not.to.be.ok();
-				L.tileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 5}).addTo(map);
+				TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 5}).addTo(map);
 				expect(spy.called).not.to.be.ok();
 			});
 		});
@@ -482,7 +483,7 @@ describe("Map", function () {
 		});
 
 		it("supports adding and removing a tile layer without initializing the map", function () {
-			var layer = L.tileLayer("{z}{x}{y}");
+			var layer = TileLayer("{z}{x}{y}");
 			map.addLayer(layer);
 			map.removeLayer(layer);
 		});
@@ -498,7 +499,7 @@ describe("Map", function () {
 			it("fires a zoomlevelschange event", function () {
 				map.whenReady(function () {
 					var spy = sinon.spy();
-					var tl = L.tileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map);
+					var tl = TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map);
 
 					map.on("zoomlevelschange", spy);
 					expect(spy.called).not.to.be.ok();
@@ -512,8 +513,8 @@ describe("Map", function () {
 			it("fires a zoomlevelschange event", function () {
 				map.whenReady(function () {
 					var spy = sinon.spy(),
-					    tl = L.tileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map),
-					    t2 = L.tileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 15}).addTo(map);
+					    tl = TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map),
+					    t2 = TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 15}).addTo(map);
 
 					map.on("zoomlevelschange", spy);
 					expect(spy.called).to.not.be.ok();
@@ -526,9 +527,9 @@ describe("Map", function () {
 		describe("when a tile layer is removed from a map it and it had lesser or the sa,e zoom level coverage as the remainding layer(s)", function () {
 			it("fires no zoomlevelschange event", function () {
 				map.whenReady(function () {
-					var tl = L.tileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map),
-					    t2 = L.tileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map),
-					    t3 = L.tileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 5}).addTo(map);
+					var tl = TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map),
+					    t2 = TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map),
+					    t3 = TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 5}).addTo(map);
 
 					map.on("zoomlevelschange", spy);
 					expect(spy).not.toHaveBeenCalled();
@@ -547,8 +548,8 @@ describe("Map", function () {
 		});
 
 		it("calls the provided function for each layer", function () {
-			var t1 = L.tileLayer("{z}{x}{y}").addTo(map),
-			    t2 = L.tileLayer("{z}{x}{y}").addTo(map),
+			var t1 = TileLayer("{z}{x}{y}").addTo(map),
+			    t2 = TileLayer("{z}{x}{y}").addTo(map),
 			    spy = sinon.spy();
 
 			map.eachLayer(spy);
@@ -559,7 +560,7 @@ describe("Map", function () {
 		});
 
 		it("calls the provided function with the provided context", function () {
-			var t1 = L.tileLayer("{z}{x}{y}").addTo(map),
+			var t1 = TileLayer("{z}{x}{y}").addTo(map),
 			    spy = sinon.spy();
 
 			map.eachLayer(spy, map);
@@ -574,7 +575,7 @@ describe("Map", function () {
 		    clock;
 
 		beforeEach(function () {
-			container = map.getContainer();
+			container = map.container;
 			container.style.width = origWidth + "px";
 			document.body.appendChild(container);
 			map.setView([0, 0], 0);
@@ -676,48 +677,48 @@ describe("Map", function () {
 			    newCenter = new LatLng(10, 11),
 			    newZoom = 12;
 			var callback = function () {
-				expect(map.getCenter()).to.eql(newCenter);
-				expect(map.getZoom()).to.eql(newZoom);
-				spy();
-				expect(spy.calledOnce).to.be.ok();
-				done();
-			};
-			map.setView([0, 0], 0);
-			map.once('zoomend', callback).flyTo(newCenter, newZoom);
-		});
-	});
+				expect(map.center).to.eql(newCenter)
+				expect(map.zoom()).to.eql(newZoom)
+				spy()
+				expect(spy.calledOnce).to.be.ok()
+				done()
+			}
+			map.view = {center: [0, 0], zoom: 0}
+			map.once('zoomend', callback).flyTo(newCenter, newZoom)
+		})
+	})
 
 	describe('#zoomIn and #zoomOut', function () {
-		var center = LatLng.latLng(22, 33);
+		let center = LatLng.latLng(22, 33)
 		beforeEach(function () {
-			map.setView(center, 10);
-		});
+			map.view = {center: center, zoom: 10}
+		})
 
 		it('zoomIn zooms by 1 zoom level by default', function (done) {
 			map.once('zoomend', function () {
-				expect(map.getZoom()).to.eql(11);
-				expect(map.getCenter()).to.eql(center);
-				done();
-			});
-			map.zoomIn(null, {animate: false});
-		});
+				expect(map.zoom).to.eql(11);
+				expect(map.center).to.eql(center)
+				done()
+			})
+			map.zoomIn(null, {animate: false})
+		})
 
 		it('zoomOut zooms by 1 zoom level by default', function (done) {
 			map.once('zoomend', function () {
-				expect(map.getZoom()).to.eql(9);
-				expect(map.getCenter()).to.eql(center);
-				done();
-			});
-			map.zoomOut(null, {animate: false});
-		});
+				expect(map.zoom).to.eql(9)
+				expect(map.center).to.eql(center)
+				done()
+			})
+			map.zoomOut(null, {animate: false})
+		})
 
 		it('zoomIn ignores the zoomDelta option on non-any3d browsers', function (done) {
 			Browser.any3d = false;
 			map.options.zoomSnap = 0.25;
 			map.options.zoomDelta = 0.25;
 			map.once('zoomend', function () {
-				expect(map.getZoom()).to.eql(11);
-				expect(map.getCenter()).to.eql(center);
+				expect(map.zoom).to.eql(11);
+				expect(map.center).to.eql(center);
 				done();
 			});
 			map.zoomIn(null, {animate: false});
@@ -729,8 +730,8 @@ describe("Map", function () {
 			map.options.zoomDelta = 0.25;
 			map.setView(center, 10);
 			map.once('zoomend', function () {
-				expect(map.getZoom()).to.eql(10.25);
-				expect(map.getCenter()).to.eql(center);
+				expect(map.zoom).to.eql(10.25);
+				expect(map.center).to.eql(center);
 				done();
 			});
 			map.zoomIn(null, {animate: false});
@@ -742,8 +743,8 @@ describe("Map", function () {
 			map.options.zoomDelta = 0.25;
 			map.setView(center, 10);
 			map.once('zoomend', function () {
-				expect(map.getZoom()).to.eql(9.75);
-				expect(map.getCenter()).to.eql(center);
+				expect(map.zoom).to.eql(9.75);
+				expect(map.center).to.eql(center);
 				done();
 			});
 			map.zoomOut(null, {animate: false});
@@ -753,8 +754,8 @@ describe("Map", function () {
 			map.options.zoomSnap = 0.25;
 			map.setView(center, 10);
 			map.once('zoomend', function () {
-				expect(map.getZoom()).to.eql(10.25);
-				expect(map.getCenter()).to.eql(center);
+				expect(map.zoom).to.eql(10.25);
+				expect(map.center).to.eql(center);
 				done();
 			});
 			Browser.any3d = true;
@@ -765,8 +766,8 @@ describe("Map", function () {
 			map.options.zoomSnap = 0.25;
 			map.setView(center, 10);
 			map.once('zoomend', function () {
-				expect(map.getZoom()).to.eql(9.75);
-				expect(map.getCenter()).to.eql(center);
+				expect(map.zoom).to.eql(9.75);
+				expect(map.center).to.eql(center);
 				done();
 			});
 			Browser.any3d = true;
@@ -777,24 +778,24 @@ describe("Map", function () {
 	describe('#fitBounds', function () {
 		var center = LatLng.latLng(22, 33),
 		    bounds = LatLngBounds.latLngBounds(LatLng.latLng(1, 102), LatLng.latLng(11, 122)),
-		    boundsCenter = bounds.getCenter();
+		    boundsCenter = bounds.center
 
 		beforeEach(function () {
 			// fitBounds needs a map container with non-null area
-			var container = map.getContainer();
+			var container = map.container;
 			container.style.width = container.style.height = "100px";
 			document.body.appendChild(container);
 			map.setView(center, 10);
 		});
 
 		afterEach(function () {
-			document.body.removeChild(map.getContainer());
+			document.body.removeChild(map.container);
 		});
 
 		it('Snaps zoom level to integer by default', function (done) {
 			map.once('zoomend', function () {
-				expect(map.getZoom()).to.eql(2);
-				expect(map.getCenter().equals(boundsCenter, 0.05)).to.eql(true);
+				expect(map.zoom).to.eql(2);
+				expect(map.center.equals(boundsCenter, 0.05)).to.eql(true);
 				done();
 			});
 			map.fitBounds(bounds, {animate: false});
@@ -804,8 +805,8 @@ describe("Map", function () {
 			map.options.zoomSnap = 0.25;
 			Browser.any3d = true;
 			map.once('zoomend', function () {
-				expect(map.getZoom()).to.eql(2.75);
-				expect(map.getCenter().equals(boundsCenter, 0.05)).to.eql(true);
+				expect(map.zoom).to.eql(2.75);
+				expect(map.center.equals(boundsCenter, 0.05)).to.eql(true);
 				done();
 			});
 			map.fitBounds(bounds, {animate: false});
@@ -815,8 +816,8 @@ describe("Map", function () {
 			map.options.zoomSnap = 0.25;
 			Browser.any3d = false;
 			map.once('zoomend', function () {
-				expect(map.getZoom()).to.eql(2);
-				expect(map.getCenter().equals(boundsCenter, 0.05)).to.eql(true);
+				expect(map.zoom).to.eql(2);
+				expect(map.center.equals(boundsCenter, 0.05)).to.eql(true);
 				done();
 			});
 			map.fitBounds(bounds, {animate: false});
@@ -828,34 +829,34 @@ describe("Map", function () {
 	describe('#fitBounds after layers set', function () {
 		var center = LatLng.latLng(22, 33),
 		    bounds = LatLngBounds.latLngBounds(LatLng.latLng(1, 102), LatLng.latLng(11, 122)),
-		    boundsCenter = bounds.getCenter();
+		    boundsCenter = bounds.center
 
 		beforeEach(function () {
 			// fitBounds needs a map container with non-null area
-			var container = map.getContainer();
+			var container = map.container;
 			container.style.width = container.style.height = "100px";
 			document.body.appendChild(container);
 		});
 
 		afterEach(function () {
-			document.body.removeChild(map.getContainer());
+			document.body.removeChild(map.container);
 		});
 
 		it('Snaps to a number after adding tile layer', function (done) {
 			Browser.any3d = true;
-			map.addLayer(L.tileLayer('file:///dev/null'));
-			expect(map.getZoom()).to.be(undefined);
+			map.addLayer(TileLayer('file:///dev/null'));
+			expect(map.zoom).to.be(undefined);
 			map.fitBounds(bounds);
-			expect(map.getZoom()).to.be(2);
+			expect(map.zoom).to.be(2);
 			done();
 		});
 
 		it('Snaps to a number after adding marker', function (done) {
 			Browser.any3d = true;
 			map.addLayer(L.marker(center));
-			expect(map.getZoom()).to.be(undefined);
+			expect(map.zoom).to.be(undefined);
 			map.fitBounds(bounds);
-			expect(map.getZoom()).to.be(2);
+			expect(map.zoom).to.be(2);
 			done();
 		});
 
@@ -1017,7 +1018,7 @@ describe("Map", function () {
 
 	});
 
-	***/
+	//***/
 
 
 	describe('#getScaleZoom && #getZoomScale', function () {
@@ -1039,7 +1040,7 @@ describe("Map", function () {
 
 		/** tilelayer not included yet
 		it("returns undefined if map not initialized but layers added", function () {
-			map.addLayer(L.tileLayer('file:///dev/null'));
+			map.addLayer(TileLayer('file:///dev/null'));
 			expect(map.zoom()).to.be(undefined);
 		});
 		**/

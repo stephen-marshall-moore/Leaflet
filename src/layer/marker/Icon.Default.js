@@ -1,33 +1,43 @@
+import {Browser} from '../../core/Browser'
+import {Icon} from './Icon'
 /*
  * L.Icon.Default is the blue marker icon used by default in Leaflet.
  */
 
-L.Icon.Default = L.Icon.extend({
-
-	options: {
+let _default_defaulticon_options = {
 		iconSize:    [25, 41],
 		iconAnchor:  [12, 41],
 		popupAnchor: [1, -34],
 		shadowSize:  [41, 41]
-	},
+	}
 
-	_getIconUrl: function (name) {
-		var key = name + 'Url';
+export class DefaultIcon extends Icon {
+
+	constructor(options)
+		let opts = {}
+		Object.assign(opts, _default_defaulticon_options, options)
+		super(opts)
+	}
+
+	_getIconUrl(name) {
+		let key = name + 'Url';
 
 		if (this.options[key]) {
 			return this.options[key];
 		}
 
-		var path = L.Icon.Default.imagePath;
+		let path = '/images' //DefaultIcon.imagePath
 
 		if (!path) {
-			throw new Error('Couldn\'t autodetect L.Icon.Default.imagePath, set it manually.');
+			throw new Error('Couldn\'t autodetect Icon.Default.imagePath, set it manually.')
 		}
 
-		return path + '/marker-' + name + (L.Browser.retina && name === 'icon' ? '-2x' : '') + '.png';
+		return path + '/marker-' + name + (Browser.retina && name === 'icon' ? '-2x' : '') + '.png'
 	}
-});
+})
 
+/****
+ **** TODO
 L.Icon.Default.imagePath = (function () {
 	var scripts = document.getElementsByTagName('script'),
 	    leafletRe = /[\/^]leaflet[\-\._]?([\w\-\._]*)\.js\??/;
@@ -43,3 +53,4 @@ L.Icon.Default.imagePath = (function () {
 		}
 	}
 }());
+ ****/
