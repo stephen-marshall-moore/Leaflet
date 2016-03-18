@@ -861,8 +861,6 @@ describe("Map", function () {
 
 	});
 
-	***/
-
 	describe('#DOM events', function () {
 
 		var c, map;
@@ -880,7 +878,6 @@ describe("Map", function () {
 			document.body.removeChild(c);
 		});
 
-		/***
 		it("DOM events propagate from polygon to map", function () {
 			var spy = sinon.spy();
 			map.on("mousemove", spy);
@@ -888,7 +885,7 @@ describe("Map", function () {
 			happen.mousemove(layer._path);
 			expect(spy.calledOnce).to.be.ok();
 		});
-		***/
+
 		it("DOM events propagate from marker to map", function () {
 			var spy = sinon.spy();
 			map.on("mousemove", spy);
@@ -1019,6 +1016,9 @@ describe("Map", function () {
 		});
 
 	});
+
+	***/
+
 
 	describe('#getScaleZoom && #getZoomScale', function () {
 		it("convert zoom to scale and viceversa and return the same values", function () {
