@@ -37,15 +37,28 @@ describe("Map", function () {
 		})
 	})
 
+	describe("#setter investigation", function () {
+		it("assigns return from setter", function () {
+			let can = document.createElement('div')
+			let map = new Map(can, {zoom: 7, center: new LatLng(30, 50)})			
+			let x, z
+			z = (x = (map.zoom = 8)) 
+			expect(x).to.eql(8)
+			expect(z).to.eql(8)
+			//conclusion, return values in setters are useless
+		})
+	})
+
 	describe("#remove", function () {
 		it("fires an unload event if loaded", function () {
-			var container = document.createElement('div'),
-			    map = new Map(container).setView([0, 0], 0),
-			    spy = sinon.spy();
-			map.on('unload', spy);
-			map.remove();
-			expect(spy.called).to.be.ok();
-		});
+			let container = document.createElement('div')
+			let map = new Map(container, {zoom: 0, center: new LatLng(0, 0)})
+			let spy = sinon.spy()
+
+			map.on('unload', spy)
+			map.remove()
+			expect(spy.called).to.be.ok()
+		})
 
 		it("fires no unload event if not loaded", function () {
 			var container = document.createElement('div'),
@@ -86,9 +99,11 @@ describe("Map", function () {
 		})
 
 		it("unbinds events", function () {
-			var container = document.createElement('div'),
-			    map = new Map(container).setView([0, 0], 1),
-			    spy = sinon.spy();
+			let container = document.createElement('div'),
+			    map = new Map(container),
+			    spy = sinon.spy()
+
+			map.view = {center: new LatLng(0, 0), zoom: 1}
 
 			map.on('click dblclick mousedown mouseup mousemove', spy);
 			map.remove();
@@ -103,7 +118,9 @@ describe("Map", function () {
 		});
 	});
 
-	describe('#getCenter', function () {
+	describe('#get center', function () {
+			let container = document.createElement('div'),
+			    map = new Map(container)
 		it('throws if not set before', function () {
 			expect(function () {
 				let x = map.center
@@ -112,40 +129,42 @@ describe("Map", function () {
 
 		it('returns a precise center when zoomed in after being set (#426)', function () {
 			let center = LatLng.latLng(10, 10)
-			map.setView(center, 1)
+			map.view = {center: center, zoom: 1}
 			map.zoom = 19
 			expect(map.center).to.eql(center)
 		})
 
 		it('returns correct center after invalidateSize (#1919)', function () {
-			map.setView(LatLng.latLng(10, 10), 1)
+			map.view = {center: new LatLng(10, 10), zoom: 1}
 			map.invalidateSize()
 			expect(map.center).not.to.eql(LatLng.latLng(10, 10))
 		})
 	})
 
 	describe("#whenReady", function () {
+		let container = document.createElement('div'),
+				map = new Map(container)
 		describe("when the map has not yet been loaded", function () {
 			it("calls the callback when the map is loaded", function () {
-				var spy = sinon.spy();
-				map.whenReady(spy);
-				expect(spy.called).to.not.be.ok();
+				let spy = sinon.spy()
+				map.whenReady(spy)
+				expect(spy.called).to.not.be.ok()
 
-				map.setView([0, 0], 1);
-				expect(spy.called).to.be.ok();
-			});
-		});
+				map.view = {center: LatLng.latLng([0,0]), zoom: 1}
+				expect(spy.called).to.be.ok()
+			})
+		})
 
 		describe("when the map has already been loaded", function () {
 			it("calls the callback immediately", function () {
-				var spy = sinon.spy();
-				map.setView([0, 0], 1);
-				map.whenReady(spy);
+				let spy = sinon.spy()
+				map.view = {center: LatLng.latLng([0,0]), zoom: 1}
+				map.whenReady(spy)
 
-				expect(spy.called).to.be.ok();
-			});
-		});
-	});
+				expect(spy.called).to.be.ok()
+			})
+		})
+	})
 
 	describe("#setView", function () {
 		it("check default zoom", function () {
@@ -153,32 +172,37 @@ describe("Map", function () {
 		})
 
 		it("sets the view of the map", function () {
-			expect(map.setView([51.505, -0.09], 13)).to.be(map);
-			expect(map.zoom).to.be(13);
-			expect(map.center.distanceTo(crs, [51.505, -0.09])).to.be.lessThan(5);
+			let c = LatLng.latLng([51.505, -0.09])
+			let v = {center:c, zoom: 13}
+			map.view = v
+			expect(map.view).to.be.eql(v)
+			expect(map.center).to.be.eql(c)
+			expect(map.zoom).to.be(13)
+			expect(map.center.distanceTo([51.505, -0.09])).to.be.lessThan(5)
 		});
 
 		it("can be passed without a zoom specified", function () {
-			expect(map.setView([51.605, -0.11])).to.be(map);
+			map.view = {center:[51.605, -0.11]}
 			map.zoom = 13
-			expect(map.zoom).to.be(13);
-			expect(map.center.distanceTo(crs,[51.605, -0.11])).to.be.lessThan(5);
-		});
+			expect(map.zoom).to.be(13)
+			expect(map.center.distanceTo([51.605, -0.11])).to.be.lessThan(5)
+		})
 
 		it("limits initial zoom when no zoom specified", function () {
 			map.options.maxZoom = 20
 			map.zoom = 100
-			expect(map.setView([51.605, -0.11])).to.be(map);
-			expect(map.zoom).to.be(20);
-			expect(map.center.distanceTo(crs,[51.605, -0.11])).to.be.lessThan(5);
-		});
+			map.view = {center:[51.605, -0.11]}
+			expect(map.zoom).to.be(20)
+			expect(map.center.distanceTo([51.605, -0.11])).to.be.lessThan(5)
+		})
 
 		it("defaults to zoom passed as map option", function () {
-			map = new Map(document.createElement('div'), {zoom: 13});
-			expect(map.setView([51.605, -0.11])).to.be(map);
-			expect(map.zoom).to.be(13);
-		});
+			map = new Map(document.createElement('div'), {zoom: 13})
+			map.view = {center:[51.605, -0.11]}
+			expect(map.zoom).to.be(13)
+		})
 
+		/*** not up to animate yet
 		it("passes duration option to panBy", function () {
 			map = Map(document.createElement('div'), {zoom: 13, center: [0, 0]});
 			map.panBy = sinon.spy();
@@ -186,56 +210,55 @@ describe("Map", function () {
 			expect(map.panBy.callCount).to.eql(1);
 			expect(map.panBy.args[0][1].duration).to.eql(13);
 		});
-	});
+		***/
+	})
 
-	describe("#getBounds", function () {
+	describe("#get bounds", function () {
 		it("is safe to call from within a moveend callback during initial load (#1027)", function () {
-			map.on("moveend", function () {
-				let x = map.bounds
-			})
+			map.on("moveend", function () {let x = map.bounds})
+			map.view = {center:LatLng.latLng([51.505, -0.09]), zoom: 13}
+		})
+	})
 
-			map.setView([51.505, -0.09], 13)
-		});
-	});
-
-	describe('#setMaxBounds', function () {
+	describe('#set maxBounds', function () {
 		it("aligns pixel-wise map view center with maxBounds center if it cannot move view bounds inside maxBounds (#1908)", function () {
-			var container = map.getContainer();
+			let container = map.container
 			// large view, cannot fit within maxBounds
-			container.style.width = container.style.height = "1000px";
-			document.body.appendChild(container);
+			container.style.width = container.style.height = "1000px"
+			document.body.appendChild(container)
 			// maxBounds
-			var bounds = LatLngBounds.latLngBounds([51.5, -0.05], [51.55, 0.05]);
-			map.setMaxBounds(bounds, {animate: false});
+			let bounds = LatLngBounds.latLngBounds([51.5, -0.05], [51.55, 0.05])
+			map.maxBounds = bounds // options???, {animate: false});
 			// set view outside
-			map.setView(LatLng.latLng([53.0, 0.15]), 12, {animate: false});
+			map.view = {center: LatLng.latLng([53.0, 0.15]), zoom: 12, options: {animate: false}} 
 			// get center of bounds in pixels
-			var boundsCenter = map.project(bounds.getCenter()).round();
-			expect(map.project(map.getCenter()).round()).to.eql(boundsCenter);
-			document.body.removeChild(container);
-		});
+			let boundsCenter = map.project(bounds.center).round()
+			expect(map.project(map.center).round()).to.eql(boundsCenter)
+			document.body.removeChild(container)
+		})
+
 		it("moves map view within maxBounds by changing one coordinate", function () {
-			var container = map.getContainer();
+			let container = map.container
 			// small view, can fit within maxBounds
-			container.style.width = container.style.height = "200px";
-			document.body.appendChild(container);
+			container.style.width = container.style.height = "200px"
+			document.body.appendChild(container)
 			// maxBounds
-			var bounds = LatLngBounds.latLngBounds([51, -0.2], [52, 0.2]);
-			map.setMaxBounds(bounds, {animate: false});
+			let bounds = new LatLngBounds([LatLng.latLng([51, -0.2]), LatLng.latLng([52, 0.2])])
+			map.maxBounds = bounds // options????, {animate: false});
 			// set view outside maxBounds on one direction only
 			// leaves untouched the other coordinate (that is not already centered)
-			var initCenter = [53.0, 0.1];
-			map.setView(LatLng.latLng(initCenter), 16, {animate: false});
+			let initCenter = [53.0, 0.1]
+			map.view = {center: LatLng.latLng(initCenter), zoom: 16, options: {animate: false}}
 			// one pixel coordinate hasn't changed, the other has
-			var pixelCenter = map.project(map.getCenter()).round();
-			var pixelInit = map.project(initCenter).round();
-			expect(pixelCenter.x).to.eql(pixelInit.x);
-			expect(pixelCenter.y).not.to.eql(pixelInit.y);
+			var pixelCenter = map.project(map.center).round()
+			var pixelInit = map.project(initCenter).round()
+			expect(pixelCenter.x).to.eql(pixelInit.x)
+			expect(pixelCenter.y).not.to.eql(pixelInit.y)
 			// the view is inside the bounds
-			expect(bounds.contains(map.getBounds())).to.be(true);
-			document.body.removeChild(container);
-		});
-	});
+			expect(bounds.contains(map.bounds)).to.be(true)
+			document.body.removeChild(container)
+		})
+	})
 
 	/***
 
@@ -1006,14 +1029,19 @@ describe("Map", function () {
 		});
 	});
 
-	describe('#getZoom', function () {
+	describe('#get zoom', function () {
+		let can = document.createElement('div')
+		let map = new Map(can)
+
 		it("returns undefined if map not initialized", function () {
-			expect(map.getZoom()).to.be(undefined);
+			expect(map.zoom).to.be(undefined);
 		});
 
+		/** tilelayer not included yet
 		it("returns undefined if map not initialized but layers added", function () {
 			map.addLayer(L.tileLayer('file:///dev/null'));
-			expect(map.getZoom()).to.be(undefined);
+			expect(map.zoom()).to.be(undefined);
 		});
-	});
-});
+		**/
+	})
+})

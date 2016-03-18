@@ -6,7 +6,9 @@ import {Util} from '../core/Util'
 import {DomUtil} from '../dom/DomUtil'
 import {DomEvent} from '../dom/DomEvent'
 import {Point} from '../geometry/Point'
+import {Bounds} from '../geometry/Bounds'
 import {LatLng} from '../geo/LatLng'
+import {LatLngBounds} from '../geo/LatLngBounds'
 import {EPSG3857} from '../geo/crs/CRS.EPSG3857'
 
 /*
@@ -53,6 +55,9 @@ export class Map extends Evented {
 
 		this._initEvents()
 
+		//not where this should go
+		//this._loaded = true
+
 		if (options.maxBounds !== undefined) {
 			this.setMaxBounds(options.maxBounds)
 		}
@@ -79,10 +84,10 @@ export class Map extends Evented {
 
 	// replaced by animation-powered implementation in Map.PanAnimation.js
 	set view({center: c, zoom: z}) {
-		this.zoom = z === undefined ? this.zoom : z
-		this.center = LatLng.latLng(c)
-		this._resetView(this.center, this.zoom)
-		return {center: this.center, zoom: this.zoom}
+		this._zoom = z === undefined ? this._zoom : z
+		this._lastCenter = LatLng.latLng(c)
+		this._resetView(this._lastCenter, this._zoom)
+		//return {center: this.center, zoom: this.zoom}
 	}
 
 	get view() {
@@ -95,17 +100,18 @@ export class Map extends Evented {
 
 	set center(latlng) {
 		this._lastCenter = LatLng.latLng(latlng)
-		return this._lastCenter
+		this._resetView(this.center, this.zoom)
 	}
 
 	//set zoom({zoom: zoom, options: options = {}}) {
 	set zoom(zoom) {
 		//if (!this._loaded) {
-			this._zoom = zoom
+		this._zoom = zoom
+		this._resetView(this.center, this.zoom)
 			//return this
 		//}
 		//return this.view = {center: this.center, zoom: zoom}
-		return this.zoom
+		// decided this was useless, return 6
 	}
 
 	zoomIn(delta, options) {
@@ -142,8 +148,8 @@ export class Map extends Evented {
 
 		var paddingOffset = paddingBR.subtract(paddingTL).divideBy(2),
 
-		    swPoint = this.project(bounds.getSouthWest(), zoom),
-		    nePoint = this.project(bounds.getNorthEast(), zoom),
+		    swPoint = this.project(bounds.southWest, zoom),
+		    nePoint = this.project(bounds.northEast, zoom),
 		    center = this.unproject(swPoint.add(nePoint).divideBy(2).add(paddingOffset), zoom)
 
 		return {center: center, zoom: zoom}
@@ -173,7 +179,7 @@ export class Map extends Evented {
 	}
 
 	set maxBounds(bounds) {
-		bounds = LatLng.latLngBounds(bounds)
+		bounds = LatLngBounds.latLngBounds(bounds)
 
 		if (!bounds) {
 			return this.off('moveend', this._panInsideMaxBounds)
@@ -222,8 +228,8 @@ export class Map extends Evented {
 
 	panInsideBounds(bounds, options) {
 		this._enforcingBounds = true
-		let center = this.getCenter(),
-		    newCenter = this._limitCenter(center, this._zoom, L.latLngBounds(bounds))
+		let center = this.center,
+		    newCenter = this._limitCenter(center, this._zoom, LatLngBounds.latLngBounds(bounds))
 
 		if (!center.equals(newCenter)) {
 			this.panTo(newCenter, options)
@@ -353,7 +359,7 @@ export class Map extends Evented {
 		    sw = this.unproject(bounds.getBottomLeft()),
 		    ne = this.unproject(bounds.getTopRight())
 
-		return new LatLng.LatLngBounds(sw, ne)
+		return new Bounds(sw, ne)
 	}
 
 	getBoundsZoom(bounds, inside, padding) { // (LatLngBounds[, Boolean, Point]) -> Number
@@ -363,8 +369,8 @@ export class Map extends Evented {
 		let zoom = this.zoom || 0,
 		    min = this.minZoom,
 		    max = this.maxZoom,
-		    nw = bounds.getNorthWest(),
-		    se = bounds.getSouthEast(),
+		    nw = bounds.northWest,
+		    se = bounds.southEast,
 		    size = this.size,
 		    boundsSize = this.project(se, zoom).subtract(this.project(nw, zoom)).add(padding),
 		    snap = Browser.any3d ? this.options.zoomSnap : 1
@@ -790,8 +796,7 @@ export class Map extends Evented {
 
 	_getTopLeftPoint(center, zoom) {
 		let pixelOrigin = center && zoom !== undefined ?
-			this._getNewPixelOrigin(center, zoom) :
-			this.getPixelOrigin()
+			this._getNewPixelOrigin(center, zoom) : this.pixelOrigin
 		return pixelOrigin.subtract(this._getMapPanePos())
 	}
 
@@ -848,8 +853,8 @@ export class Map extends Evented {
 	// returns offset needed for pxBounds to get inside maxBounds at a specified zoom
 	_getBoundsOffset(pxBounds, maxBounds, zoom) {
 		let projectedMaxBounds = Bounds.bounds(
-		        this.project(maxBounds.getNorthEast(), zoom),
-		        this.project(maxBounds.getSouthWest(), zoom)
+		        this.project(maxBounds.northEast, zoom),
+		        this.project(maxBounds.southWest, zoom)
 		    ),
 		    minOffset = projectedMaxBounds.min.subtract(pxBounds.min),
 		    maxOffset = projectedMaxBounds.max.subtract(pxBounds.max),

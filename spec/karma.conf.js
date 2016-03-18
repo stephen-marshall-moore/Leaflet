@@ -114,7 +114,7 @@ module.exports = function (config) {
 		browsers: ['Custom_Chrome'],
 
 		// If browser does not capture in given timeout [ms], kill it
-		captureTimeout: 100000,
+		captureTimeout: 10000,
 
 		// Workaround for PhantomJS random DISCONNECTED error
 		browserDisconnectTimeout: 10000, // default 2000

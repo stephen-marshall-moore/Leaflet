@@ -1,3 +1,4 @@
+"use strict"
 /*
  * LatLngBounds represents a rectangular area on the map in geographical coordinates.
  */
