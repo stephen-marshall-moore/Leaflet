@@ -227,7 +227,7 @@ describe("Map", function () {
 			container.style.width = container.style.height = "1000px"
 			document.body.appendChild(container)
 			// maxBounds
-			let bounds = LatLngBounds.latLngBounds([51.5, -0.05], [51.55, 0.05])
+			let bounds = LatLngBounds.latLngBounds(LatLng.latLng([51.5, -0.05]), LatLng.latLng([51.55, 0.05]))
 			map.maxBounds = bounds // options???, {animate: false});
 			// set view outside
 			map.view = {center: LatLng.latLng([53.0, 0.15]), zoom: 12, options: {animate: false}} 
@@ -243,7 +243,7 @@ describe("Map", function () {
 			container.style.width = container.style.height = "200px"
 			document.body.appendChild(container)
 			// maxBounds
-			let bounds = new LatLngBounds([LatLng.latLng([51, -0.2]), LatLng.latLng([52, 0.2])])
+			let bounds = new LatLngBounds(LatLng.latLng([51, -0.2]), LatLng.latLng([52, 0.2]))
 			map.maxBounds = bounds // options????, {animate: false});
 			// set view outside maxBounds on one direction only
 			// leaves untouched the other coordinate (that is not already centered)
@@ -872,7 +872,7 @@ describe("Map", function () {
 			c.style.width = '400px';
 			c.style.height = '400px';
 			map = new Map(c);
-			map.setView(new LatLng(0, 0), 0);
+			map.view = {center:[0, 0], zoom: 0}
 			document.body.appendChild(c);
 		});
 

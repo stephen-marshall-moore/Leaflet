@@ -359,7 +359,7 @@ export class Map extends Evented {
 		    sw = this.unproject(bounds.getBottomLeft()),
 		    ne = this.unproject(bounds.getTopRight())
 
-		return new Bounds(sw, ne)
+		return new LatLngBounds(sw, ne)
 	}
 
 	getBoundsZoom(bounds, inside, padding) { // (LatLngBounds[, Boolean, Point]) -> Number
@@ -786,7 +786,7 @@ export class Map extends Evented {
 	// private methods for getting map state
 
 	_getMapPanePos() {
-		return DomUtil.getPosition(this._mapPane) || new L.Point(0, 0)
+		return DomUtil.getPosition(this._mapPane) || new Point(0, 0)
 	}
 
 	_moved() {
