@@ -39,21 +39,19 @@ export class Bounds {
 		return this
 	}
 
-	getCenter(round) { // (Boolean) -> Point
-		return new Point((this.min.x + this.max.x) / 2,
-											(this.min.y + this.max.y) / 2,
-											round)
+	get center() { // (Boolean) -> Point // rounding must happen separately
+		return new Point((this.min.x + this.max.x) / 2, (this.min.y + this.max.y) / 2)
 	}
 
-	getBottomLeft() { // () -> Point
+	get bottomLeft() { // () -> Point
 		return new Point(this.min.x, this.max.y)
 	}
 
-	getTopRight() { // () -> Point
+	get topRight() { // () -> Point
 		return new Point(this.max.x, this.min.y)
 	}
 
-	getSize() { // () -> Point
+	get size() { // () -> Point
 		return this.max.subtract(this.min)
 	}
 

@@ -40,7 +40,7 @@ export class Mercator extends Projection {
 		    ts = Math.exp(-point.y / r),
 		    phi = Math.PI / 2 - 2 * Math.atan(ts)
 
-		for (let i = 0, dphi = 0.1, con i < 15 && Math.abs(dphi) > 1e-7 i++) {
+		for (let i = 0, dphi = 0.1, con; i < 15 && Math.abs(dphi) > 1e-7; i++) {
 			con = e * Math.sin(phi)
 			con = Math.pow((1 - con) / (1 + con), e / 2)
 			dphi = Math.PI / 2 - 2 * Math.atan(ts * con) - phi

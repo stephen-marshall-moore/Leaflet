@@ -356,8 +356,8 @@ export class Map extends Evented {
 
 	get bounds() {
 		let bounds = this.getPixelBounds(),
-		    sw = this.unproject(bounds.getBottomLeft()),
-		    ne = this.unproject(bounds.getTopRight())
+		    sw = this.unproject(bounds.bottomLeft),
+		    ne = this.unproject(bounds.topRight)
 
 		return new LatLngBounds(sw, ne)
 	}

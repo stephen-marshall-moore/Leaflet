@@ -23,10 +23,14 @@ describe('Bounds', function () {
 		it('creates bounds with proper min & max on (Point, Point)', function () {
 			expect(a.min).to.eql(new Point(14, 12))
 			expect(a.max).to.eql(new Point(30, 40))
+			expect(a.bottomLeft).to.eql(new Point(14, 40))
+			expect(a.topRight).to.eql(new Point(30, 12))
 		})
 		it('creates bounds with proper min & max on (Point[])', function () {
 			expect(b.min).to.eql(new Point(14, 12))
 			expect(b.max).to.eql(new Point(30, 40))
+			expect(b.bottomLeft).to.eql(new Point(14, 40))
+			expect(a.topRight).to.eql(new Point(30, 12))
 		})
 	})
 
@@ -42,9 +46,9 @@ describe('Bounds', function () {
 		})
 	})
 
-	describe('#getCenter', function () {
+	describe('#get center', function () {
 		it('returns the center point', function () {
-			expect(a.getCenter()).to.eql(new Point(22, 26))
+			expect(a.center).to.eql(new Point(22, 26))
 		})
 	})
 
@@ -71,9 +75,9 @@ describe('Bounds', function () {
 		})
 	})
 
-	describe('#getSize', function () {
+	describe('#get size', function () {
 		it('returns the size of the bounds as point', function () {
-			expect(a.getSize()).to.eql(new Point(16, 28))
+			expect(a.size).to.eql(new Point(16, 28))
 		})
 	})
 

@@ -25,10 +25,10 @@ module.exports = function (config) {
 		{pattern: "src/geo/projection/*.js", served: true, included: false, watched: true},
 		{pattern: "src/map/Map.js", served: true, included: false, watched: true},
 		// specs
-		//"spec/suites/core/*Spec.js",
-		//"spec/suites/dom/*Spec.js",
-		//"spec/suites/geometry/*Spec.js",
-		//"spec/suites/geo/*Spec.js",
+		"spec/suites/core/*Spec.js",
+		"spec/suites/dom/*Spec.js",
+		"spec/suites/geometry/*Spec.js",
+		"spec/suites/geo/*Spec.js",
 		"spec/suites/map/MapSpec.js",
 		//"spec/suites/**/*.js",
 		{pattern: "dist/images/*.png", included: false}

@@ -58,7 +58,7 @@ describe("CRS.EPSG3857", function () {
 			let crs = new EPSG3857()
 			let worldSize = 256, crsSize = 0
 			for (let i = 0; i <= 22; i++) {
-				crsSize = crs.getProjectedBounds(i).getSize()
+				crsSize = crs.getProjectedBounds(i).size
 				expect(crsSize.x).to.eql(worldSize)
 				expect(crsSize.y).to.eql(worldSize)
 				worldSize *= 2
@@ -94,12 +94,12 @@ describe("CRS.EPSG3857", function () {
 
 describe("CRS.EPSG4326", function () {
 
-	describe("#getSize", function () {
+	describe("#get size", function () {
 		it("gives correct size", function () {
 			let crs = new EPSG4326()
 			let worldSize = 256, crsSize = 0
 			for (let i = 0; i <= 22; i++) {
-				crsSize = crs.getProjectedBounds(i).getSize()
+				crsSize = crs.getProjectedBounds(i).size
 				expect(crsSize.x).to.eql(worldSize * 2)
 				// Lat bounds are half as high (-90/+90 compared to -180/+180)
 				expect(crsSize.y).to.eql(worldSize)
