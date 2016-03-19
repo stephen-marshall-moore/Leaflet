@@ -1,5 +1,7 @@
 import {DomUtil} from '../../dom/DomUtil'
+import {LatLng} from '../../geo/LatLng'
 import {Layer} from '../Layer'
+import {DefaultIcon} from './Icon.Default'
 
 /*
  * L.Marker is used to display clickable/draggable icons on the map.
@@ -9,7 +11,7 @@ let _default_marker_options = {
 		pane: 'markerPane',
 		nonBubblingEvents: ['click', 'dblclick', 'mouseover', 'mouseout', 'contextmenu'],
 
-		icon: new L.Icon.Default(),
+		icon: new DefaultIcon,
 		// title: '',
 		// alt: '',
 		interactive: true,
@@ -28,13 +30,8 @@ export class Marker extends Layer {
 		
 		this._latlng = LatLng.latLng(latlng) 
 
-		this.options = {}
-		if(options) {
-			Object.assign(this.options, _default_tile_options, options)
-		} else {
-			this.options = _default_tile_options
-			options = {}
-		}
+		Object.assign(this.options, _default_marker_options, options)
+
 	}
 
 	onAdd(map) {
@@ -74,7 +71,7 @@ export class Marker extends Layer {
 	
 	setLatLng(latlng) {
 		var oldLatLng = this._latlng
-		this._latlng = L.latLng(latlng)
+		this._latlng = LatLng.latLng(latlng)
 		this.update()
 		return this.fire('move', {oldLatLng: oldLatLng, latlng: this._latlng})
 	}
@@ -229,6 +226,7 @@ export class Marker extends Layer {
 
 		this.addInteractiveTarget(this._icon)
 
+		/** wait on Handler
 		if (L.Handler.MarkerDrag) {
 			var draggable = this.options.draggable
 			if (this.dragging) {
@@ -242,6 +240,7 @@ export class Marker extends Layer {
 				this.dragging.enable()
 			}
 		}
+		***/
 	}
 
 	setOpacity(opacity) {
@@ -270,5 +269,5 @@ export class Marker extends Layer {
 	_resetZIndex() {
 		this._updateZIndex(0)
 	}
-})
+}
 

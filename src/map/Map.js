@@ -15,7 +15,7 @@ import {EPSG3857} from '../geo/crs/CRS.EPSG3857'
 	const _default_map_options = {
 			crs: new EPSG3857(),
 			zoom: 5,
-			minZoom: 4,
+			minZoom: 0,
 			maxZoom: 25,
 			/*
 			center: LatLng,
@@ -114,12 +114,12 @@ export class Map extends Evented {
 
 	zoomIn(delta, options) {
 		delta = delta || (Browser.any3d ? this.options.zoomDelta : 1)
-		return this.zoom({zoom: this._zoom + delta, options: options})
+		return this.zoom = {zoom: this._zoom + delta, options: options}
 	}
 
 	zoomOut(delta, options) {
 		delta = delta || (Browser.any3d ? this.options.zoomDelta : 1)
-		return this.setZoom({zoom: this._zoom - delta, options: options})
+		return this.zoom = {zoom: this._zoom - delta, options: options}
 	}
 
 	setZoomAround(latlng, zoom, options) {
@@ -361,7 +361,7 @@ export class Map extends Evented {
 	}
 
 	getBoundsZoom(bounds, inside, padding) { // (LatLngBounds[, Boolean, Point]) -> Number
-		bounds = LatLng.latLngBounds(bounds)
+		bounds = LatLngBounds.latLngBounds(bounds)
 		padding = Point.point(padding || [0, 0])
 
 		let zoom = this.zoom || 0,
@@ -405,11 +405,9 @@ export class Map extends Evented {
 		return this.options.crs.getProjectedBounds(zoom === undefined ? this.zoom : zoom)
 	}
 
-	/**
 	getPane(pane) {
-		return typeof pane === 'string' ? this._panes[pane] : pane;
+		return typeof pane === 'string' ? this._panes[pane] : pane
 	}
-	**/
 
 	get panes() {
 		return this._panes
@@ -482,7 +480,7 @@ export class Map extends Evented {
 	}
 
 	mouseEventToContainerPoint(e) { // (MouseEvent)
-		return L.DomEvent.getMousePosition(e, this._container)
+		return DomEvent.getMousePosition(e, this._container)
 	}
 
 	mouseEventToLayerPoint(e) { // (MouseEvent)
@@ -760,7 +758,7 @@ export class Map extends Evented {
 		for (var i = 0; i < targets.length; i++) {
 			targets[i].fire(type, data, true)
 			if (data.originalEvent._stopped ||
-				(targets[i].options.nonBubblingEvents && L.Util.indexOf(targets[i].options.nonBubblingEvents, type) !== -1)) { return }
+				(targets[i].options.nonBubblingEvents && Util.indexOf(targets[i].options.nonBubblingEvents, type) !== -1)) { return }
 		}
 	}
 
@@ -953,7 +951,7 @@ export class Map extends Evented {
 
 	_addZoomLimit(layer) {
 		if (Number.isNaN(layer.options.maxZoom) || !Number.isNaN(layer.options.minZoom)) {
-			this._zoomBoundLayers[L.stamp(layer)] = layer
+			this._zoomBoundLayers[Util.stamp(layer)] = layer
 			this._updateZoomLevels()
 		}
 	}

@@ -6,7 +6,6 @@ import {Icon} from './Icon'
  */
 
 let _default_divicon_options = {
-	options: {
 		iconSize: [12, 12], // also can be set through CSS
 		/*
 		iconAnchor: (Point)
@@ -43,5 +42,5 @@ export class DivIcon extends Icon {
 	createShadow() {
 		return null
 	}
-})
+}
 

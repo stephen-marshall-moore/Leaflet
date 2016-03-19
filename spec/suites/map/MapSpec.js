@@ -5,7 +5,10 @@ import {LatLng} from 'src/geo/LatLng'
 import {LatLngBounds} from 'src/geo/LatLngBounds'
 import {Map} from 'src/map/Map'
 import {Layer} from 'src/layer/Layer'
+import {GridLayer} from 'src/layer/tile/GridLayer'
 import {TileLayer} from 'src/layer/tile/TileLayer'
+import {Marker} from 'src/layer/marker/Marker'
+import {DivIcon} from 'src/layer/marker/DivIcon'
 // temporary, should fix distance function
 import {EPSG3857} from 'src/geo/crs/CRS.EPSG3857'
 
@@ -25,7 +28,7 @@ describe("Map", function () {
 		it("tries new without options", function () {
 			let can = document.createElement('div')
 			let map2 = new Map(can)
-			expect(map2.options.minZoom).to.be(4)
+			expect(map2.options.minZoom).to.be(0)
 			expect(map2.options.fadeAnimation).to.be(true)
 			expect(map2.options.center).to.be.undefined
 		})
@@ -267,48 +270,48 @@ describe("Map", function () {
 	describe("#get MinZoom and #get MaxZoom", function () {
 		describe('#get MinZoom', function () {
 			it('returns 0 if not set by Map options or TileLayer options', function () {
-				var map = Map(document.createElement('div'));
-				expect(map.minZoom()).to.be(0);
+				let map2 = new Map(document.createElement('div'))
+				expect(map2.minZoom).to.be(0)
 			});
 		});
 
 		it("minZoom and maxZoom options overrides any minZoom and maxZoom set on layers", function () {
 
-			let map = Map(document.createElement('div'), {minZoom: 2, maxZoom: 20})
+			let map = new Map(document.createElement('div'), {minZoom: 2, maxZoom: 20})
 
-			TileLayer("{z}{x}{y}", {minZoom: 4, maxZoom: 10}).addTo(map);
-			TileLayer("{z}{x}{y}", {minZoom: 6, maxZoom: 17}).addTo(map);
-			TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 22}).addTo(map);
+			new TileLayer("{z}{x}{y}", {minZoom: 4, maxZoom: 10}).addTo(map)
+			new TileLayer("{z}{x}{y}", {minZoom: 6, maxZoom: 17}).addTo(map)
+			new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 22}).addTo(map)
 
-			expect(map.getMinZoom()).to.be(2);
-			expect(map.getMaxZoom()).to.be(20);
+			expect(map.minZoom).to.be(2);
+			expect(map.maxZoom).to.be(20);
 		});
 	});
 
 	describe("#getMinZoom and #getMaxZoom", function () {
 		describe('#getMinZoom', function () {
 			it('returns 0 if not set by Map options or TileLayer options', function () {
-				var map = Map(document.createElement('div'));
-				expect(map.getMinZoom()).to.be(0);
-			});
-		});
+				let map2 = new Map(document.createElement('div'))
+				expect(map2.minZoom).to.be(0)
+			})
+		})
 
 		it("minZoom and maxZoom options overrides any minZoom and maxZoom set on layers", function () {
 
-			var map = Map(document.createElement('div'), {minZoom: 2, maxZoom: 20});
+			let map = new Map(document.createElement('div'), {minZoom: 2, maxZoom: 20})
 
-			TileLayer("{z}{x}{y}", {minZoom: 4, maxZoom: 10}).addTo(map);
-			TileLayer("{z}{x}{y}", {minZoom: 6, maxZoom: 17}).addTo(map);
-			TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 22}).addTo(map);
+			new TileLayer("{z}{x}{y}", {minZoom: 4, maxZoom: 10}).addTo(map)
+			new TileLayer("{z}{x}{y}", {minZoom: 6, maxZoom: 17}).addTo(map)
+			new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 22}).addTo(map)
 
-			expect(map.getMinZoom()).to.be(2);
-			expect(map.getMaxZoom()).to.be(20);
-		});
+			expect(map.minZoom).to.be(2)
+			expect(map.maxZoom).to.be(20)
+		})
 	});
 
 	describe("#hasLayer", function () {
 		it("returns false when passed undefined, null, or false", function () {
-			var map = Map(document.createElement('div'));
+			let map = new Map(document.createElement('div'));
 			expect(map.hasLayer(undefined)).to.equal(false);
 			expect(map.hasLayer(null)).to.equal(false);
 			expect(map.hasLayer(false)).to.equal(false);
@@ -332,10 +335,11 @@ describe("Map", function () {
 		})
 
 		it("calls layer.onAdd when the map becomes ready", function () {
+			let map2 = new Map(document.createElement('div'))
 			let layer = layerSpy()
-			map.addLayer(layer)
+			map2.addLayer(layer)
 			expect(layer.onAdd.called).not.to.be.ok()
-			map.view = {center: [0, 0], zoom: 0}
+			map2.view = {center: [0, 0], zoom: 0}
 			expect(layer.onAdd.called).to.be.ok()
 		})
 
@@ -854,7 +858,7 @@ describe("Map", function () {
 
 		it('Snaps to a number after adding marker', function (done) {
 			Browser.any3d = true;
-			map.addLayer(L.marker(center));
+			map.addLayer(Marker(center));
 			expect(map.zoom).to.be(undefined);
 			map.fitBounds(bounds);
 			expect(map.zoom).to.be(2);
@@ -880,6 +884,7 @@ describe("Map", function () {
 			document.body.removeChild(c);
 		});
 
+    /***
 		it("DOM events propagate from polygon to map", function () {
 			var spy = sinon.spy();
 			map.on("mousemove", spy);
@@ -887,11 +892,12 @@ describe("Map", function () {
 			happen.mousemove(layer._path);
 			expect(spy.calledOnce).to.be.ok();
 		});
+		***/
 
 		it("DOM events propagate from marker to map", function () {
 			var spy = sinon.spy();
 			map.on("mousemove", spy);
-			var layer = new L.Marker([1, 2]).addTo(map);
+			var layer = new Marker([1, 2]).addTo(map);
 			happen.mousemove(layer._icon);
 			expect(spy.calledOnce).to.be.ok();
 		});
@@ -900,13 +906,14 @@ describe("Map", function () {
 			var mapSpy = sinon.spy();
 			var layerSpy = sinon.spy();
 			map.on("mousemove", mapSpy);
-			var layer = new L.Marker([1, 2]).addTo(map);
-			layer.on("mousemove", L.DomEvent.stopPropagation).on("mousemove", layerSpy);
+			var layer = new Marker([1, 2]).addTo(map);
+			layer.on("mousemove", DomEvent.stopPropagation).on("mousemove", layerSpy);
 			happen.mousemove(layer._icon);
 			expect(layerSpy.calledOnce).to.be.ok();
 			expect(mapSpy.called).not.to.be.ok();
 		});
 
+		/***
 		it("DOM events fired on polygon can be cancelled before being caught by the map", function () {
 			var mapSpy = sinon.spy();
 			var layerSpy = sinon.spy();
@@ -932,54 +939,56 @@ describe("Map", function () {
 			expect(otherSpy.called).not.to.be.ok();
 			expect(layerSpy.calledOnce).to.be.ok();
 		});
+		***/
 
 		it("mouseout is forwarded when using a DivIcon", function () {
-			var icon = L.divIcon({
+			let icon = new DivIcon({
 				html: "<p>this is text in a child element</p>",
 				iconSize: [100, 100]
-			});
-			var mapSpy = sinon.spy(),
+			})
+			let mapSpy = sinon.spy(),
 			    layerSpy = sinon.spy(),
-			    layer = L.marker([1, 2], {icon: icon}).addTo(map);
-			map.on("mouseout", mapSpy);
-			layer.on("mouseout", layerSpy);
-			happen.mouseout(layer._icon, {relatedTarget: map._container});
-			expect(mapSpy.called).not.to.be.ok();
-			expect(layerSpy.calledOnce).to.be.ok();
-		});
+			    layer = new Marker([1, 2], {icon: icon}).addTo(map)
+			map.on("mouseout", mapSpy)
+			layer.on("mouseout", layerSpy)
+			happen.mouseout(layer._icon, {relatedTarget: map._container})
+			expect(mapSpy.called).not.to.be.ok()
+			expect(layerSpy.calledOnce).to.be.ok()
+		})
 
 		it("mouseout is not forwarded if relatedTarget is a target's child", function () {
-			var icon = L.divIcon({
+			let icon = new DivIcon({
 				html: "<p>this is text in a child element</p>",
 				iconSize: [100, 100]
-			});
-			var mapSpy = sinon.spy(),
+			})
+			let mapSpy = sinon.spy(),
 			    layerSpy = sinon.spy(),
-			    layer = L.marker([1, 2], {icon: icon}).addTo(map),
-			    child = layer._icon.querySelector('p');
-			map.on("mouseout", mapSpy);
-			layer.on("mouseout", layerSpy);
-			happen.mouseout(layer._icon, {relatedTarget: child});
-			expect(mapSpy.called).not.to.be.ok();
-			expect(layerSpy.calledOnce).not.to.be.ok();
-		});
+			    layer = new Marker([1, 2], {icon: icon}).addTo(map),
+			    child = layer._icon.querySelector('p')
+			map.on("mouseout", mapSpy)
+			layer.on("mouseout", layerSpy)
+			happen.mouseout(layer._icon, {relatedTarget: child})
+			expect(mapSpy.called).not.to.be.ok()
+			expect(layerSpy.calledOnce).not.to.be.ok()
+		})
 
 		it("mouseout is not forwarded if fired on target's child", function () {
-			var icon = L.divIcon({
+			let icon = new DivIcon({
 				html: "<p>this is text in a child element</p>",
 				iconSize: [100, 100]
-			});
+			})
 			var mapSpy = sinon.spy(),
 			    layerSpy = sinon.spy(),
-			    layer = L.marker([1, 2], {icon: icon}).addTo(map),
-			    child = layer._icon.querySelector('p');
-			map.on("mouseout", mapSpy);
-			layer.on("mouseout", layerSpy);
-			happen.mouseout(child, {relatedTarget: layer._icon});
-			expect(mapSpy.called).not.to.be.ok();
-			expect(layerSpy.calledOnce).not.to.be.ok();
-		});
+			    layer = new Marker([1, 2], {icon: icon}).addTo(map),
+			    child = layer._icon.querySelector('p')
+			map.on("mouseout", mapSpy)
+			layer.on("mouseout", layerSpy)
+			happen.mouseout(child, {relatedTarget: layer._icon})
+			expect(mapSpy.called).not.to.be.ok()
+			expect(layerSpy.calledOnce).not.to.be.ok()
+		})
 
+		/***
 		it("mouseout is not forwarded to layers if fired on the map", function () {
 			var mapSpy = sinon.spy(),
 			    layerSpy = sinon.spy(),
@@ -994,33 +1003,31 @@ describe("Map", function () {
 			expect(layerSpy.called).not.to.be.ok();
 			expect(mapSpy.calledOnce).to.be.ok();
 		});
+		***/
 
 		it("preclick is fired before click on marker and map", function () {
-			var called = 0;
-			var layer = new L.Marker([1, 2]).addTo(map);
+			let called = 0
+			let layer = new Marker([1, 2]).addTo(map)
 			layer.on("preclick", function (e) {
-				expect(called++).to.eql(0);
-				expect(e.latlng).to.ok();
-			});
+				expect(called++).to.eql(0)
+				expect(e.latlng).to.ok()
+			})
 			layer.on("click", function (e) {
-				expect(called++).to.eql(2);
-				expect(e.latlng).to.ok();
-			});
+				expect(called++).to.eql(2)
+				expect(e.latlng).to.ok()
+			})
 			map.on("preclick", function (e) {
-				expect(called++).to.eql(1);
-				expect(e.latlng).to.ok();
-			});
+				expect(called++).to.eql(1)
+				expect(e.latlng).to.ok()
+			})
 			map.on("click", function (e) {
-				expect(called++).to.eql(3);
-				expect(e.latlng).to.ok();
-			});
-			happen.click(layer._icon);
-		});
+				expect(called++).to.eql(3)
+				expect(e.latlng).to.ok()
+			})
+			happen.click(layer._icon)
+		})
 
-	});
-
-	//***/
-
+	})
 
 	describe('#getScaleZoom && #getZoomScale', function () {
 		it("convert zoom to scale and viceversa and return the same values", function () {

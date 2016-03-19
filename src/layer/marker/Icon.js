@@ -20,7 +20,7 @@ export class Icon {
 	}
 	*/
 
-	constructor(options)
+	constructor(options) {
 		this.options = options
 	}
 
@@ -76,5 +76,5 @@ export class Icon {
 	_getIconUrl(name) {
 		return Browser.retina && this.options[name + 'RetinaUrl'] || this.options[name + 'Url']
 	}
-})
+}
 

@@ -13,17 +13,17 @@ let _default_defaulticon_options = {
 
 export class DefaultIcon extends Icon {
 
-	constructor(options)
+	constructor(options) {
 		let opts = {}
 		Object.assign(opts, _default_defaulticon_options, options)
 		super(opts)
 	}
 
 	_getIconUrl(name) {
-		let key = name + 'Url';
+		let key = name + 'Url'
 
 		if (this.options[key]) {
-			return this.options[key];
+			return this.options[key]
 		}
 
 		let path = '/images' //DefaultIcon.imagePath
@@ -34,7 +34,7 @@ export class DefaultIcon extends Icon {
 
 		return path + '/marker-' + name + (Browser.retina && name === 'icon' ? '-2x' : '') + '.png'
 	}
-})
+}
 
 /****
  **** TODO
