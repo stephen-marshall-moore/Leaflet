@@ -4,6 +4,7 @@ import {Browser} from 'src/core/Browser'
 import {LatLng} from 'src/geo/LatLng'
 import {LatLngBounds} from 'src/geo/LatLngBounds'
 import {Map} from 'src/map/Map'
+import {Layer} from 'src/layer/Layer'
 import {TileLayer} from 'src/layer/tile/TileLayer'
 // temporary, should fix distance function
 import {EPSG3857} from 'src/geo/crs/CRS.EPSG3857'
@@ -167,7 +168,7 @@ describe("Map", function () {
 		})
 	})
 
-	describe("#setView", function () {
+	describe("#set view", function () {
 		it("check default zoom", function () {
 			expect(map.zoom).to.be(5)
 		})
@@ -315,7 +316,7 @@ describe("Map", function () {
 	});
 
 	function layerSpy() {
-		var layer = new L.Layer();
+		var layer = new Layer();
 		layer.onAdd = sinon.spy();
 		layer.onRemove = sinon.spy();
 		return layer;
@@ -324,106 +325,106 @@ describe("Map", function () {
 	describe("#addLayer", function () {
 
 		it("calls layer.onAdd immediately if the map is ready", function () {
-			var layer = layerSpy();
-			map.setView([0, 0], 0);
-			map.addLayer(layer);
-			expect(layer.onAdd.called).to.be.ok();
-		});
+			let layer = layerSpy()
+			map.view = {center: [0, 0], zoom: 0}
+			map.addLayer(layer)
+			expect(layer.onAdd.called).to.be.ok()
+		})
 
 		it("calls layer.onAdd when the map becomes ready", function () {
-			var layer = layerSpy();
-			map.addLayer(layer);
-			expect(layer.onAdd.called).not.to.be.ok();
-			map.setView([0, 0], 0);
-			expect(layer.onAdd.called).to.be.ok();
-		});
+			let layer = layerSpy()
+			map.addLayer(layer)
+			expect(layer.onAdd.called).not.to.be.ok()
+			map.view = {center: [0, 0], zoom: 0}
+			expect(layer.onAdd.called).to.be.ok()
+		})
 
 		it("does not call layer.onAdd if the layer is removed before the map becomes ready", function () {
-			var layer = layerSpy();
-			map.addLayer(layer);
-			map.removeLayer(layer);
-			map.setView([0, 0], 0);
-			expect(layer.onAdd.called).not.to.be.ok();
-		});
+			let layer = layerSpy()
+			map.addLayer(layer)
+			map.removeLayer(layer)
+			map.view = {center: [0, 0], zoom: 0}
+			expect(layer.onAdd.called).not.to.be.ok()
+		})
 
 		it("fires a layeradd event immediately if the map is ready", function () {
-			var layer = layerSpy(),
-			    spy = sinon.spy();
-			map.on('layeradd', spy);
-			map.setView([0, 0], 0);
-			map.addLayer(layer);
-			expect(spy.called).to.be.ok();
-		});
+			let layer = layerSpy(),
+			    spy = sinon.spy()
+			map.on('layeradd', spy)
+			map.view = {center: [0, 0], zoom: 0}
+			map.addLayer(layer)
+			expect(spy.called).to.be.ok()
+		})
 
 		it("fires a layeradd event when the map becomes ready", function () {
-			var layer = layerSpy(),
-			    spy = sinon.spy();
-			map.on('layeradd', spy);
-			map.addLayer(layer);
-			expect(spy.called).not.to.be.ok();
-			map.setView([0, 0], 0);
-			expect(spy.called).to.be.ok();
-		});
+			let layer = layerSpy(),
+			    spy = sinon.spy()
+			map.on('layeradd', spy)
+			map.addLayer(layer)
+			expect(spy.called).not.to.be.ok()
+			map.view = {center: [0, 0], zoom: 0}
+			expect(spy.called).to.be.ok()
+		})
 
 		it("does not fire a layeradd event if the layer is removed before the map becomes ready", function () {
-			var layer = layerSpy(),
-			    spy = sinon.spy();
-			map.on('layeradd', spy);
-			map.addLayer(layer);
-			map.removeLayer(layer);
-			map.setView([0, 0], 0);
-			expect(spy.called).not.to.be.ok();
-		});
+			let layer = layerSpy(),
+			    spy = sinon.spy()
+			map.on('layeradd', spy)
+			map.addLayer(layer)
+			map.removeLayer(layer)
+			map.view = {center: [0, 0], zoom: 0}
+			expect(spy.called).not.to.be.ok()
+		})
 
 		it("adds the layer before firing layeradd", function (done) {
-			var layer = layerSpy();
+			let layer = layerSpy()
 			map.on('layeradd', function () {
-				expect(map.hasLayer(layer)).to.be.ok();
-				done();
-			});
-			map.setView([0, 0], 0);
-			map.addLayer(layer);
-		});
+				expect(map.hasLayer(layer)).to.be.ok()
+				done()
+			})
+			map.view = {center: [0, 0], zoom: 0}
+			map.addLayer(layer)
+		})
 
 		describe("When the first layer is added to a map", function () {
 			it("fires a zoomlevelschange event", function () {
-				var spy = sinon.spy();
-				map.on("zoomlevelschange", spy);
-				expect(spy.called).not.to.be.ok();
-				TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map);
-				expect(spy.called).to.be.ok();
-			});
-		});
+				let spy = sinon.spy()
+				map.on("zoomlevelschange", spy)
+				expect(spy.called).not.to.be.ok()
+				TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map)
+				expect(spy.called).to.be.ok()
+			})
+		})
 
 		describe("when a new layer with greater zoomlevel coverage than the current layer is added to a map", function () {
 			it("fires a zoomlevelschange event", function () {
-				var spy = sinon.spy();
-				TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map);
-				map.on("zoomlevelschange", spy);
-				expect(spy.called).not.to.be.ok();
-				TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 15}).addTo(map);
-				expect(spy.called).to.be.ok();
-			});
-		});
+				let spy = sinon.spy()
+				TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map)
+				map.on("zoomlevelschange", spy)
+				expect(spy.called).not.to.be.ok()
+				TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 15}).addTo(map)
+				expect(spy.called).to.be.ok()
+			})
+		})
 
 		describe("when a new layer with the same or lower zoomlevel coverage as the current layer is added to a map", function () {
 			it("fires no zoomlevelschange event", function () {
-				var spy = sinon.spy();
-				TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map);
-				map.on("zoomlevelschange", spy);
-				expect(spy.called).not.to.be.ok();
-				TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map);
-				expect(spy.called).not.to.be.ok();
-				TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 5}).addTo(map);
-				expect(spy.called).not.to.be.ok();
-			});
-		});
-	});
+				let spy = sinon.spy()
+				TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map)
+				map.on("zoomlevelschange", spy)
+				expect(spy.called).not.to.be.ok()
+				TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map)
+				expect(spy.called).not.to.be.ok()
+				TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 5}).addTo(map)
+				expect(spy.called).not.to.be.ok()
+			})
+		})
+	})
 
 	describe("#removeLayer", function () {
 		it("calls layer.onRemove if the map is ready", function () {
 			var layer = layerSpy();
-			map.setView([0, 0], 0);
+			map.view = {center: [0, 0], zoom: 0}
 			map.addLayer(layer);
 			map.removeLayer(layer);
 			expect(layer.onRemove.called).to.be.ok();
@@ -431,7 +432,7 @@ describe("Map", function () {
 
 		it("does not call layer.onRemove if the layer was not added", function () {
 			var layer = layerSpy();
-			map.setView([0, 0], 0);
+			map.view = {center: [0, 0], zoom: 0}
 			map.removeLayer(layer);
 			expect(layer.onRemove.called).not.to.be.ok();
 		});
@@ -447,7 +448,7 @@ describe("Map", function () {
 			var layer = layerSpy(),
 			    spy = sinon.spy();
 			map.on('layerremove', spy);
-			map.setView([0, 0], 0);
+			map.view = {center: [0, 0], zoom: 0}
 			map.addLayer(layer);
 			map.removeLayer(layer);
 			expect(spy.called).to.be.ok();
@@ -457,7 +458,7 @@ describe("Map", function () {
 			var layer = layerSpy(),
 			    spy = sinon.spy();
 			map.on('layerremove', spy);
-			map.setView([0, 0], 0);
+			map.view = {center: [0, 0], zoom: 0}
 			map.removeLayer(layer);
 			expect(spy.called).not.to.be.ok();
 		});
@@ -477,7 +478,7 @@ describe("Map", function () {
 				expect(map.hasLayer(layer)).not.to.be.ok();
 				done();
 			});
-			map.setView([0, 0], 0);
+			map.view = {center: [0, 0], zoom: 0}
 			map.addLayer(layer);
 			map.removeLayer(layer);
 		});
@@ -489,8 +490,8 @@ describe("Map", function () {
 		});
 
 		it("supports adding and removing a tile layer without initializing the map", function () {
-			map.setView([0, 0], 18);
-			var layer = L.gridLayer();
+			map.view = {center: [0, 0], zoom: 18}
+			var layer = GridLayer()
 			map.addLayer(layer);
 			map.removeLayer(layer);
 		});
@@ -578,7 +579,7 @@ describe("Map", function () {
 			container = map.container;
 			container.style.width = origWidth + "px";
 			document.body.appendChild(container);
-			map.setView([0, 0], 0);
+			map.view = {center: [0, 0], zoom: 0}
 			map.invalidateSize({pan: false});
 			clock = sinon.useFakeTimers();
 		});
@@ -728,7 +729,7 @@ describe("Map", function () {
 			Browser.any3d = true;
 			map.options.zoomSnap = 0.25;
 			map.options.zoomDelta = 0.25;
-			map.setView(center, 10);
+			map.view = {center: [0, 0], zoom: 10}
 			map.once('zoomend', function () {
 				expect(map.zoom).to.eql(10.25);
 				expect(map.center).to.eql(center);
@@ -741,7 +742,7 @@ describe("Map", function () {
 			Browser.any3d = true;
 			map.options.zoomSnap = 0.25;
 			map.options.zoomDelta = 0.25;
-			map.setView(center, 10);
+			map.view = {center: [0, 0], zoom: 10}
 			map.once('zoomend', function () {
 				expect(map.zoom).to.eql(9.75);
 				expect(map.center).to.eql(center);
@@ -752,7 +753,7 @@ describe("Map", function () {
 
 		it('zoomIn snaps to zoomSnap on any3d browsers', function (done) {
 			map.options.zoomSnap = 0.25;
-			map.setView(center, 10);
+			map.view = {center: [0, 0], zoom: 10}
 			map.once('zoomend', function () {
 				expect(map.zoom).to.eql(10.25);
 				expect(map.center).to.eql(center);
@@ -764,7 +765,7 @@ describe("Map", function () {
 
 		it('zoomOut snaps to zoomSnap on any3d browsers', function (done) {
 			map.options.zoomSnap = 0.25;
-			map.setView(center, 10);
+			map.view = {center: [0, 0], zoom: 10}
 			map.once('zoomend', function () {
 				expect(map.zoom).to.eql(9.75);
 				expect(map.center).to.eql(center);
@@ -785,7 +786,7 @@ describe("Map", function () {
 			var container = map.container;
 			container.style.width = container.style.height = "100px";
 			document.body.appendChild(container);
-			map.setView(center, 10);
+			map.view = {center: [0, 0], zoom: 10}
 		});
 
 		afterEach(function () {

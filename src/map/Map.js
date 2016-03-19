@@ -135,7 +135,7 @@ export class Map extends Evented {
 
 	_getBoundsCenterZoom(bounds, options = {}) {
 
-		bounds = bounds.getBounds ? bounds.getBounds() : LatLng.latLngBounds(bounds)
+		bounds = bounds.getBounds ? bounds.getBounds() : LatLngBounds.latLngBounds(bounds)
 
 		let paddingTL = Point.point(options.paddingTopLeft || options.padding || [0, 0]),
 		    paddingBR = Point.point(options.paddingBottomRight || options.padding || [0, 0]),
