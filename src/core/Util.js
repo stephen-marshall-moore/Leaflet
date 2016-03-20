@@ -63,6 +63,35 @@ export class Util {
 			return fn.apply(obj, args.length ? args.concat(slice.call(arguments)) : arguments);
 		};
 	}
+
+	// return a function that won't be called more often than the given interval
+	static throttle(fn, time, context) {
+		var lock, args, wrapperFn, later
+
+		later = function () {
+			// reset lock and call if queued
+			lock = false
+			if (args) {
+				wrapperFn.apply(context, args)
+				args = false
+			}
+		}
+
+		wrapperFn = function () {
+			if (lock) {
+				// called too soon, queue to call later
+				args = arguments
+			} else {
+				// call and lock until later
+				fn.apply(context, arguments)
+				setTimeout(later, time)
+				lock = true
+			}
+		}
+
+		return wrapperFn
+	}
+
 }
 
 Util._lastId = 0;

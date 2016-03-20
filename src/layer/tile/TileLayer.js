@@ -25,16 +25,8 @@ export class TileLayer extends GridLayer {
 
 	constructor(url, options = undefined) {
 		super()
-		
 		this._url = url
-
-		this.options = {}
-		if(options) {
-			Object.assign(this.options, _default_tile_options, options)
-		} else {
-			this.options = _default_tile_options
-			options = {}
-		}
+		Object.assign(this.options, _default_tile_options, options)
 
 		// detecting retina displays, adjusting tileSize and zoom levels
 		if (options.detectRetina && Browser.retina && options.maxZoom > 0) {
@@ -87,18 +79,22 @@ export class TileLayer extends GridLayer {
 	}
 
 	getTileUrl(coords) {
-		return Util.template(this._url, L.extend({
-			r: L.Browser.retina ? '@2x' : '',
+		return `${this._getSubdomain(coords)}${coords.x}${this.options.tms ? this._globalTileRange.max.y - coords.y : coords.y}${this._getZoomForUrl()}`
+
+		/***
+		return Util.template(this._url, Util.extend({
+			r: Browser.retina ? '@2x' : '',
 			s: this._getSubdomain(coords),
 			x: coords.x,
 			y: this.options.tms ? this._globalTileRange.max.y - coords.y : coords.y,
 			z: this._getZoomForUrl()
 		}, this.options))
+		***/
 	}
 
 	_tileOnLoad(done, tile) {
 		// For https://github.com/Leaflet/Leaflet/issues/3332
-		if (L.Browser.ielt9) {
+		if (Browser.ielt9) {
 			setTimeout(Util.bind(done, this, null, tile), 0)
 		} else {
 			done(null, tile)
@@ -114,8 +110,15 @@ export class TileLayer extends GridLayer {
 	}
 
 	getTileSize() {
+		/***
 		var map = this._map,
 		    tileSize = L.GridLayer.prototype.getTileSize.call(this),
+		    zoom = this._tileZoom + this.options.zoomOffset,
+		    zoomN = this.options.maxNativeZoom
+		***/
+
+		let tileSize = super.getTileSize(),
+				map = this._map,
 		    zoom = this._tileZoom + this.options.zoomOffset,
 		    zoomN = this.options.maxNativeZoom
 

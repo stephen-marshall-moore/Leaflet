@@ -67,6 +67,14 @@ export class Point {
 		return this.clone()._multiplyBy(s)
 	}
 
+	scaleBy(s) {
+		return new Point(this.x * s.x, this.y * s.y)
+	}
+
+	unscaleBy(s) {
+		return new Point(this.x / s.x, this.y / s.y)
+	}
+
 	_round() {
 		this.x = Math.round(this.x)
 		this.y = Math.round(this.y)

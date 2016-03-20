@@ -121,7 +121,7 @@ export class Layer extends Evented {
 	}
 
 	_addLayers(layers) {
-		layers = layers ? (L.Util.isArray(layers) ? layers : [layers]) : []
+		layers = layers ? (Array.isArray(layers) ? layers : [layers]) : []
 
 		for (var i = 0, len = layers.length; i < len; i++) {
 			this.addLayer(layers[i])

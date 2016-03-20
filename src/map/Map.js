@@ -331,9 +331,9 @@ export class Map extends Evented {
 		let className = 'leaflet-pane' + (name ? ' leaflet-' + name.replace('Pane', '') + '-pane' : ''),
 		    pane = DomUtil.create('div', className, container)  // || this._mapPane)
 
-		if (name) {
-			this._panes[name] = pane
-		}
+		//if (name) {
+		//	this._panes[name] = pane
+		//}
 		return pane
 	}
 
@@ -544,11 +544,11 @@ export class Map extends Evented {
 
 		DomUtil.setPosition(mp, new Point(0, 0))
 
-		this.createPane('tilePane', mp)
-		this.createPane('shadowPane', mp)
-		this.createPane('overlayPane', mp)
-		this.createPane('markerPane', mp)
-		this.createPane('popupPane', mp)
+		panes['tilePane'] = this.createPane('tilePane', mp)
+		panes['shadowPane'] = this.createPane('shadowPane', mp)
+		panes['overlayPane'] = this.createPane('overlayPane', mp)
+		panes['markerPane'] = this.createPane('markerPane', mp)
+		panes['popupPane'] = this.createPane('popupPane', mp)
 
 		if (!this.options.markerZoomAnimation) {
 			DomUtil.addClass(panes.markerPane, 'leaflet-zoom-hide')

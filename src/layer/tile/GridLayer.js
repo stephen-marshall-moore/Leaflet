@@ -1,5 +1,8 @@
 import {Browser} from '../../core/Browser'
 import {Util} from '../../core/Util'
+import {DomUtil} from '../../dom/DomUtil'
+import {Point} from '../../geometry/Point'
+import {Bounds} from '../../geometry/Bounds'
 import {Layer} from '../Layer'
 
 /*
@@ -27,14 +30,7 @@ export class GridLayer extends Layer {
 
 	constructor(options = undefined) {
 		super()
-		
-		this.options = {}
-		if(options) {
-			Object.assign(this.options, _default_grid_options, options)
-		} else {
-			this.options = _default_grid_options
-			options = {}
-		}
+		Object.assign(this.options, _default_grid_options, options)
 	}
 
 	onAdd() {
@@ -244,10 +240,10 @@ export class GridLayer extends Layer {
 			level.el = DomUtil.create('div', 'leaflet-tile-container leaflet-zoom-animated', this._container)
 			level.el.style.zIndex = maxZoom
 
-			level.origin = map.project(map.unproject(map.getPixelOrigin()), zoom).round()
+			level.origin = map.project(map.unproject(map.pixelOrigin), zoom).round()
 			level.zoom = zoom
 
-			this._setZoomTransform(level, map.getCenter(), map.getZoom())
+			this._setZoomTransform(level, map.center, map.zoom)
 
 			// force the browser to consider the newly added element for transition
 			Util.falseFn(level.el.offsetWidth)
@@ -262,7 +258,7 @@ export class GridLayer extends Layer {
 
 		var key, tile
 
-		var zoom = this._map.getZoom()
+		var zoom = this._map.zoom
 		if (zoom > this.options.maxZoom ||
 			zoom < this.options.minZoom) { return this._removeAllTiles() }
 
@@ -366,7 +362,7 @@ export class GridLayer extends Layer {
 
 	_resetView(e) {
 		var animating = e && (e.pinch || e.flyTo)
-		this._setView(this._map.getCenter(), this._map.getZoom(), animating, animating)
+		this._setView(this._map.center, this._map.zoom, animating, animating)
 	}
 
 	_animateZoom(e) {
@@ -456,10 +452,10 @@ export class GridLayer extends Layer {
 
 	_getTiledPixelBounds(center) {
 		var map = this._map,
-		    mapZoom = map._animatingZoom ? Math.max(map._animateToZoom, map.getZoom()) : map.getZoom(),
+		    mapZoom = map._animatingZoom ? Math.max(map._animateToZoom, map.zoom) : map.zoom,
 		    scale = map.getZoomScale(mapZoom, this._tileZoom),
 		    pixelCenter = map.project(center, this._tileZoom).floor(),
-		    halfSize = map.getSize().divideBy(scale * 2)
+		    halfSize = map.size.divideBy(scale * 2)
 
 		return new Bounds(pixelCenter.subtract(halfSize), pixelCenter.add(halfSize))
 	}
@@ -468,14 +464,14 @@ export class GridLayer extends Layer {
 	_update(center) {
 		var map = this._map
 		if (!map) { return }
-		var zoom = map.getZoom()
+		var zoom = map.zoom
 
-		if (center === undefined) { center = map.getCenter() }
+		if (center === undefined) { center = map.center }
 		if (this._tileZoom === undefined) { return }	// if out of minzoom/maxzoom
 
 		var pixelBounds = this._getTiledPixelBounds(center),
 		    tileRange = this._pxBoundsToTileRange(pixelBounds),
-		    tileCenter = tileRange.getCenter(),
+		    tileCenter = tileRange.center,
 		    queue = []
 
 		for (var key in this._tiles) {
@@ -540,7 +536,7 @@ export class GridLayer extends Layer {
 
 		// don't load tile if it doesn't intersect the bounds in options
 		var tileBounds = this._tileCoordsToBounds(coords)
-		return L.latLngBounds(this.options.bounds).overlaps(tileBounds)
+		return LatLngBounds.latLngBounds(this.options.bounds).overlaps(tileBounds)
 	}
 
 	_keyToBounds(key) {
@@ -559,7 +555,7 @@ export class GridLayer extends Layer {
 		    nw = map.wrapLatLng(map.unproject(nwPoint, coords.z)),
 		    se = map.wrapLatLng(map.unproject(sePoint, coords.z))
 
-		return new L.LatLngBounds(nw, se)
+		return new LatLngBounds.latLngBounds(nw, se)
 	}
 
 	// converts tile coordinates to key for the tile cache

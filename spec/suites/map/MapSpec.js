@@ -15,6 +15,7 @@ import {EPSG3857} from 'src/geo/crs/CRS.EPSG3857'
 describe("Map", function () {
 	let crs,
 			map,
+			map_notready,
 	    spy,
 			container
 
@@ -22,6 +23,7 @@ describe("Map", function () {
 		crs = new EPSG3857()
 		container = document.createElement('div')
 		map = new Map(container, {center: new LatLng(30,50), zoom: 5})
+		map_notready = new Map(document.createElement('div'))
 	})
 
 	describe("#constructor, checking options setting", function () {
@@ -344,10 +346,11 @@ describe("Map", function () {
 		})
 
 		it("does not call layer.onAdd if the layer is removed before the map becomes ready", function () {
+			let map2 = new Map(document.createElement('div'))
 			let layer = layerSpy()
-			map.addLayer(layer)
-			map.removeLayer(layer)
-			map.view = {center: [0, 0], zoom: 0}
+			map2.addLayer(layer)
+			map2.removeLayer(layer)
+			map2.view = {center: [0, 0], zoom: 0}
 			expect(layer.onAdd.called).not.to.be.ok()
 		})
 
@@ -363,20 +366,20 @@ describe("Map", function () {
 		it("fires a layeradd event when the map becomes ready", function () {
 			let layer = layerSpy(),
 			    spy = sinon.spy()
-			map.on('layeradd', spy)
-			map.addLayer(layer)
+			map_notready.on('layeradd', spy)
+			map_notready.addLayer(layer)
 			expect(spy.called).not.to.be.ok()
-			map.view = {center: [0, 0], zoom: 0}
+			map_notready.view = {center: [0, 0], zoom: 0}
 			expect(spy.called).to.be.ok()
 		})
 
 		it("does not fire a layeradd event if the layer is removed before the map becomes ready", function () {
 			let layer = layerSpy(),
 			    spy = sinon.spy()
-			map.on('layeradd', spy)
-			map.addLayer(layer)
-			map.removeLayer(layer)
-			map.view = {center: [0, 0], zoom: 0}
+			map_notready.on('layeradd', spy)
+			map_notready.addLayer(layer)
+			map_notready.removeLayer(layer)
+			map_notready.view = {center: [0, 0], zoom: 0}
 			expect(spy.called).not.to.be.ok()
 		})
 
@@ -395,7 +398,7 @@ describe("Map", function () {
 				let spy = sinon.spy()
 				map.on("zoomlevelschange", spy)
 				expect(spy.called).not.to.be.ok()
-				TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map)
+				new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map)
 				expect(spy.called).to.be.ok()
 			})
 		})
@@ -403,10 +406,10 @@ describe("Map", function () {
 		describe("when a new layer with greater zoomlevel coverage than the current layer is added to a map", function () {
 			it("fires a zoomlevelschange event", function () {
 				let spy = sinon.spy()
-				TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map)
+				new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 5}).addTo(map)
 				map.on("zoomlevelschange", spy)
 				expect(spy.called).not.to.be.ok()
-				TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 15}).addTo(map)
+				new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 15}).addTo(map)
 				expect(spy.called).to.be.ok()
 			})
 		})
@@ -414,12 +417,12 @@ describe("Map", function () {
 		describe("when a new layer with the same or lower zoomlevel coverage as the current layer is added to a map", function () {
 			it("fires no zoomlevelschange event", function () {
 				let spy = sinon.spy()
-				TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map)
+				new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 5}).addTo(map)
 				map.on("zoomlevelschange", spy)
 				expect(spy.called).not.to.be.ok()
-				TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map)
+				new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map)
 				expect(spy.called).not.to.be.ok()
-				TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 5}).addTo(map)
+				new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 5}).addTo(map)
 				expect(spy.called).not.to.be.ok()
 			})
 		})
@@ -488,14 +491,14 @@ describe("Map", function () {
 		});
 
 		it("supports adding and removing a tile layer without initializing the map", function () {
-			var layer = TileLayer("{z}{x}{y}");
+			var layer = new TileLayer("{z}{x}{y}");
 			map.addLayer(layer);
 			map.removeLayer(layer);
 		});
 
 		it("supports adding and removing a tile layer without initializing the map", function () {
 			map.view = {center: [0, 0], zoom: 18}
-			var layer = GridLayer()
+			var layer = new GridLayer()
 			map.addLayer(layer);
 			map.removeLayer(layer);
 		});
@@ -504,7 +507,7 @@ describe("Map", function () {
 			it("fires a zoomlevelschange event", function () {
 				map.whenReady(function () {
 					var spy = sinon.spy();
-					var tl = TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map);
+					var tl = new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map);
 
 					map.on("zoomlevelschange", spy);
 					expect(spy.called).not.to.be.ok();
@@ -518,8 +521,8 @@ describe("Map", function () {
 			it("fires a zoomlevelschange event", function () {
 				map.whenReady(function () {
 					var spy = sinon.spy(),
-					    tl = TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map),
-					    t2 = TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 15}).addTo(map);
+					    tl = new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map),
+					    t2 = new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 15}).addTo(map);
 
 					map.on("zoomlevelschange", spy);
 					expect(spy.called).to.not.be.ok();
@@ -532,9 +535,9 @@ describe("Map", function () {
 		describe("when a tile layer is removed from a map it and it had lesser or the sa,e zoom level coverage as the remainding layer(s)", function () {
 			it("fires no zoomlevelschange event", function () {
 				map.whenReady(function () {
-					var tl = TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map),
-					    t2 = TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map),
-					    t3 = TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 5}).addTo(map);
+					var tl = new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map),
+					    t2 = new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map),
+					    t3 = new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 5}).addTo(map);
 
 					map.on("zoomlevelschange", spy);
 					expect(spy).not.toHaveBeenCalled();
@@ -553,8 +556,8 @@ describe("Map", function () {
 		});
 
 		it("calls the provided function for each layer", function () {
-			var t1 = TileLayer("{z}{x}{y}").addTo(map),
-			    t2 = TileLayer("{z}{x}{y}").addTo(map),
+			var t1 = new TileLayer("{z}{x}{y}").addTo(map),
+			    t2 = new TileLayer("{z}{x}{y}").addTo(map),
 			    spy = sinon.spy();
 
 			map.eachLayer(spy);
@@ -565,7 +568,7 @@ describe("Map", function () {
 		});
 
 		it("calls the provided function with the provided context", function () {
-			var t1 = TileLayer("{z}{x}{y}").addTo(map),
+			var t1 = new TileLayer("{z}{x}{y}").addTo(map),
 			    spy = sinon.spy();
 
 			map.eachLayer(spy, map);
