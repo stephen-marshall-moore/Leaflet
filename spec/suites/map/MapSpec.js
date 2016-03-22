@@ -838,12 +838,13 @@ describe("Map", function () {
 		})
 
 		it('Snaps zoom level to integer by default', function (done) {
+			Browser.any3d = false
 			map.once('zoomend', function () {
-				expect(map.zoom).to.eql(2);
-				expect(map.center.equals(boundsCenter, 0.05)).to.eql(true);
-				done();
-			});
-			map.fitBounds(bounds, {animate: false});
+				expect(map.zoom).to.eql(2)
+				expect(map.center.equals(boundsCenter, 0.05)).to.eql(true)
+				done()
+			})
+			map.fitBounds(bounds, {animate: false})
 		});
 
 		it('Snaps zoom to zoomSnap on any3d browsers', function (done) {
@@ -889,19 +890,19 @@ describe("Map", function () {
 
 		it('Snaps to a number after adding tile layer', function (done) {
 			Browser.any3d = true;
-			map_notready.addLayer(new TileLayer('file:///dev/null'));
-			expect(map_notready.zoom).to.be(undefined);
+			map.addLayer(new TileLayer("{z}{x}{y}"))
+			expect(map.zoom).to.be(5);
 			map.fitBounds(bounds);
-			expect(map_notready.zoom).to.be(2);
+			expect(map.zoom).to.be(2.75);
 			done();
 		});
 
 		it('Snaps to a number after adding marker', function (done) {
 			Browser.any3d = true;
-			map_notready.addLayer(new Marker(center));
-			expect(map_notready.zoom).to.be(undefined);
-			map_notready.fitBounds(bounds);
-			expect(map_notready.zoom).to.be(2);
+			map.addLayer(new Marker(center));
+			expect(map.zoom).to.be(5);
+			map.fitBounds(bounds);
+			expect(map.zoom).to.be(2.75);
 			done();
 		});
 

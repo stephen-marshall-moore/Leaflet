@@ -83,9 +83,12 @@ export class Map extends Evented {
 
 	// replaced by animation-powered implementation in Map.PanAnimation.js
 	set view({center: c, zoom: z}) {
-		this._zoom = z === undefined ? this._zoom : z
-		this._lastCenter = LatLng.latLng(c)
-		this._resetView(this._lastCenter, this._zoom)
+		//this._zoom = z === undefined ? this._zoom : z
+		//this._lastCenter = LatLng.latLng(c)
+		//this._resetView(this._lastCenter, this._zoom)
+		let zoom = z === undefined ? this._zoom : z
+		let center = LatLng.latLng(c)
+		this._resetView(center, zoom)
 		//return {center: this.center, zoom: this.zoom}
 	}
 
