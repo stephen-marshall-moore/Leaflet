@@ -16,6 +16,11 @@ export class Layer extends Evented {
 		return this
 	}
 
+	beforeAdd(map) {
+		// do nothing
+		return this
+	}
+
 	remove(){
 		return this.removeFrom(this._map || this._mapToAdd)
 	}
@@ -63,6 +68,8 @@ export class Layer extends Evented {
 		this.fire('add')
 		map.fire('layeradd', {layer: this})
 	}
+
+	/*** these are Map methods
 
 	addLayer(layer) {
 		var id = Util.stamp(layer)
@@ -163,5 +170,7 @@ export class Layer extends Evented {
 			this.fire('zoomlevelschange')
 		}
 	}
+	***/
+
 }
 

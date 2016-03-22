@@ -8,13 +8,14 @@ import {Bounds} from '../geometry/Bounds'
 import {LatLng} from '../geo/LatLng'
 import {LatLngBounds} from '../geo/LatLngBounds'
 import {EPSG3857} from '../geo/crs/CRS.EPSG3857'
+import {Marker} from '../layer/marker/Marker'
 
 /*
  * L.Map is the central class of the API - it is used to create a map.
  */
 	const _default_map_options = {
 			crs: new EPSG3857(),
-			zoom: 5,
+			//zoom: 5,
 			minZoom: 0,
 			maxZoom: 25,
 			/*
@@ -49,7 +50,7 @@ export class Map extends Evented {
 		this._initLayout()
 
 		// hack for https://github.com/Leaflet/Leaflet/issues/1980
-		//this._onResize = L.bind(this._onResize, this);
+		this._onResize = Util.bind(this._onResize, this);
 
 		this._initEvents()
 
@@ -92,20 +93,20 @@ export class Map extends Evented {
 		return {center: this.center, zoom: this.zoom}
 	}
 
-	get zoom() {
-		return this._zoom
-	}
+	//get zoom() {
+	//	return this._zoom
+	//}
 
 	set center(latlng) {
 		this._lastCenter = LatLng.latLng(latlng)
-		this._resetView(this.center, this.zoom)
+		this._resetView(this._lastCenter, this._zoom)
 	}
 
 	//set zoom({zoom: zoom, options: options = {}}) {
 	set zoom(zoom) {
 		//if (!this._loaded) {
 		this._zoom = zoom
-		this._resetView(this.center, this.zoom)
+		this._resetView(this._lastCenter, this._zoom)
 			//return this
 		//}
 		//return this.view = {center: this.center, zoom: zoom}
@@ -114,12 +115,15 @@ export class Map extends Evented {
 
 	zoomIn(delta, options) {
 		delta = delta || (Browser.any3d ? this.options.zoomDelta : 1)
-		return this.zoom = {zoom: this._zoom + delta, options: options}
+		this.zoom = this._zoom + delta // {zoom: this._zoom + delta, options: options}
+		return this
 	}
 
 	zoomOut(delta, options) {
 		delta = delta || (Browser.any3d ? this.options.zoomDelta : 1)
-		return this.zoom = {zoom: this._zoom - delta, options: options}
+		this.zoom = this._zoom - delta
+		return this
+		//return this.zoom = {zoom: this._zoom - delta, options: options}
 	}
 
 	setZoomAround(latlng, zoom, options) {
@@ -204,7 +208,8 @@ export class Map extends Evented {
 		this.options.minZoom = zoom
 
 		if (this._loaded && this.zoom < this.options.minZoom) {
-			return this._zoom = zoom
+			this._zoom = zoom
+			//return this._zoom = zoom
 		}
 
 	}
@@ -219,7 +224,8 @@ export class Map extends Evented {
 		this.options.maxZoom = zoom
 
 		if (this._loaded && this.zoom > this.options.maxZoom) {
-			return this._zoom = zoom
+			this._zoom = zoom
+			//return this._zoom = zoom
 		}
 
 	}
@@ -663,9 +669,9 @@ export class Map extends Evented {
 	}
 
 	_onResize() {
-		Util.cancelAnimFrame(this._resizeRequest)
-		this._resizeRequest = Util.requestAnimFrame(
-		        function () { this.invalidateSize({debounceMoveend: true}) }, this)
+		//Util.cancelAnimFrame(this._resizeRequest)
+		//this._resizeRequest = Util.requestAnimFrame(
+		//        function () { this.invalidateSize({debounceMoveend: true}) }, this)
 	}
 
 	_onScroll() {
@@ -758,7 +764,7 @@ export class Map extends Evented {
 		for (var i = 0; i < targets.length; i++) {
 			targets[i].fire(type, data, true)
 			if (data.originalEvent._stopped ||
-				(targets[i].options.nonBubblingEvents && Util.indexOf(targets[i].options.nonBubblingEvents, type) !== -1)) { return }
+				(targets[i].options.nonBubblingEvents && targets[i].options.nonBubblingEvents.findIndex(x => type) !== -1)) { return }
 		}
 	}
 
@@ -950,7 +956,8 @@ export class Map extends Evented {
 	}
 
 	_addZoomLimit(layer) {
-		if (Number.isNaN(layer.options.maxZoom) || !Number.isNaN(layer.options.minZoom)) {
+		//if (Number.isNaN(layer.options.maxZoom) || !Number.isNaN(layer.options.minZoom)) {
+		if (isNaN(layer.options.maxZoom) || !isNaN(layer.options.minZoom)) {
 			this._zoomBoundLayers[Util.stamp(layer)] = layer
 			this._updateZoomLevels()
 		}

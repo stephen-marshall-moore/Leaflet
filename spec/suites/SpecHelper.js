@@ -26,6 +26,8 @@ if (!Array.prototype.map) {
 	};
 }
 
+import {Util} from 'src/core/Util'
+
 expect.Assertion.prototype.near = function (expected, delta) {
 	delta = delta || 1;
 	expect(this.obj.x).to
@@ -42,9 +44,9 @@ expect.Assertion.prototype.nearLatLng = function (expected, delta) {
 		.be.within(expected.lng - delta, expected.lng + delta);
 };
 
-/***
+//***
 happen.at = function (what, x, y, props) {
-	this.once(document.elementFromPoint(x, y), L.Util.extend({
+	this.once(document.elementFromPoint(x, y), Util.extend({
 		type: what,
 		clientX: x,
 		clientY: y,
@@ -77,7 +79,7 @@ happen.drag = function (fromX, fromY, toX, toY, then, duration) {
 		if (then) { then(); }
 	}, duration || 100);
 };
-***/
+//***/
 
 // We'll want to skip a couple of things when in PhantomJS :-/
 //it.skipInPhantom = L.Browser.any3d ? it : it.skip;

@@ -76,6 +76,12 @@ module.exports = function (config) {
 		// frameworks to use
 		frameworks: ['systemjs', 'expect', 'sinon', 'mocha'],
 
+    client: {
+      mocha: {
+        timeout: 2000
+      }
+    },
+
 		// list of files / patterns to load in the browser
 		files: files,
 		exclude: [],

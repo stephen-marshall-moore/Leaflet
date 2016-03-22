@@ -29,17 +29,17 @@ export class TileLayer extends GridLayer {
 		Object.assign(this.options, _default_tile_options, options)
 
 		// detecting retina displays, adjusting tileSize and zoom levels
-		if (options.detectRetina && Browser.retina && options.maxZoom > 0) {
+		if (this.options.detectRetina && Browser.retina && this.options.maxZoom > 0) {
 
-			options.tileSize = Math.floor(options.tileSize / 2)
-			options.zoomOffset++
+			this.options.tileSize = Math.floor(this.options.tileSize / 2)
+			this.options.zoomOffset++
 
-			options.minZoom = Math.max(0, options.minZoom)
-			options.maxZoom--
+			this.options.minZoom = Math.max(0, this.options.minZoom)
+			this.options.maxZoom--
 		}
 
-		if (typeof options.subdomains === 'string') {
-			options.subdomains = options.subdomains.split('')
+		if (typeof this.options.subdomains === 'string') {
+			this.options.subdomains = this.options.subdomains.split('')
 		}
 
 		// for https://github.com/Leaflet/Leaflet/issues/137

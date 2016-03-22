@@ -1,6 +1,7 @@
 "use strict"
 
 import {Browser} from 'src/core/Browser'
+import {DomEvent} from 'src/dom/DomEvent'
 import {LatLng} from 'src/geo/LatLng'
 import {LatLngBounds} from 'src/geo/LatLngBounds'
 import {Map} from 'src/map/Map'
@@ -25,6 +26,15 @@ describe("Map", function () {
 		map = new Map(container, {center: new LatLng(30,50), zoom: 5})
 		map_notready = new Map(document.createElement('div'))
 	})
+
+	/*** no change with this
+	afterEach(function () {
+		crs = undefined
+		container = undefined
+		map = undefined
+		map_notready = undefined
+	})
+	***/
 
 	describe("#constructor, checking options setting", function () {
 		it("tries new without options", function () {
@@ -396,9 +406,16 @@ describe("Map", function () {
 		describe("When the first layer is added to a map", function () {
 			it("fires a zoomlevelschange event", function () {
 				let spy = sinon.spy()
-				map.on("zoomlevelschange", spy)
+				map_notready.on("zoomlevelschange", spy)
+				//map_notready.view = {center: [0, 0], minZoom: undefined, maxZoom: undefined}
 				expect(spy.called).not.to.be.ok()
-				new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map)
+				expect(map_notready._getZoomSpan()).to.be(25)
+				expect(map_notready._layersMaxZoom).to.be(undefined)
+				let tiles = new TileLayer("{z}{x}{y}", {minZoom: 5, maxZoom: 12})
+				tiles.addTo(map_notready)
+				expect(this._zoomBoundLayers).to.be(undefined)
+				expect(map_notready._layersMaxZoom).to.be(12)
+				expect(map_notready._getZoomSpan()).to.be(25)
 				expect(spy.called).to.be.ok()
 			})
 		})
@@ -446,8 +463,8 @@ describe("Map", function () {
 
 		it("does not call layer.onRemove if the map is not ready", function () {
 			var layer = layerSpy();
-			map.addLayer(layer);
-			map.removeLayer(layer);
+			map_notready.addLayer(layer);
+			map_notready.removeLayer(layer);
 			expect(layer.onRemove.called).not.to.be.ok();
 		});
 
@@ -473,9 +490,9 @@ describe("Map", function () {
 		it("does not fire a layerremove if the map is not ready", function () {
 			var layer = layerSpy(),
 			    spy = sinon.spy();
-			map.on('layerremove', spy);
-			map.addLayer(layer);
-			map.removeLayer(layer);
+			map_notready.on('layerremove', spy);
+			map_notready.addLayer(layer);
+			map_notready.removeLayer(layer);
 			expect(spy.called).not.to.be.ok();
 		});
 
@@ -535,20 +552,21 @@ describe("Map", function () {
 		describe("when a tile layer is removed from a map it and it had lesser or the sa,e zoom level coverage as the remainding layer(s)", function () {
 			it("fires no zoomlevelschange event", function () {
 				map.whenReady(function () {
-					var tl = new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map),
+					let spy = new sinon.spy()
+					let tl = new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map),
 					    t2 = new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map),
 					    t3 = new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 5}).addTo(map);
 
-					map.on("zoomlevelschange", spy);
-					expect(spy).not.toHaveBeenCalled();
-					map.removeLayer(t2);
-					expect(spy).not.toHaveBeenCalled();
-					map.removeLayer(t3);
-					expect(spy).not.toHaveBeenCalled();
-				});
-			});
-		});
-	});
+					map.on("zoomlevelschange", spy)
+					expect(spy.called).to.not.be.ok()
+					map.removeLayer(t2)
+					expect(spy.called).to.not.be.ok()
+					map.removeLayer(t3)
+					expect(spy.called).to.not.be.ok()
+				})
+			})
+		})
+	})
 
 	describe("#eachLayer", function () {
 		it("returns self", function () {
@@ -578,23 +596,25 @@ describe("Map", function () {
 	});
 
 	describe("#invalidateSize", function () {
-		var container,
+		let map,
+				container,
 		    origWidth = 100,
 		    clock;
 
 		beforeEach(function () {
-			container = map.container;
-			container.style.width = origWidth + "px";
-			document.body.appendChild(container);
+			container = document.createElement('div')
+			map = new Map(container, {center: new LatLng(30,50), zoom: 5})
+			container.style.width = origWidth + "px"
+			document.body.appendChild(container)
 			map.view = {center: [0, 0], zoom: 0}
-			map.invalidateSize({pan: false});
-			clock = sinon.useFakeTimers();
+			map.invalidateSize({pan: false})
+			clock = sinon.useFakeTimers()
 		});
 
 		afterEach(function () {
-			document.body.removeChild(container);
-			clock.restore();
-		});
+			document.body.removeChild(container)
+			clock.restore()
+		})
 
 		it("pans by the right amount when growing in 1px increments", function () {
 			container.style.width = (origWidth + 1) + "px";
@@ -678,6 +698,8 @@ describe("Map", function () {
 		});
 	});
 
+	/***
+		don't have fly to included yet
 	describe('#flyTo', function () {
 
 		it('move to requested center and zoom, and call zoomend once', function (done) {
@@ -695,29 +717,42 @@ describe("Map", function () {
 			map.once('zoomend', callback).flyTo(newCenter, newZoom)
 		})
 	})
+	***/
 
 	describe('#zoomIn and #zoomOut', function () {
-		let center = LatLng.latLng(22, 33)
+		let map2,
+				container2,
+				center
+
 		beforeEach(function () {
-			map.view = {center: center, zoom: 10}
+			container2 = document.createElement('div')
+			map2 = new Map(container2)
+			center = LatLng.latLng(22, 33)
+			map2.view = {center: center, zoom: 10}
+		})
+
+		it('manual zoomIn zooms by 1 zoom level by default', function () {
+			map2.zoomIn(null, {animate: false})
+			expect(map2.zoom).to.eql(11);
+			expect(map2.center).to.eql(center)
 		})
 
 		it('zoomIn zooms by 1 zoom level by default', function (done) {
-			map.once('zoomend', function () {
-				expect(map.zoom).to.eql(11);
-				expect(map.center).to.eql(center)
+			map2.once('zoomend', function () {
+				expect(map2.zoom).to.eql(11);
+				expect(map2.center).to.eql(center)
 				done()
 			})
-			map.zoomIn(null, {animate: false})
+			map2.zoomIn(null, {animate: false})
 		})
 
 		it('zoomOut zooms by 1 zoom level by default', function (done) {
-			map.once('zoomend', function () {
-				expect(map.zoom).to.eql(9)
-				expect(map.center).to.eql(center)
+			map2.once('zoomend', function () {
+				expect(map2.zoom).to.eql(9)
+				expect(map2.center).to.eql(center)
 				done()
 			})
-			map.zoomOut(null, {animate: false})
+			map2.zoomOut(null, {animate: false})
 		})
 
 		it('zoomIn ignores the zoomDelta option on non-any3d browsers', function (done) {
@@ -760,7 +795,7 @@ describe("Map", function () {
 
 		it('zoomIn snaps to zoomSnap on any3d browsers', function (done) {
 			map.options.zoomSnap = 0.25;
-			map.view = {center: [0, 0], zoom: 10}
+			map.view = {center: [22, 33], zoom: 10}
 			map.once('zoomend', function () {
 				expect(map.zoom).to.eql(10.25);
 				expect(map.center).to.eql(center);
@@ -772,7 +807,7 @@ describe("Map", function () {
 
 		it('zoomOut snaps to zoomSnap on any3d browsers', function (done) {
 			map.options.zoomSnap = 0.25;
-			map.view = {center: [0, 0], zoom: 10}
+			map.view = {center: [22, 33], zoom: 10}
 			map.once('zoomend', function () {
 				expect(map.zoom).to.eql(9.75);
 				expect(map.center).to.eql(center);
@@ -784,21 +819,21 @@ describe("Map", function () {
 	});
 
 	describe('#fitBounds', function () {
-		var center = LatLng.latLng(22, 33),
+		let center = LatLng.latLng(22, 33),
 		    bounds = LatLngBounds.latLngBounds(LatLng.latLng(1, 102), LatLng.latLng(11, 122)),
 		    boundsCenter = bounds.center
 
 		beforeEach(function () {
 			// fitBounds needs a map container with non-null area
-			var container = map.container;
-			container.style.width = container.style.height = "100px";
-			document.body.appendChild(container);
+			let container = map.container;
+			container.style.width = container.style.height = "100px"
+			document.body.appendChild(container)
 			map.view = {center: [0, 0], zoom: 10}
-		});
+		})
 
 		afterEach(function () {
-			document.body.removeChild(map.container);
-		});
+			document.body.removeChild(map.container)
+		})
 
 		it('Snaps zoom level to integer by default', function (done) {
 			map.once('zoomend', function () {
@@ -852,19 +887,19 @@ describe("Map", function () {
 
 		it('Snaps to a number after adding tile layer', function (done) {
 			Browser.any3d = true;
-			map.addLayer(TileLayer('file:///dev/null'));
-			expect(map.zoom).to.be(undefined);
+			map_notready.addLayer(new TileLayer('file:///dev/null'));
+			expect(map_notready.zoom).to.be(undefined);
 			map.fitBounds(bounds);
-			expect(map.zoom).to.be(2);
+			expect(map_notready.zoom).to.be(2);
 			done();
 		});
 
 		it('Snaps to a number after adding marker', function (done) {
 			Browser.any3d = true;
-			map.addLayer(Marker(center));
-			expect(map.zoom).to.be(undefined);
-			map.fitBounds(bounds);
-			expect(map.zoom).to.be(2);
+			map_notready.addLayer(new Marker(center));
+			expect(map_notready.zoom).to.be(undefined);
+			map_notready.fitBounds(bounds);
+			expect(map_notready.zoom).to.be(2);
 			done();
 		});
 
@@ -872,20 +907,20 @@ describe("Map", function () {
 
 	describe('#DOM events', function () {
 
-		var c, map;
+		let c, map
 
 		beforeEach(function () {
-			c = document.createElement('div');
-			c.style.width = '400px';
-			c.style.height = '400px';
-			map = new Map(c);
+			c = document.createElement('div')
+			c.style.width = '400px'
+			c.style.height = '400px'
+			map = new Map(c)
 			map.view = {center:[0, 0], zoom: 0}
-			document.body.appendChild(c);
-		});
+			document.body.appendChild(c)
+		})
 
 		afterEach(function () {
-			document.body.removeChild(c);
-		});
+			document.body.removeChild(c)
+		})
 
     /***
 		it("DOM events propagate from polygon to map", function () {

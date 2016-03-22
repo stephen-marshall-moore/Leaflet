@@ -92,6 +92,8 @@ export class Util {
 		return wrapperFn
 	}
 
+	static requestAnimFrame() {}
+	static cancelAnimFrame() {}
 }
 
 Util._lastId = 0;
