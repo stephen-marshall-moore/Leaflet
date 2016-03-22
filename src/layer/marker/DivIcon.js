@@ -20,7 +20,7 @@ let _default_divicon_options = {
 export class DivIcon extends Icon {
 
 	constructor(latlng, options = undefined) {
-		super()		
+		super(latlng)		
 		Object.assign(this.options, _default_divicon_options, options)
 	}
 

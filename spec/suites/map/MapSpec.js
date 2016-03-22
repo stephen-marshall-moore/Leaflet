@@ -908,6 +908,168 @@ describe("Map", function () {
 
 	});
 
+	describe('#DOM events', function () {
+
+		let domcan, dommap
+
+		beforeEach(function () {
+			domcan = document.createElement('div')
+			domcan.style.width = '400px'
+			domcan.style.height = '400px'
+			dommap = new Map(domcan)
+			dommap.view = {center:[0, 0], zoom: 0}
+			document.body.appendChild(domcan)
+		})
+
+		afterEach(function () {
+			document.body.removeChild(domcan)
+		})
+
+    /***
+		it("DOM events propagate from polygon to map", function () {
+			var spy = sinon.spy();
+			map.on("mousemove", spy);
+			var layer = new L.Polygon([[1, 2], [3, 4], [5, 6]]).addTo(map);
+			happen.mousemove(layer._path);
+			expect(spy.calledOnce).to.be.ok();
+		});
+		***/
+
+		it("DOM events propagate from marker to map", function () {
+			var spy = sinon.spy();
+			dommap.on("mousemove", spy);
+			var layer = new Marker([1, 2]).addTo(dommap);
+			happen.mousemove(layer._icon);
+			expect(spy.calledOnce).to.be.ok();
+		});
+
+		it("DOM events fired on marker can be cancelled before being caught by the map", function () {
+			var mapSpy = sinon.spy();
+			var layerSpy = sinon.spy();
+			dommap.on("mousemove", mapSpy);
+			var layer = new Marker([1, 2]).addTo(dommap);
+			layer.on("mousemove", DomEvent.stopPropagation).on("mousemove", layerSpy);
+			happen.mousemove(layer._icon);
+			expect(layerSpy.calledOnce).to.be.ok();
+			expect(mapSpy.called).not.to.be.ok();
+		});
+
+		/***
+		it("DOM events fired on polygon can be cancelled before being caught by the map", function () {
+			var mapSpy = sinon.spy();
+			var layerSpy = sinon.spy();
+			map.on("mousemove", mapSpy);
+			var layer = new L.Polygon([[1, 2], [3, 4], [5, 6]]).addTo(map);
+			layer.on("mousemove", L.DomEvent.stopPropagation).on("mousemove", layerSpy);
+			happen.mousemove(layer._path);
+			expect(layerSpy.calledOnce).to.be.ok();
+			expect(mapSpy.called).not.to.be.ok();
+		});
+
+		it("mouseout is forwarded if fired on the original target", function () {
+			var mapSpy = sinon.spy(),
+			    layerSpy = sinon.spy(),
+			    otherSpy = sinon.spy();
+			var layer = new L.Polygon([[1, 2], [3, 4], [5, 6]]).addTo(map);
+			var other = new L.Polygon([[10, 20], [30, 40], [50, 60]]).addTo(map);
+			map.on("mouseout", mapSpy);
+			layer.on("mouseout", layerSpy);
+			other.on("mouseout", otherSpy);
+			happen.mouseout(layer._path, {relatedTarget: map._container});
+			expect(mapSpy.called).not.to.be.ok();
+			expect(otherSpy.called).not.to.be.ok();
+			expect(layerSpy.calledOnce).to.be.ok();
+		});
+		***/
+
+		it("mouseout is forwarded when using a DivIcon", function () {
+			let icon = new DivIcon([1,2], {
+				html: "<p>this is text in a child element</p>",
+				iconSize: [100, 100]
+			})
+			let mapSpy = sinon.spy(),
+			    layerSpy = sinon.spy(),
+			    layer = new Marker([1, 2], {icon: icon}).addTo(dommap)
+			dommap.on("mouseout", mapSpy)
+			layer.on("mouseout", layerSpy)
+			happen.mouseout(layer._icon, {relatedTarget: dommap._container})
+			expect(mapSpy.called).not.to.be.ok()
+			expect(layerSpy.calledOnce).to.be.ok()
+		})
+
+		it("mouseout is not forwarded if relatedTarget is a target's child", function () {
+			let icon = new DivIcon([1, 2], {
+				html: "<p>this is text in a child element</p>",
+				iconSize: [100, 100]
+			})
+			let mapSpy = sinon.spy(),
+			    layerSpy = sinon.spy(),
+			    layer = new Marker([1, 2], {icon: icon}).addTo(dommap),
+			    child = layer._icon.querySelector('p')
+			dommap.on("mouseout", mapSpy)
+			layer.on("mouseout", layerSpy)
+			happen.mouseout(layer._icon, {relatedTarget: child})
+			expect(mapSpy.called).not.to.be.ok()
+			expect(layerSpy.calledOnce).not.to.be.ok()
+		})
+
+		it("mouseout is not forwarded if fired on target's child", function () {
+			let icon = new DivIcon([1, 2], {
+				html: "<p>this is text in a child element</p>",
+				iconSize: [100, 100]
+			})
+			var mapSpy = sinon.spy(),
+			    layerSpy = sinon.spy(),
+			    layer = new Marker([1, 2], {icon: icon}).addTo(dommap),
+			    child = layer._icon.querySelector('p')
+			dommap.on("mouseout", mapSpy)
+			layer.on("mouseout", layerSpy)
+			happen.mouseout(child, {relatedTarget: layer._icon})
+			expect(mapSpy.called).not.to.be.ok()
+			expect(layerSpy.calledOnce).not.to.be.ok()
+		})
+
+		/***
+		it("mouseout is not forwarded to layers if fired on the map", function () {
+			var mapSpy = sinon.spy(),
+			    layerSpy = sinon.spy(),
+			    otherSpy = sinon.spy();
+			var layer = new L.Polygon([[1, 2], [3, 4], [5, 6]]).addTo(map);
+			var other = new L.Polygon([[10, 20], [30, 40], [50, 60]]).addTo(map);
+			map.on("mouseout", mapSpy);
+			layer.on("mouseout", layerSpy);
+			other.on("mouseout", otherSpy);
+			happen.mouseout(map._container);
+			expect(otherSpy.called).not.to.be.ok();
+			expect(layerSpy.called).not.to.be.ok();
+			expect(mapSpy.calledOnce).to.be.ok();
+		});
+		***/
+
+		it("preclick is fired before click on marker and map", function () {
+			let called = 0
+			let layer = new Marker([1, 2]).addTo(dommap)
+			layer.on("preclick", function (e) {
+				expect(called++).to.eql(0)
+				expect(e.latlng).to.ok()
+			})
+			layer.on("click", function (e) {
+				expect(called++).to.eql(1) // really should be 2??
+				expect(e.latlng).to.ok()
+			})
+			dommap.on("preclick", function (e) {
+				expect(called++).to.eql(1)
+				expect(e.latlng).to.ok()
+			})
+			dommap.on("click", function (e) {
+				expect(called++).to.eql(3)
+				expect(e.latlng).to.ok()
+			})
+			happen.click(layer._icon)
+		})
+
+	})
+
 	describe('#getScaleZoom && #getZoomScale', function () {
 		it("convert zoom to scale and viceversa and return the same values", function () {
 			var toZoom = 6.25;
