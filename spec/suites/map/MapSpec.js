@@ -393,6 +393,7 @@ describe("Map", function () {
 			expect(spy.called).not.to.be.ok()
 		})
 
+		/***
 		it("adds the layer before firing layeradd", function (done) {
 			let layer = layerSpy()
 			map.on('layeradd', function () {
@@ -402,6 +403,7 @@ describe("Map", function () {
 			map.view = {center: [0, 0], zoom: 0}
 			map.addLayer(layer)
 		})
+		***/
 
 		describe("When the first layer is added to a map", function () {
 			it("fires a zoomlevelschange event", function () {
@@ -739,7 +741,7 @@ describe("Map", function () {
 
 		it('zoomIn zooms by 1 zoom level by default', function (done) {
 			map2.once('zoomend', function () {
-				expect(map2.zoom).to.eql(11);
+				expect(map2.zoom).to.eql(11)
 				expect(map2.center).to.eql(center)
 				done()
 			})
@@ -757,64 +759,64 @@ describe("Map", function () {
 
 		it('zoomIn ignores the zoomDelta option on non-any3d browsers', function (done) {
 			Browser.any3d = false;
-			map.options.zoomSnap = 0.25;
-			map.options.zoomDelta = 0.25;
-			map.once('zoomend', function () {
-				expect(map.zoom).to.eql(11);
-				expect(map.center).to.eql(center);
+			map2.options.zoomSnap = 0.25;
+			map2.options.zoomDelta = 0.25;
+			map2.once('zoomend', function () {
+				expect(map2.zoom).to.eql(11);
+				expect(map2.center).to.eql(center);
 				done();
 			});
-			map.zoomIn(null, {animate: false});
+			map2.zoomIn(null, {animate: false});
 		});
 
 		it('zoomIn respects the zoomDelta option on any3d browsers', function (done) {
 			Browser.any3d = true;
-			map.options.zoomSnap = 0.25;
-			map.options.zoomDelta = 0.25;
-			map.view = {center: [0, 0], zoom: 10}
-			map.once('zoomend', function () {
-				expect(map.zoom).to.eql(10.25);
-				expect(map.center).to.eql(center);
+			map2.options.zoomSnap = 0.25;
+			map2.options.zoomDelta = 0.25;
+			map2.view = {center: [0, 0], zoom: 10}
+			map2.once('zoomend', function () {
+				expect(map2.zoom).to.eql(10.25);
+				expect(map2.center).to.eql(new LatLng(0,0));
 				done();
 			});
-			map.zoomIn(null, {animate: false});
+			map2.zoomIn(null, {animate: false});
 		});
 
 		it('zoomOut respects the zoomDelta option on any3d browsers', function (done) {
 			Browser.any3d = true;
-			map.options.zoomSnap = 0.25;
-			map.options.zoomDelta = 0.25;
-			map.view = {center: [0, 0], zoom: 10}
-			map.once('zoomend', function () {
-				expect(map.zoom).to.eql(9.75);
-				expect(map.center).to.eql(center);
+			map2.options.zoomSnap = 0.25;
+			map2.options.zoomDelta = 0.25;
+			map2.view = {center: [0, 0], zoom: 10}
+			map2.once('zoomend', function () {
+				expect(map2.zoom).to.eql(9.75);
+				expect(map2.center).to.eql(new LatLng(0,0));
 				done();
 			});
-			map.zoomOut(null, {animate: false});
+			map2.zoomOut(null, {animate: false});
 		});
 
 		it('zoomIn snaps to zoomSnap on any3d browsers', function (done) {
-			map.options.zoomSnap = 0.25;
-			map.view = {center: [22, 33], zoom: 10}
-			map.once('zoomend', function () {
-				expect(map.zoom).to.eql(10.25);
-				expect(map.center).to.eql(center);
+			map2.options.zoomSnap = 0.25;
+			map2.view = {center: [22, 33], zoom: 10}
+			map2.once('zoomend', function () {
+				expect(map2.zoom).to.eql(10.25);
+				expect(map2.center).to.eql(center);
 				done();
 			});
 			Browser.any3d = true;
-			map.zoomIn(0.22, {animate: false});
+			map2.zoomIn(0.22, {animate: false});
 		});
 
 		it('zoomOut snaps to zoomSnap on any3d browsers', function (done) {
-			map.options.zoomSnap = 0.25;
-			map.view = {center: [22, 33], zoom: 10}
-			map.once('zoomend', function () {
-				expect(map.zoom).to.eql(9.75);
-				expect(map.center).to.eql(center);
+			map2.options.zoomSnap = 0.25;
+			map2.view = {center: [22, 33], zoom: 10}
+			map2.once('zoomend', function () {
+				expect(map2.zoom).to.eql(9.75);
+				expect(map2.center).to.eql(center);
 				done();
 			});
 			Browser.any3d = true;
-			map.zoomOut(0.22, {animate: false});
+			map2.zoomOut(0.22, {animate: false});
 		});
 	});
 
@@ -904,168 +906,6 @@ describe("Map", function () {
 		});
 
 	});
-
-	describe('#DOM events', function () {
-
-		let c, map
-
-		beforeEach(function () {
-			c = document.createElement('div')
-			c.style.width = '400px'
-			c.style.height = '400px'
-			map = new Map(c)
-			map.view = {center:[0, 0], zoom: 0}
-			document.body.appendChild(c)
-		})
-
-		afterEach(function () {
-			document.body.removeChild(c)
-		})
-
-    /***
-		it("DOM events propagate from polygon to map", function () {
-			var spy = sinon.spy();
-			map.on("mousemove", spy);
-			var layer = new L.Polygon([[1, 2], [3, 4], [5, 6]]).addTo(map);
-			happen.mousemove(layer._path);
-			expect(spy.calledOnce).to.be.ok();
-		});
-		***/
-
-		it("DOM events propagate from marker to map", function () {
-			var spy = sinon.spy();
-			map.on("mousemove", spy);
-			var layer = new Marker([1, 2]).addTo(map);
-			happen.mousemove(layer._icon);
-			expect(spy.calledOnce).to.be.ok();
-		});
-
-		it("DOM events fired on marker can be cancelled before being caught by the map", function () {
-			var mapSpy = sinon.spy();
-			var layerSpy = sinon.spy();
-			map.on("mousemove", mapSpy);
-			var layer = new Marker([1, 2]).addTo(map);
-			layer.on("mousemove", DomEvent.stopPropagation).on("mousemove", layerSpy);
-			happen.mousemove(layer._icon);
-			expect(layerSpy.calledOnce).to.be.ok();
-			expect(mapSpy.called).not.to.be.ok();
-		});
-
-		/***
-		it("DOM events fired on polygon can be cancelled before being caught by the map", function () {
-			var mapSpy = sinon.spy();
-			var layerSpy = sinon.spy();
-			map.on("mousemove", mapSpy);
-			var layer = new L.Polygon([[1, 2], [3, 4], [5, 6]]).addTo(map);
-			layer.on("mousemove", L.DomEvent.stopPropagation).on("mousemove", layerSpy);
-			happen.mousemove(layer._path);
-			expect(layerSpy.calledOnce).to.be.ok();
-			expect(mapSpy.called).not.to.be.ok();
-		});
-
-		it("mouseout is forwarded if fired on the original target", function () {
-			var mapSpy = sinon.spy(),
-			    layerSpy = sinon.spy(),
-			    otherSpy = sinon.spy();
-			var layer = new L.Polygon([[1, 2], [3, 4], [5, 6]]).addTo(map);
-			var other = new L.Polygon([[10, 20], [30, 40], [50, 60]]).addTo(map);
-			map.on("mouseout", mapSpy);
-			layer.on("mouseout", layerSpy);
-			other.on("mouseout", otherSpy);
-			happen.mouseout(layer._path, {relatedTarget: map._container});
-			expect(mapSpy.called).not.to.be.ok();
-			expect(otherSpy.called).not.to.be.ok();
-			expect(layerSpy.calledOnce).to.be.ok();
-		});
-		***/
-
-		it("mouseout is forwarded when using a DivIcon", function () {
-			let icon = new DivIcon({
-				html: "<p>this is text in a child element</p>",
-				iconSize: [100, 100]
-			})
-			let mapSpy = sinon.spy(),
-			    layerSpy = sinon.spy(),
-			    layer = new Marker([1, 2], {icon: icon}).addTo(map)
-			map.on("mouseout", mapSpy)
-			layer.on("mouseout", layerSpy)
-			happen.mouseout(layer._icon, {relatedTarget: map._container})
-			expect(mapSpy.called).not.to.be.ok()
-			expect(layerSpy.calledOnce).to.be.ok()
-		})
-
-		it("mouseout is not forwarded if relatedTarget is a target's child", function () {
-			let icon = new DivIcon({
-				html: "<p>this is text in a child element</p>",
-				iconSize: [100, 100]
-			})
-			let mapSpy = sinon.spy(),
-			    layerSpy = sinon.spy(),
-			    layer = new Marker([1, 2], {icon: icon}).addTo(map),
-			    child = layer._icon.querySelector('p')
-			map.on("mouseout", mapSpy)
-			layer.on("mouseout", layerSpy)
-			happen.mouseout(layer._icon, {relatedTarget: child})
-			expect(mapSpy.called).not.to.be.ok()
-			expect(layerSpy.calledOnce).not.to.be.ok()
-		})
-
-		it("mouseout is not forwarded if fired on target's child", function () {
-			let icon = new DivIcon({
-				html: "<p>this is text in a child element</p>",
-				iconSize: [100, 100]
-			})
-			var mapSpy = sinon.spy(),
-			    layerSpy = sinon.spy(),
-			    layer = new Marker([1, 2], {icon: icon}).addTo(map),
-			    child = layer._icon.querySelector('p')
-			map.on("mouseout", mapSpy)
-			layer.on("mouseout", layerSpy)
-			happen.mouseout(child, {relatedTarget: layer._icon})
-			expect(mapSpy.called).not.to.be.ok()
-			expect(layerSpy.calledOnce).not.to.be.ok()
-		})
-
-		/***
-		it("mouseout is not forwarded to layers if fired on the map", function () {
-			var mapSpy = sinon.spy(),
-			    layerSpy = sinon.spy(),
-			    otherSpy = sinon.spy();
-			var layer = new L.Polygon([[1, 2], [3, 4], [5, 6]]).addTo(map);
-			var other = new L.Polygon([[10, 20], [30, 40], [50, 60]]).addTo(map);
-			map.on("mouseout", mapSpy);
-			layer.on("mouseout", layerSpy);
-			other.on("mouseout", otherSpy);
-			happen.mouseout(map._container);
-			expect(otherSpy.called).not.to.be.ok();
-			expect(layerSpy.called).not.to.be.ok();
-			expect(mapSpy.calledOnce).to.be.ok();
-		});
-		***/
-
-		it("preclick is fired before click on marker and map", function () {
-			let called = 0
-			let layer = new Marker([1, 2]).addTo(map)
-			layer.on("preclick", function (e) {
-				expect(called++).to.eql(0)
-				expect(e.latlng).to.ok()
-			})
-			layer.on("click", function (e) {
-				expect(called++).to.eql(2)
-				expect(e.latlng).to.ok()
-			})
-			map.on("preclick", function (e) {
-				expect(called++).to.eql(1)
-				expect(e.latlng).to.ok()
-			})
-			map.on("click", function (e) {
-				expect(called++).to.eql(3)
-				expect(e.latlng).to.ok()
-			})
-			happen.click(layer._icon)
-		})
-
-	})
 
 	describe('#getScaleZoom && #getZoomScale', function () {
 		it("convert zoom to scale and viceversa and return the same values", function () {

@@ -105,8 +105,8 @@ export class Map extends Evented {
 	//set zoom({zoom: zoom, options: options = {}}) {
 	set zoom(zoom) {
 		//if (!this._loaded) {
-		this._zoom = zoom
-		this._resetView(this._lastCenter, this._zoom)
+		//this._zoom = zoom
+		this._resetView(this._lastCenter, zoom)
 			//return this
 		//}
 		//return this.view = {center: this.center, zoom: zoom}
