@@ -410,14 +410,16 @@ describe("Map", function () {
 				let spy = sinon.spy()
 				map_notready.on("zoomlevelschange", spy)
 				//map_notready.view = {center: [0, 0], minZoom: undefined, maxZoom: undefined}
+				map_notready.options.maxZoom = undefined
+				map_notready.options.minZoom = undefined
 				expect(spy.called).not.to.be.ok()
-				expect(map_notready._getZoomSpan()).to.be(25)
-				expect(map_notready._layersMaxZoom).to.be(undefined)
+				expect(map_notready._getZoomSpan()).to.be(Infinity)
+				expect(map_notready._layersMaxZoom).to.be.undefined
 				let tiles = new TileLayer("{z}{x}{y}", {minZoom: 5, maxZoom: 12})
 				tiles.addTo(map_notready)
-				expect(this._zoomBoundLayers).to.be(undefined)
+				expect(this._zoomBoundLayers).to.be.undefined
 				expect(map_notready._layersMaxZoom).to.be(12)
-				expect(map_notready._getZoomSpan()).to.be(25)
+				expect(map_notready._getZoomSpan()).to.be(7)
 				expect(spy.called).to.be.ok()
 			})
 		})
@@ -436,7 +438,7 @@ describe("Map", function () {
 		describe("when a new layer with the same or lower zoomlevel coverage as the current layer is added to a map", function () {
 			it("fires no zoomlevelschange event", function () {
 				let spy = sinon.spy()
-				new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 5}).addTo(map)
+				new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map)
 				map.on("zoomlevelschange", spy)
 				expect(spy.called).not.to.be.ok()
 				new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map)
