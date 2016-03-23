@@ -79,7 +79,8 @@ export class TileLayer extends GridLayer {
 	}
 
 	getTileUrl(coords) {
-		return `${this._getSubdomain(coords)}${coords.x}${this.options.tms ? this._globalTileRange.max.y - coords.y : coords.y}${this._getZoomForUrl()}`
+		return `https://api.tiles.mapbox.com/v4/mapbox.streets/${this._getZoomForUrl()}/${coords.x}/${this.options.tms ? this._globalTileRange.max.y - coords.y : coords.y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw`
+		//return `${this._getSubdomain(coords)}${coords.x}${this.options.tms ? this._globalTileRange.max.y - coords.y : coords.y}${this._getZoomForUrl()}`
 
 		/***
 		return Util.template(this._url, Util.extend({

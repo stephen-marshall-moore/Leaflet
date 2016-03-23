@@ -1,4 +1,5 @@
 var gulp = require('gulp'),
+		serve = require('gulp-serve'),
     uglify = require('gulp-uglifyjs'),
     sourcemaps = require('gulp-sourcemaps'),
     Server = require('karma').Server;
@@ -32,3 +33,10 @@ gulp.task('compile:polyfills', function() {
 });
 
 gulp.task('default', ['test']);
+
+// serve example files
+gulp.task('serve', serve( {
+	root: ['./'],
+  port: 3000
+}))
+

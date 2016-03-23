@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>map zero</title>
+				<meta charset="utf-8" />
+				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+				<link rel="stylesheet" href="/dist/leaflet.css" />
+
+        <script src="/public/vendors/traceur/traceur.min.js"></script>
+        <script src="/public/vendors/es6-shim/es6-shim.min.js"></script>
+        <script src="/public/vendors/es6-module-loader/dist/es6-module-loader.js"></script>
+        <script src="/public/vendors/fetch/fetch.js"></script>
+        <!-- script src="/sw-import.js"></script -->
+
+        <!-- compiled version of all of the above -->
+        <!-- script src="/lib/es6-starter.min.js"></script -->
+
+    </head>
+    <body>
+
+        <h1>map zero</h1>
+				<div id="map" style="width: 750px; height: 450px"></div>
+
+        <script>
+						System.paths = {
+								'src/mapzero': '/src/mapzero.js',
+								'src/*': '/src/*.js'
+						};
+            System
+                .import('src/mapzero')
+                .then(function(mapzero) {
+                    console.log('imported?');
+										var map = mapzero.makemap(document.getElementById("map"))
+                });
+        </script>
+    </body>
+</html>
+
+
