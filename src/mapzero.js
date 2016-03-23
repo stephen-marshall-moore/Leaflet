@@ -1,7 +1,9 @@
+import {Browser} from 'src/core/Browser'
 import {Map} from 'src/map/Map'
 import {TileLayer} from 'src/layer/tile/TileLayer'
 
 export function makemap(container) {
+	Browser.any3d = false
 
 	let map = new Map(container, {center: [51.505, -0.09], zoom: 13})
 
