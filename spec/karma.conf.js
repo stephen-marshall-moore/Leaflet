@@ -28,11 +28,12 @@ module.exports = function (config) {
 		{pattern: "src/layer/tile/*.js", served: true, included: false, watched: true},
 		{pattern: "src/layer/marker/*.js", served: true, included: false, watched: true},
 		// specs
-		"spec/suites/core/*Spec.js",
-		"spec/suites/dom/*Spec.js",
-		"spec/suites/geometry/*Spec.js",
-		"spec/suites/geo/*Spec.js",
-		"spec/suites/map/MapSpec.js",
+		//"spec/suites/core/*Spec.js",
+		//"spec/suites/dom/*Spec.js",
+		//"spec/suites/geometry/*Spec.js",
+		//"spec/suites/geo/*Spec.js",
+		"spec/suites/layer/PopupSpec.js",
+		//"spec/suites/map/MapSpec.js",
 		//"spec/suites/**/*.js",
 		{pattern: "dist/images/*.png", included: false}
 	]);

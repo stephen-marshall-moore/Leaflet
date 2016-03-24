@@ -71,11 +71,44 @@ describe('DomEvent', function () {
 			let listener = sinon.spy()
 
 			DomEvent.addListener(el, 'click', listener)
+			//simulateClick(el)
+			//expect(listener.called).to.be.ok()
+
 			DomEvent.removeListener(el, 'click', listener)
-
 			simulateClick(el)
-
 			expect(listener.called).to.not.be.ok()
+		})
+	})
+
+	describe('#onOffListener', function () {
+		it('removes a previously added listener', function () {
+			let listener = sinon.spy()
+
+			DomEvent.on(el, 'click', listener)
+			//simulateClick(el)
+			//expect(listener.called).to.be.ok()
+
+			DomEvent.off(el, 'click', listener)
+			simulateClick(el)
+			expect(listener.called).to.not.be.ok()
+		})
+	})
+
+	describe('#[onOff]Listener', function () {
+		it('removes a previously added listener', function () {
+			let listener = sinon.spy()
+
+			let onOff = 'on'
+
+			DomEvent[onOff](el, 'click', listener)
+			simulateClick(el)
+			expect(listener.called).to.be.ok()
+
+			onOff = 'off'
+
+			DomEvent[onOff](el, 'click', listener)
+			//simulateClick(el)
+			//expect(listener.called).to.not.be.ok()
 		})
 	})
 

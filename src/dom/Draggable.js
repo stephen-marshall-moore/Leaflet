@@ -1,11 +1,16 @@
+import {Browser} from 'src/core/Browser'
+import {Util} from 'src/core/Util'
+import {Evented} from 'src/core/Events'
+import {DomUtil} from 'src/dom/DomUtil'
+import {DomEvent} from 'src/dom/DomEvent'
+
 /*
- * L.Draggable allows you to add dragging capabilities to any element. Supports mobile devices too.
+ * Draggable allows you to add dragging capabilities to any element. Supports mobile devices too.
  */
 
-L.Draggable = L.Evented.extend({
-
-	statics: {
-		START: L.Browser.touch ? ['touchstart', 'mousedown'] : ['mousedown'],
+export const	Dragged = {
+		//START: Browser.touch ? ['touchstart', 'mousedown'] : ['mousedown'],
+		START: ['touchstart', 'mousedown'],
 		END: {
 			mousedown: 'mouseup',
 			touchstart: 'touchend',
@@ -18,45 +23,49 @@ L.Draggable = L.Evented.extend({
 			pointerdown: 'touchmove',
 			MSPointerDown: 'touchmove'
 		}
-	},
+	}
 
-	initialize: function (element, dragStartTarget, preventOutline) {
-		this._element = element;
-		this._dragStartTarget = dragStartTarget || element;
-		this._preventOutline = preventOutline;
-	},
+export class Draggable extends Evented {
 
-	enable: function () {
+	constructor(element, dragStartTarget, preventOutline) {
+		super()
+
+		this._element = element
+		this._dragStartTarget = dragStartTarget || element
+		this._preventOutline = preventOutline
+	}
+
+	enable() {
 		if (this._enabled) { return; }
 
-		L.DomEvent.on(this._dragStartTarget, L.Draggable.START.join(' '), this._onDown, this);
+		DomEvent.on(this._dragStartTarget, Dragged.START.join(' '), this._onDown, this);
 
 		this._enabled = true;
-	},
+	}
 
-	disable: function () {
+	disable() {
 		if (!this._enabled) { return; }
 
-		L.DomEvent.off(this._dragStartTarget, L.Draggable.START.join(' '), this._onDown, this);
+		DomEvent.off(this._dragStartTarget, Dragged.START.join(' '), this._onDown, this);
 
 		this._enabled = false;
 		this._moved = false;
-	},
+	}
 
-	_onDown: function (e) {
+	_onDown(e) {
 		this._moved = false;
 
-		if (L.DomUtil.hasClass(this._element, 'leaflet-zoom-anim')) { return; }
+		if (DomUtil.hasClass(this._element, 'leaflet-zoom-anim')) { return; }
 
-		if (L.Draggable._dragging || e.shiftKey || ((e.which !== 1) && (e.button !== 1) && !e.touches) || !this._enabled) { return; }
-		L.Draggable._dragging = true;  // Prevent dragging multiple objects at once.
+		if (Draggable._dragging || e.shiftKey || ((e.which !== 1) && (e.button !== 1) && !e.touches) || !this._enabled) { return; }
+		Draggable._dragging = true;  // Prevent dragging multiple objects at once.
 
 		if (this._preventOutline) {
-			L.DomUtil.preventOutline(this._element);
+			DomUtil.preventOutline(this._element);
 		}
 
-		L.DomUtil.disableImageDrag();
-		L.DomUtil.disableTextSelection();
+		DomUtil.disableImageDrag();
+		DomUtil.disableTextSelection();
 
 		if (this._moving) { return; }
 
@@ -64,76 +73,76 @@ L.Draggable = L.Evented.extend({
 
 		var first = e.touches ? e.touches[0] : e;
 
-		this._startPoint = new L.Point(first.clientX, first.clientY);
-		this._startPos = this._newPos = L.DomUtil.getPosition(this._element);
+		this._startPoint = new Point(first.clientX, first.clientY);
+		this._startPos = this._newPos = DomUtil.getPosition(this._element);
 
-		L.DomEvent
-		    .on(document, L.Draggable.MOVE[e.type], this._onMove, this)
-		    .on(document, L.Draggable.END[e.type], this._onUp, this);
-	},
+		DomEvent
+		    .on(document, Draggable.MOVE[e.type], this._onMove, this)
+		    .on(document, Draggable.END[e.type], this._onUp, this);
+	}
 
-	_onMove: function (e) {
+	_onMove(e) {
 		if (e.touches && e.touches.length > 1) {
 			this._moved = true;
 			return;
 		}
 
 		var first = (e.touches && e.touches.length === 1 ? e.touches[0] : e),
-		    newPoint = new L.Point(first.clientX, first.clientY),
-		    offset = newPoint.subtract(this._startPoint);
+		    newPoint = new Point(first.clientX, first.clientY),
+		    offset = new Point.subtract(this._startPoint);
 
 		if (!offset.x && !offset.y) { return; }
-		if (L.Browser.touch && Math.abs(offset.x) + Math.abs(offset.y) < 3) { return; }
+		if (Browser.touch && Math.abs(offset.x) + Math.abs(offset.y) < 3) { return; }
 
-		L.DomEvent.preventDefault(e);
+		DomEvent.preventDefault(e);
 
 		if (!this._moved) {
 			this.fire('dragstart');
 
 			this._moved = true;
-			this._startPos = L.DomUtil.getPosition(this._element).subtract(offset);
+			this._startPos = DomUtil.getPosition(this._element).subtract(offset);
 
-			L.DomUtil.addClass(document.body, 'leaflet-dragging');
+			DomUtil.addClass(document.body, 'leaflet-dragging');
 
 			this._lastTarget = e.target || e.srcElement;
-			L.DomUtil.addClass(this._lastTarget, 'leaflet-drag-target');
+			DomUtil.addClass(this._lastTarget, 'leaflet-drag-target');
 		}
 
 		this._newPos = this._startPos.add(offset);
 		this._moving = true;
 
-		L.Util.cancelAnimFrame(this._animRequest);
+		Util.cancelAnimFrame(this._animRequest);
 		this._lastEvent = e;
-		this._animRequest = L.Util.requestAnimFrame(this._updatePosition, this, true);
-	},
+		this._animRequest = Util.requestAnimFrame(this._updatePosition, this, true);
+	}
 
-	_updatePosition: function () {
+	_updatePosition() {
 		var e = {originalEvent: this._lastEvent};
 		this.fire('predrag', e);
-		L.DomUtil.setPosition(this._element, this._newPos);
+		DomUtil.setPosition(this._element, this._newPos);
 		this.fire('drag', e);
-	},
+	}
 
-	_onUp: function () {
-		L.DomUtil.removeClass(document.body, 'leaflet-dragging');
+	_onUp() {
+		DomUtil.removeClass(document.body, 'leaflet-dragging');
 
 		if (this._lastTarget) {
-			L.DomUtil.removeClass(this._lastTarget, 'leaflet-drag-target');
+			DomUtil.removeClass(this._lastTarget, 'leaflet-drag-target');
 			this._lastTarget = null;
 		}
 
-		for (var i in L.Draggable.MOVE) {
-			L.DomEvent
-			    .off(document, L.Draggable.MOVE[i], this._onMove, this)
-			    .off(document, L.Draggable.END[i], this._onUp, this);
+		for (var i in Draggable.MOVE) {
+			DomEvent
+			    .off(document, Dragged.MOVE[i], this._onMove, this)
+			    .off(document, Dragged.END[i], this._onUp, this);
 		}
 
-		L.DomUtil.enableImageDrag();
-		L.DomUtil.enableTextSelection();
+		DomUtil.enableImageDrag();
+		DomUtil.enableTextSelection();
 
 		if (this._moved && this._moving) {
 			// ensure drag is not fired after dragend
-			L.Util.cancelAnimFrame(this._animRequest);
+			Util.cancelAnimFrame(this._animRequest);
 
 			this.fire('dragend', {
 				distance: this._newPos.distanceTo(this._startPos)
@@ -141,6 +150,6 @@ L.Draggable = L.Evented.extend({
 		}
 
 		this._moving = false;
-		L.Draggable._dragging = false;
+		Draggable._dragging = false;
 	}
-});
+}

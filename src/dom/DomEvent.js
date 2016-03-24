@@ -6,14 +6,18 @@
 
 import {Util} from 'src/core/Util'
 import {Browser} from 'src/core/Browser'
+import {Dragged, Draggable} from 'src/dom/Draggable'
 import {Point} from 'src/geometry/Point'
 
-var DomEvent = {
-	eventsKey: '_leaflet_events',
+const _eventsKey = '_leaflet_events'
 
-	_skipEvents: {},
+export class DomEvent {
+	
+	//constructor() {
+	//	this._skipEvents = {}
+	//}
 
-	on: function(obj, types, fn, context) {
+	static on(obj, types, fn, context) {
 
 		if (typeof types === 'object') {
 			for (let type in types) {
@@ -28,13 +32,13 @@ var DomEvent = {
 		}
 
 		return this
-	},
+	}
 	
-	addListener: function(obj, types, fn, context) {
+	static addListener(obj, types, fn, context) {
 		return DomEvent.on(obj, types, fn, context)
-	},
+	}
 
-	off: function(obj, types, fn, context) {
+	static off(obj, types, fn, context) {
 
 		if (typeof types === 'object') {
 			for (let type in types) {
@@ -49,16 +53,16 @@ var DomEvent = {
 		}
 
 		return this
-	},
+	}
 	
-	removeListener: function(obj, types, fn, context) {
+	static removeListener(obj, types, fn, context) {
 		return DomEvent.off(obj, types, fn, context)
-	},
+	}
 
-	_on: function(obj, type, fn, context) {
+	static _on(obj, type, fn, context) {
 		let id = type + Util.stamp(fn) + (context ? '_' + Util.stamp(context) : '')
 
-		if (obj[DomEvent.eventsKey] && obj[DomEvent.eventsKey][id]) { return this }
+		if (obj[_eventsKey] && obj[_eventsKey][id]) { return this }
 
 		let handler = function (e) {
 			return fn.call(context || obj, e || window.event)
@@ -99,16 +103,16 @@ var DomEvent = {
 			obj.attachEvent('on' + type, handler)
 		}
 
-		obj[DomEvent.eventsKey] = obj[DomEvent.eventsKey] || {}
-		obj[DomEvent.eventsKey][id] = handler
+		obj[_eventsKey] = obj[_eventsKey] || {}
+		obj[_eventsKey][id] = handler
 
 		return this
-	},
+	}
 
-	_off: function(obj, type, fn, context) {
+	static _off(obj, type, fn, context) {
 
 		let id = type + Util.stamp(fn) + (context ? '_' + Util.stamp(context) : ''),
-		    handler = obj[DomEvent.eventsKey] && obj[DomEvent.eventsKey][id]
+		    handler = obj[_eventsKey] && obj[_eventsKey][id]
 
 		if (!handler) { return this }
 
@@ -133,12 +137,12 @@ var DomEvent = {
 			obj.detachEvent('on' + type, handler)
 		}
 
-		obj[DomEvent.eventsKey][id] = null
+		obj[_eventsKey][id] = null
 
 		return this
-	},
+	}
 
-	stopPropagation: function(e) {
+	static stopPropagation(e) {
 
 		if (e.stopPropagation) {
 			e.stopPropagation()
@@ -150,24 +154,24 @@ var DomEvent = {
 		DomEvent._skipped(e)
 
 		return this
-	},
+	}
 
-	disableScrollPropagation: function(el) {
+	static disableScrollPropagation(el) {
 		return DomEvent.on(el, 'mousewheel', DomEvent.stopPropagation)
-	},
+	}
 
-	disableClickPropagation: function(el) {
+	static disableClickPropagation(el) {
 		let stop = this.stopPropagation
 
-		this.on(el, Draggable.START.join(' '), stop)
+		this.on(el, Dragged.START.join(' '), stop)
 
 		return this.on(el, {
 			click: DomEvent._fakeStop,
 			dblclick: stop
 		})
-	},
+	}
 
-	preventDefault: function(e) {
+	static preventDefault(e) {
 
 		if (e.preventDefault) {
 			e.preventDefault()
@@ -175,15 +179,15 @@ var DomEvent = {
 			e.returnValue = false
 		}
 		return this
-	},
+	}
 
-	stop: function(e) {
+	static stop(e) {
 		return DomEvent
 			.preventDefault(e)
 			.stopPropagation(e)
-	},
+	}
 
-	getMousePosition: function(e, container) {
+	static getMousePosition(e, container) {
 		if (!container) {
 			return new Point(e.clientX, e.clientY)
 		}
@@ -193,9 +197,9 @@ var DomEvent = {
 		return new Point(
 			e.clientX - rect.left - container.clientLeft,
 			e.clientY - rect.top - container.clientTop)
-	},
+	}
 
-	getWheelDelta: function(e) {
+	static getWheelDelta(e) {
 		return (e.deltaY && e.deltaMode === 0) ? -e.deltaY :        // Pixels
 		       (e.deltaY && e.deltaMode === 1) ? -e.deltaY * 18 :   // Lines
 		       (e.deltaY && e.deltaMode === 2) ? -e.deltaY * 52 :   // Pages
@@ -204,22 +208,22 @@ var DomEvent = {
 		       (e.detail && Math.abs(e.detail) < 32765) ? -e.detail * 18 : // Legacy Moz lines
 		       e.detail ? e.detail / -32765 * 52 : // Legacy Moz pages
 		       0
-	},
+	}
 
-	_fakeStop: function(e) {
+	static _fakeStop(e) {
 		// fakes stopPropagation by setting a special event flag, checked/reset with DomEvent._skipped(e)
 		DomEvent._skipEvents[e.type] = true
-	},
+	}
 
-	_skipped: function(e) {
+	static _skipped(e) {
 		let skipped = this._skipEvents[e.type]
 		// reset when checking, as it's only used in map container and propagates outside of the map
 		this._skipEvents[e.type] = false
 		return skipped
-	},
+	}
 
 	// check if element really left/entered the event target (for mouseenter/mouseleave)
-	_isExternalTarget: function(el, e) {
+	static _isExternalTarget(el, e) {
 
 		let related = e.relatedTarget
 
@@ -233,10 +237,10 @@ var DomEvent = {
 			return false
 		}
 		return (related !== el)
-	},
+	}
 
 	// this is a horrible workaround for a bug in Android where a single touch triggers two click events
-	_filterClick: function(e, handler) {
+	static _filterClick(e, handler) {
 		let timeStamp = (e.timeStamp || e.originalEvent.timeStamp),
 		    elapsed = DomEvent._lastClick && (timeStamp - DomEvent._lastClick)
 
@@ -256,6 +260,7 @@ var DomEvent = {
 	}
 }
 
-export {DomEvent}
+DomEvent._skipEvents = {}
+
 
 
