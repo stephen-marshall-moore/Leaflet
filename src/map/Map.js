@@ -106,14 +106,20 @@ export class Map extends Evented {
 	}
 
 	//set zoom({zoom: zoom, options: options = {}}) {
-	set zoom(zoom) {
-		//if (!this._loaded) {
-		//this._zoom = zoom
-		this._resetView(this._lastCenter, zoom)
-			//return this
-		//}
-		//return this.view = {center: this.center, zoom: zoom}
-		// decided this was useless, return 6
+	set zoom(z) {
+		if (typeof z === 'number') {
+			if (!this._loaded) {
+				this._zoom = z
+			} else {
+				this._resetView(this._lastCenter, z)
+			}
+		} else {
+			if (!this._loaded) {
+				this._zoom = z.zoom
+			} else {
+				this._resetView(this._lastCenter, z.zoom, z.options)
+			}
+		}
 	}
 
 	zoomIn(delta, options) {
@@ -585,9 +591,9 @@ export class Map extends Evented {
 
 		this.fire('viewreset')
 
-		if (loading) {
+		//if (loading) {
 			this.fire('load')
-		}
+		//}
 	}
 
 	_moveStart(zoomChanged) {

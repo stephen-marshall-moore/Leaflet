@@ -23,9 +23,9 @@ let _default_tile_options = {
 
 export class TileLayer extends GridLayer {
 
-	constructor(url, options = undefined) {
+	constructor(url_template, options = undefined) {
 		super()
-		this._url = url
+		this._url = url_template
 		Object.assign(this.options, _default_tile_options, options)
 
 		// detecting retina displays, adjusting tileSize and zoom levels
@@ -79,17 +79,13 @@ export class TileLayer extends GridLayer {
 	}
 
 	getTileUrl(coords) {
-		return `${this._getSubdomain(coords)}${coords.x}${this.options.tms ? this._globalTileRange.max.y - coords.y : coords.y}${this._getZoomForUrl()}`
+		let r = Browser.retina ? '@2x' : ''
+		let s = this._getSubdomain(coords)
+		let x = coords.x
+		let y = this.options.tms ? this._globalTileRange.max.y - coords.y : coords.y
+		let z = this._getZoomForUrl()
 
-		/***
-		return Util.template(this._url, Util.extend({
-			r: Browser.retina ? '@2x' : '',
-			s: this._getSubdomain(coords),
-			x: coords.x,
-			y: this.options.tms ? this._globalTileRange.max.y - coords.y : coords.y,
-			z: this._getZoomForUrl()
-		}, this.options))
-		***/
+		return this.url
 	}
 
 	_tileOnLoad(done, tile) {

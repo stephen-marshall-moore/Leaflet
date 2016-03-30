@@ -32,7 +32,8 @@ module.exports = function (config) {
 		//"spec/suites/dom/*Spec.js",
 		//"spec/suites/geometry/*Spec.js",
 		//"spec/suites/geo/*Spec.js",
-		"spec/suites/layer/PopupSpec.js",
+		//"spec/suites/layer/PopupSpec.js",
+		"spec/suites/layer/tile/GridLayerSpec.js",
 		//"spec/suites/map/MapSpec.js",
 		//"spec/suites/**/*.js",
 		{pattern: "dist/images/*.png", included: false}

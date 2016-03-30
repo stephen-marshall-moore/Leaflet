@@ -176,6 +176,9 @@ export class DomUtil {
 	}
 }
 
+DomUtil.TRANSFORM = DomUtil.testProp(
+			['transform', 'WebkitTransform', 'OTransform', 'MozTransform', 'msTransform'])
+
 /***
 (function () {
 	// prefix style property names
