@@ -92,9 +92,19 @@ export class Util {
 		return wrapperFn
 	}
 
-	static requestAnimFrame() {}
-	static cancelAnimFrame() {}
+	// counting on polyfill??
+
+	static requestAnimFrame(callback) {
+		console.log(callback.toString())
+		return window.requestAnimationFrame(callback)
+	}
+
+	static cancelAnimFrame(id) {
+		window.cancelAnimationFrame(id)
+	}
+
 }
+
 
 Util._lastId = 0;
 

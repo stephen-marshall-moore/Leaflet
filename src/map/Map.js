@@ -591,9 +591,9 @@ export class Map extends Evented {
 
 		this.fire('viewreset')
 
-		//if (loading) {
+		if (loading) {
 			this.fire('load')
-		//}
+		}
 	}
 
 	_moveStart(zoomChanged) {

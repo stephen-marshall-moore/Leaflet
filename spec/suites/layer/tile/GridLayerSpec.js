@@ -50,6 +50,7 @@ describe('GridLayer', function () {
 
 		let grid = new GridLayer()
 		grid.createTile = function (coords) {
+			console.log('grid(53).createTile')
 			let tile = document.createElement('div')
 			tiles.push({coords: coords, tile: tile})
 			return tile
@@ -278,7 +279,7 @@ describe('GridLayer', function () {
 				tileSize: Point.point(256, 256)
 			})
 
-			grid.createTile = function (coords) {
+			GridLayer.prototype.createTile = function (coords) {
 				let tile = document.createElement('div')
 				tile.innerHTML = [coords.x, coords.y, coords.z].join(', ')
 				tile.style.border = '2px solid red'

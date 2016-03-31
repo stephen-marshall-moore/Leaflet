@@ -129,6 +129,7 @@ export class GridLayer extends Layer {
 	}
 
 	createTile() {
+		console.log('GridLayer.createTile')
 		return document.createElement('div')
 	}
 
@@ -197,7 +198,8 @@ export class GridLayer extends Layer {
 
 		if (nextFrame) {
 			Util.cancelAnimFrame(this._fadeFrame)
-			this._fadeFrame = Util.requestAnimFrame(this._updateOpacity, this)
+			//this._fadeFrame = Util.requestAnimFrame(this._updateOpacity, this)
+			this._fadeFrame = Util.requestAnimFrame(x => this._updateOpacity(x))
 		}
 	}
 
@@ -611,7 +613,9 @@ export class GridLayer extends Layer {
 		var tilePos = this._getTilePos(coords),
 		    key = this._tileCoordsToKey(coords)
 
-		var tile = this.createTile(this._wrapCoords(coords), Util.bind(this._tileReady, this, coords))
+		//var tile = this.createTile(this._wrapCoords(coords), Util.bind(this._tileReady, this, coords))
+		var tile = this.createTile(this._wrapCoords(coords), () => this._tileReady(coords))
+		//var tile = this.createTile(this._wrapCoords(coords))
 
 		this._initTile(tile)
 
@@ -619,7 +623,9 @@ export class GridLayer extends Layer {
 		// we know that tile is async and will be ready later otherwise
 		if (this.createTile.length < 2) {
 			// mark tile as ready, but delay one frame for opacity animation to happen
-			Util.requestAnimFrame(Util.bind(this._tileReady, this, coords, null, tile))
+			//Util.requestAnimFrame(Util.bind(this._tileReady, this, coords, null, tile))
+			//Util.requestAnimFrame(x => this._tileReady(x, coords, null, tile))
+			Util.requestAnimFrame(() => this._tileReady(coords, null, tile))
 		}
 
 		DomUtil.setPosition(tile, tilePos)
@@ -650,6 +656,7 @@ export class GridLayer extends Layer {
 		}
 
 		var key = this._tileCoordsToKey(coords)
+		console.log('_tileReady', key, arguments)
 
 		tile = this._tiles[key]
 		if (!tile) { return }
@@ -658,7 +665,8 @@ export class GridLayer extends Layer {
 		if (this._map._fadeAnimated) {
 			DomUtil.setOpacity(tile.el, 0)
 			Util.cancelAnimFrame(this._fadeFrame)
-			this._fadeFrame = Util.requestAnimFrame(this._updateOpacity, this)
+			//this._fadeFrame = Util.requestAnimFrame(this._updateOpacity, this)
+			this._fadeFrame = Util.requestAnimFrame(() => this._updateOpacity())
 		} else {
 			tile.active = true
 			this._pruneTiles()
@@ -676,11 +684,13 @@ export class GridLayer extends Layer {
 			this.fire('load')
 
 			if (Browser.ielt9 || !this._map._fadeAnimated) {
-				Util.requestAnimFrame(this._pruneTiles, this)
+				//Util.requestAnimFrame(this._pruneTiles, this)
+				Util.requestAnimFrame(() => this._pruneTiles())
 			} else {
 				// Wait a bit more than 0.2 secs (the duration of the tile fade-in)
 				// to trigger a pruning.
-				setTimeout(Util.bind(this._pruneTiles, this), 250)
+				//setTimeout(Util.bind(this._pruneTiles, this), 250)
+				setTimeout(() => this._pruneTiles(), 250)
 			}
 		}
 	}
