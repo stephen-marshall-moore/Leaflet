@@ -2,6 +2,7 @@
 
 import {Browser} from 'src/core/Browser'
 import {Util} from 'src/core/Util'
+import {Point} from 'src/geometry/Point'
 
 /*
  * L.DomUtil contains various utility functions for working with DOM.
@@ -172,7 +173,7 @@ export class DomUtil {
 		// this method is only used for elements previously positioned using setPosition,
 		// so it's safe to cache the position for performance
 
-		return el._leaflet_pos || new L.Point(0, 0)
+		return el._leaflet_pos || new Point(0, 0)
 	}
 }
 

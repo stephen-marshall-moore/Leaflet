@@ -129,7 +129,7 @@ export class GridLayer extends Layer {
 	}
 
 	createTile() {
-		console.log('GridLayer.createTile')
+		//console.log('GridLayer.createTile')
 		return document.createElement('div')
 	}
 
@@ -199,7 +199,7 @@ export class GridLayer extends Layer {
 		if (nextFrame) {
 			Util.cancelAnimFrame(this._fadeFrame)
 			//this._fadeFrame = Util.requestAnimFrame(this._updateOpacity, this)
-			this._fadeFrame = Util.requestAnimFrame(x => this._updateOpacity(x))
+			this._fadeFrame = Util.requestAnimFrame(() => this._updateOpacity())
 		}
 	}
 
@@ -656,7 +656,7 @@ export class GridLayer extends Layer {
 		}
 
 		var key = this._tileCoordsToKey(coords)
-		console.log('_tileReady', key, arguments)
+		//console.log('_tileReady', key, arguments)
 
 		tile = this._tiles[key]
 		if (!tile) { return }

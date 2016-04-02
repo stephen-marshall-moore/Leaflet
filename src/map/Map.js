@@ -344,11 +344,12 @@ export class Map extends Evented {
 
 	createPane(name, container) {
 		let className = 'leaflet-pane' + (name ? ' leaflet-' + name.replace('Pane', '') + '-pane' : ''),
-		    pane = DomUtil.create('div', className, container)  // || this._mapPane)
+		    pane = DomUtil.create('div', className, container || this._mapPane)
 
-		//if (name) {
-		//	this._panes[name] = pane
-		//}
+		if (name) {
+			this._panes[name] = pane
+		}
+
 		return pane
 	}
 

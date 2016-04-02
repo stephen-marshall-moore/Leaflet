@@ -95,7 +95,7 @@ export class Util {
 	// counting on polyfill??
 
 	static requestAnimFrame(callback) {
-		console.log(callback.toString())
+		//console.log(callback.toString())
 		return window.requestAnimationFrame(callback)
 	}
 

@@ -1,6 +1,7 @@
 "use strict"
 
 import {Browser} from 'src/core/Browser'
+import {Util} from 'src/core/Util'
 import {DomUtil} from 'src/dom/DomUtil'
 import {Point} from 'src/geometry/Point'
 //import {LatLng} from 'src/geo/LatLng'
@@ -17,7 +18,7 @@ describe('GridLayer', function () {
 		div = document.createElement('div')
 		div.style.width = '800px'
 		div.style.height = '600px'
-		div.style.visibility = 'hidden'
+		//div.style.visibility = 'hidden'
 
 		document.body.appendChild(div)
 
@@ -50,7 +51,7 @@ describe('GridLayer', function () {
 
 		let grid = new GridLayer()
 		grid.createTile = function (coords) {
-			console.log('grid(53).createTile')
+			//console.log('grid(53).createTile')
 			let tile = document.createElement('div')
 			tiles.push({coords: coords, tile: tile})
 			return tile
@@ -496,7 +497,8 @@ describe('GridLayer', function () {
 					Util.requestAnimFrame(_runFrames(n - 1))
 				}
 			} else {
-				return Util.falseFn
+				return (() => false)
+				//return Util.falseFn
 			}
 		}
 
@@ -578,7 +580,7 @@ describe('GridLayer', function () {
 			clock.tick(250)
 		})
 
-		/***
+		/*** 
 		// NOTE: This test has different behaviour in PhantomJS and graphical
 		// browsers due to CSS animations!
 		it.skipInPhantom("Loads 32, unloads 16 tiles zooming out 11-10", function (done) {
