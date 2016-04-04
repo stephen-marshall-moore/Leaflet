@@ -85,7 +85,12 @@ export class TileLayer extends GridLayer {
 		let y = this.options.tms ? this._globalTileRange.max.y - coords.y : coords.y
 		let z = this._getZoomForUrl()
 
-		return this.url
+		if (typeof(this._url) === 'function') {
+			//console.log("function: " + this._url.toString())
+			return this._url(x,y,z)
+		}
+
+		return this._url
 	}
 
 	_tileOnLoad(done, tile) {

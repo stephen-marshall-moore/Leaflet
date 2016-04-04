@@ -291,9 +291,9 @@ describe("Map", function () {
 
 			let map = new Map(document.createElement('div'), {minZoom: 2, maxZoom: 20})
 
-			new TileLayer("{z}{x}{y}", {minZoom: 4, maxZoom: 10}).addTo(map)
-			new TileLayer("{z}{x}{y}", {minZoom: 6, maxZoom: 17}).addTo(map)
-			new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 22}).addTo(map)
+			new TileLayer((x, y, z) => `file:///dev/null/z=${z}/x=${x}/y=${y}`, {minZoom: 4, maxZoom: 10}).addTo(map)
+			new TileLayer((x, y, z) => `file:///dev/null/z=${z}/x=${x}/y=${y}`, {minZoom: 6, maxZoom: 17}).addTo(map)
+			new TileLayer((x, y, z) => `file:///dev/null/z=${z}/x=${x}/y=${y}`, {minZoom: 0, maxZoom: 22}).addTo(map)
 
 			expect(map.minZoom).to.be(2);
 			expect(map.maxZoom).to.be(20);
@@ -312,9 +312,9 @@ describe("Map", function () {
 
 			let map = new Map(document.createElement('div'), {minZoom: 2, maxZoom: 20})
 
-			new TileLayer("{z}{x}{y}", {minZoom: 4, maxZoom: 10}).addTo(map)
-			new TileLayer("{z}{x}{y}", {minZoom: 6, maxZoom: 17}).addTo(map)
-			new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 22}).addTo(map)
+			new TileLayer((x, y, z) => `file:///dev/null/z=${z}/x=${x}/y=${y}`, {minZoom: 4, maxZoom: 10}).addTo(map)
+			new TileLayer((x, y, z) => `file:///dev/null/z=${z}/x=${x}/y=${y}`, {minZoom: 6, maxZoom: 17}).addTo(map)
+			new TileLayer((x, y, z) => `file:///dev/null/z=${z}/x=${x}/y=${y}`, {minZoom: 0, maxZoom: 22}).addTo(map)
 
 			expect(map.minZoom).to.be(2)
 			expect(map.maxZoom).to.be(20)
@@ -415,7 +415,7 @@ describe("Map", function () {
 				expect(spy.called).not.to.be.ok()
 				expect(map_notready._getZoomSpan()).to.be(Infinity)
 				expect(map_notready._layersMaxZoom).to.be.undefined
-				let tiles = new TileLayer("{z}{x}{y}", {minZoom: 5, maxZoom: 12})
+				let tiles = new TileLayer((x, y, z) => `file:///dev/null/z=${z}/x=${x}/y=${y}`, {minZoom: 5, maxZoom: 12})
 				tiles.addTo(map_notready)
 				expect(this._zoomBoundLayers).to.be.undefined
 				expect(map_notready._layersMaxZoom).to.be(12)
@@ -427,10 +427,10 @@ describe("Map", function () {
 		describe("when a new layer with greater zoomlevel coverage than the current layer is added to a map", function () {
 			it("fires a zoomlevelschange event", function () {
 				let spy = sinon.spy()
-				new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 5}).addTo(map)
+				new TileLayer((x, y, z) => `file:///dev/null/z=${z}/x=${x}/y=${y}`, {minZoom: 0, maxZoom: 5}).addTo(map)
 				map.on("zoomlevelschange", spy)
 				expect(spy.called).not.to.be.ok()
-				new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 15}).addTo(map)
+				new TileLayer((x, y, z) => `file:///dev/null/z=${z}/x=${x}/y=${y}`, {minZoom: 0, maxZoom: 15}).addTo(map)
 				expect(spy.called).to.be.ok()
 			})
 		})
@@ -438,12 +438,12 @@ describe("Map", function () {
 		describe("when a new layer with the same or lower zoomlevel coverage as the current layer is added to a map", function () {
 			it("fires no zoomlevelschange event", function () {
 				let spy = sinon.spy()
-				new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map)
+				new TileLayer((x, y, z) => `file:///dev/null/z=${z}/x=${x}/y=${y}`, {minZoom: 0, maxZoom: 10}).addTo(map)
 				map.on("zoomlevelschange", spy)
 				expect(spy.called).not.to.be.ok()
-				new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map)
+				new TileLayer((x, y, z) => `file:///dev/null/z=${z}/x=${x}/y=${y}`, {minZoom: 0, maxZoom: 10}).addTo(map)
 				expect(spy.called).not.to.be.ok()
-				new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 5}).addTo(map)
+				new TileLayer((x, y, z) => `file:///dev/null/z=${z}/x=${x}/y=${y}`, {minZoom: 0, maxZoom: 5}).addTo(map)
 				expect(spy.called).not.to.be.ok()
 			})
 		})
@@ -512,7 +512,7 @@ describe("Map", function () {
 		});
 
 		it("supports adding and removing a tile layer without initializing the map", function () {
-			var layer = new TileLayer("{z}{x}{y}");
+			var layer = new TileLayer((x, y, z) => `file:///dev/null/z=${z}/x=${x}/y=${y}`);
 			map.addLayer(layer);
 			map.removeLayer(layer);
 		});
@@ -528,7 +528,7 @@ describe("Map", function () {
 			it("fires a zoomlevelschange event", function () {
 				map.whenReady(function () {
 					var spy = sinon.spy();
-					var tl = new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map);
+					var tl = new TileLayer((x, y, z) => `file:///dev/null/z=${z}/x=${x}/y=${y}`, {minZoom: 0, maxZoom: 10}).addTo(map);
 
 					map.on("zoomlevelschange", spy);
 					expect(spy.called).not.to.be.ok();
@@ -542,8 +542,8 @@ describe("Map", function () {
 			it("fires a zoomlevelschange event", function () {
 				map.whenReady(function () {
 					var spy = sinon.spy(),
-					    tl = new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map),
-					    t2 = new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 15}).addTo(map);
+					    tl = new TileLayer((x, y, z) => `file:///dev/null/z=${z}/x=${x}/y=${y}`, {minZoom: 0, maxZoom: 10}).addTo(map),
+					    t2 = new TileLayer((x, y, z) => `file:///dev/null/z=${z}/x=${x}/y=${y}`, {minZoom: 0, maxZoom: 15}).addTo(map);
 
 					map.on("zoomlevelschange", spy);
 					expect(spy.called).to.not.be.ok();
@@ -557,9 +557,9 @@ describe("Map", function () {
 			it("fires no zoomlevelschange event", function () {
 				map.whenReady(function () {
 					let spy = new sinon.spy()
-					let tl = new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map),
-					    t2 = new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 10}).addTo(map),
-					    t3 = new TileLayer("{z}{x}{y}", {minZoom: 0, maxZoom: 5}).addTo(map);
+					let tl = new TileLayer((x, y, z) => `file:///dev/null/z=${z}/x=${x}/y=${y}`, {minZoom: 0, maxZoom: 10}).addTo(map),
+					    t2 = new TileLayer((x, y, z) => `file:///dev/null/z=${z}/x=${x}/y=${y}`, {minZoom: 0, maxZoom: 10}).addTo(map),
+					    t3 = new TileLayer((x, y, z) => `file:///dev/null/z=${z}/x=${x}/y=${y}`, {minZoom: 0, maxZoom: 5}).addTo(map);
 
 					map.on("zoomlevelschange", spy)
 					expect(spy.called).to.not.be.ok()
@@ -578,8 +578,8 @@ describe("Map", function () {
 		});
 
 		it("calls the provided function for each layer", function () {
-			var t1 = new TileLayer("{z}{x}{y}").addTo(map),
-			    t2 = new TileLayer("{z}{x}{y}").addTo(map),
+			var t1 = new TileLayer((x, y, z) => `file:///dev/null/z=${z}/x=${x}/y=${y}`).addTo(map),
+			    t2 = new TileLayer((x, y, z) => `file:///dev/null/z=${z}/x=${x}/y=${y}`).addTo(map),
 			    spy = sinon.spy();
 
 			map.eachLayer(spy);
@@ -590,7 +590,7 @@ describe("Map", function () {
 		});
 
 		it("calls the provided function with the provided context", function () {
-			var t1 = new TileLayer("{z}{x}{y}").addTo(map),
+			var t1 = new TileLayer((x, y, z) => `file:///dev/null/z=${z}/x=${x}/y=${y}`).addTo(map),
 			    spy = sinon.spy();
 
 			map.eachLayer(spy, map);
@@ -892,7 +892,7 @@ describe("Map", function () {
 
 		it('Snaps to a number after adding tile layer', function (done) {
 			Browser.any3d = true;
-			map.addLayer(new TileLayer("{z}{x}{y}"))
+			map.addLayer(new TileLayer((x, y, z) => `file:///dev/null/z=${z}/x=${x}/y=${y}`))
 			expect(map.zoom).to.be(5);
 			map.fitBounds(bounds);
 			expect(map.zoom).to.be(2.75);

@@ -1,13 +1,24 @@
+"use strict"
+
+//import {Browser} from 'src/core/Browser'
+import {Util} from 'src/core/Util'
+//import {DomUtil} from 'src/dom/DomUtil'
+//import {Point} from 'src/geometry/Point'
+//import {LatLng} from 'src/geo/LatLng'
+//import {LatLngBounds} from 'src/geo/LatLngBounds'
+import {Map} from 'src/map/Map'
+//import {Layer} from 'src/layer/Layer'
+import {TileLayer} from 'src/layer/tile/TileLayer'
 
 
 describe('TileLayer', function () {
 
-	var div, map;
+	var div, map
 
 	// Placekitten via http://placekitten.com/attribution.html
 	// Image licensed under CC-by-sa by http://flickr.com/photos/lachlanrogers/
 
-	var placeKitten = "data:image/jpeg;base64," +
+	var placeKitten = "data:image/jpegbase64," +
 	"/9j/4AAQSkZJRgABAQAAAQABAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBF" +
 	"RyB2NjIpLCBxdWFsaXR5ID0gNjUK/9sAQwALCAgKCAcLCgkKDQwLDREcEhEPDxEiGRoUHCkkKyooJCcn" +
 	"LTJANy0wPTAnJzhMOT1DRUhJSCs2T1VORlRAR0hF/9sAQwEMDQ0RDxEhEhIhRS4nLkVFRUVFRUVFRUVF" +
@@ -159,134 +170,135 @@ describe('TileLayer', function () {
 	"REGNY13tnPoM+3vUjyCSLaQW2t8wzgn3qAIEmG5y+CGHcA05GVV25AEhJTnkDpQA0H5mUZcBsEsMc+n0" +
 	"qMEAbA4BUkEHPNTRh5Y2wTuJ6MOvSovLEsSKoMar/Fnk9e9AEzMWg2hsEkjI71DCWhh+V94Xnjk/lTDG" +
 	"8kRchtw56dc9z/nvTjIftC+YoUtwMHqPegBiYZ98Qdc8fMP5VI+Vh8zZltuCPf2odlWMlmIIOwsw4P69" +
-	"qQzPJJgDeASMHuOx+lAH/9k=";
+	"qQzPJJgDeASMHuOx+lAH/9k="
 
 	beforeEach(function () {
-		div = document.createElement('div');
-		div.style.width = '800px';
-		div.style.height = '600px';
-		div.style.visibility = 'hidden';
+		div = document.createElement('div')
+		div.style.width = '800px'
+		div.style.height = '600px'
+		div.style.visibility = 'hidden'
 
-		document.body.appendChild(div);
+		document.body.appendChild(div)
 
-		map = L.map(div);
-	});
+		map = new Map(div)
+	})
 
 	afterEach(function () {
-		document.body.removeChild(div);
-	});
+		document.body.removeChild(div)
+	})
 
 	function kittenLayerFactory(options) {
-		return L.tileLayer(placeKitten, options || {});
+		return new TileLayer(placeKitten, options || {})
 	}
 
 	describe("number of kittens loaded", function () {
 
-		var clock, kittenLayer, counts;
+		var clock, kittenLayer, counts
 
 		// animationFrame helper, just runs requestAnimFrame() a given number of times
 		function runFrames(n) {
-			return _runFrames(n)();
+			return _runFrames(n)()
 		}
 
 		function _runFrames(n) {
 			if (n) {
 				return function () {
-					clock.tick(40); // 40msec/frame ~= 25fps
-					map.fire('_frame');
-					L.Util.requestAnimFrame(_runFrames(n - 1));
-				};
+					clock.tick(40) // 40msec/frame ~= 25fps
+					map.fire('_frame')
+					Util.requestAnimFrame(_runFrames(n - 1))
+				}
 			} else {
-				return L.Util.falseFn;
+				return () => false
 			}
 		}
 
 		beforeEach(function () {
-			clock = sinon.useFakeTimers();
+			clock = sinon.useFakeTimers()
 
-			kittenLayer = kittenLayerFactory();
+			kittenLayer = kittenLayerFactory()
 
 			counts = {
 				tileload: 0,
 				tileerror: 0,
 				tileloadstart: 0,
 				tileunload: 0
-			};
+			}
 
 			kittenLayer.on('tileload tileunload tileerror tileloadstart', function (ev) {
-// 				console.log(ev.type);
-				counts[ev.type]++;
-			});
+// 				console.log(ev.type)
+				counts[ev.type]++
+			})
 // 			grid.on('tileunload', function (ev) {
-// 				console.log(ev.type, ev.coords, counts);
-// 			});
+// 				console.log(ev.type, ev.coords, counts)
+// 			})
 
-			map.options.fadeAnimation = false;
-			map.options.zoomAnimation = false;
-		});
+			map.options.fadeAnimation = false
+			map.options.zoomAnimation = false
+		})
 
 		afterEach(function () {
-			clock.restore();
-			kittenLayer.off();
-			kittenLayer = undefined;
-			counts = undefined;
-		});
+			clock.restore()
+			kittenLayer.off()
+			kittenLayer = undefined
+			counts = undefined
+		})
 
 		it("Loads 8 kittens zoom 1", function (done) {
 
 			kittenLayer.on('load', function () {
-				expect(counts.tileloadstart).to.be(8);
-				expect(counts.tileload).to.be(8);
-				expect(counts.tileunload).to.be(0);
-				expect(kittenLayer._container.querySelectorAll('img').length).to.be(8);
-				done();
-			});
+				expect(counts.tileloadstart).to.be(8)
+				expect(counts.tileload).to.be(8)
+				expect(counts.tileunload).to.be(0)
+				expect(kittenLayer._container.querySelectorAll('img').length).to.be(8)
+				done()
+			})
 
-			map.addLayer(kittenLayer).setView([0, 0], 1);
-			clock.tick(250);
-		});
+			map.addLayer(kittenLayer).view = {center: [0, 0], zoom: 1}
+			clock.tick(250)
+		})
 
-
+		/***
 		// NOTE: This test has different behaviour in PhantomJS and graphical
 		// browsers due to CSS animations!
 		it.skipInPhantom("Loads 290, unloads 275 kittens on MAD-TRD flyTo()", function (done) {
 
-			this.timeout(10000); // This test takes longer than usual due to frames
+			this.timeout(10000) // This test takes longer than usual due to frames
 
-			var mad = [40.40, -3.7], trd = [63.41, 10.41];
+			var mad = [40.40, -3.7], trd = [63.41, 10.41]
 
 			kittenLayer.on('load', function () {
-				expect(counts.tileloadstart).to.be(12);
-				expect(counts.tileload).to.be(12);
-				expect(counts.tileunload).to.be(0);
-				kittenLayer.off('load');
+				expect(counts.tileloadstart).to.be(12)
+				expect(counts.tileload).to.be(12)
+				expect(counts.tileunload).to.be(0)
+				kittenLayer.off('load')
 
 				map.on('zoomend', function () {
-					expect(counts.tileloadstart).to.be(290);
-					expect(counts.tileunload).to.be(275);
+					expect(counts.tileloadstart).to.be(290)
+					expect(counts.tileunload).to.be(275)
 
 					// image tiles take time, so then might not be fully loaded yet.
-					expect(counts.tileload).to.be.lessThan(counts.tileloadstart + 1);
-					expect(counts.tileload).to.be.greaterThan(counts.tileunload);
-					expect(kittenLayer._container.querySelectorAll('img').length).to.be(15);
-					done();
-				});
+					expect(counts.tileload).to.be.lessThan(counts.tileloadstart + 1)
+					expect(counts.tileload).to.be.greaterThan(counts.tileunload)
+					expect(kittenLayer._container.querySelectorAll('img').length).to.be(15)
+					done()
+				})
 
-				map.flyTo(trd, 12, {animate: true});
+				map.flyTo(trd, 12, {animate: true})
 
 	// 				map.on('_frame', function () {
-	// 					console.log('frame', counts);
-	// 				});
+	// 					console.log('frame', counts)
+	// 				})
 
-				runFrames(500);
-			});
+				runFrames(500)
+			})
 
-			map.addLayer(kittenLayer).setView(mad, 12);
-			clock.tick(250);
-		});
+			map.addLayer(kittenLayer).setView(mad, 12)
+			clock.tick(250)
+		})
+		***/
 
-	});
+	})
 
 
-});
+})
 

@@ -5,9 +5,9 @@ module.exports = function (config) {
 
 	var files = [
 		//'public/vendors/traceur/traceur.min.js',
-		'public/vendors/es6-shim/es6-shim.min.js',
-		'public/vendors/es6-module-loader/dist/es6-module-loader.js',
-		'public/vendors/fetch/fetch.js',
+		//'public/vendors/es6-shim/es6-shim.min.js',
+		//'public/vendors/es6-module-loader/dist/es6-module-loader.js',
+		//'public/vendors/fetch/fetch.js',
 		//'lib/es6-starter.min.js', //compiled version of all of the above
 		//"spec/sinon.js",
 		//{pattern: "spec/expect.js", served: true, included: false, watched: true}
@@ -28,13 +28,14 @@ module.exports = function (config) {
 		{pattern: "src/layer/tile/*.js", served: true, included: false, watched: true},
 		{pattern: "src/layer/marker/*.js", served: true, included: false, watched: true},
 		// specs
-		//"spec/suites/core/*Spec.js",
-		//"spec/suites/dom/*Spec.js",
-		//"spec/suites/geometry/*Spec.js",
-		//"spec/suites/geo/*Spec.js",
-		//"spec/suites/layer/PopupSpec.js",
+		"spec/suites/core/*Spec.js",
+		"spec/suites/dom/*Spec.js",
+		"spec/suites/geometry/*Spec.js",
+		"spec/suites/geo/*Spec.js",
+		"spec/suites/layer/PopupSpec.js",
 		"spec/suites/layer/tile/GridLayerSpec.js",
-		//"spec/suites/map/MapSpec.js",
+		"spec/suites/layer/tile/TileLayerSpec.js",
+		"spec/suites/map/MapSpec.js",
 		//"spec/suites/**/*.js",
 		{pattern: "dist/images/*.png", included: false}
 	]);
