@@ -1,73 +1,95 @@
+import {DomUtil} from 'src/dom/DomUtil'
+import {Draggable} from 'src/dom/Draggable'
+
 /*
  * L.Handler.MarkerDrag is used internally by L.Marker to make the markers draggable.
  */
 
-L.Handler.MarkerDrag = L.Handler.extend({
-	initialize: function (marker) {
-		this._marker = marker;
-	},
+export class MarkerDrag {
+	constructor(marker) {
+		this._element = marker
+		this._enabled = false
+	}
 
-	addHooks: function () {
-		var icon = this._marker._icon;
+	enable() {
+		if (this._enabled) { return }
+
+		this._enabled = true
+		this.addHooks()
+	}
+
+	disable() {
+		if (!this._enabled) { return }
+
+		this._enabled = false
+		this.removeHooks()
+	}
+
+	get enabled() {
+		return !!this._enabled
+	}
+
+	addHooks() {
+		let icon = this._element._icon
 
 		if (!this._draggable) {
-			this._draggable = new L.Draggable(icon, icon, true);
+			this._draggable = new Draggable(icon, icon, true)
 		}
 
 		this._draggable.on({
 			dragstart: this._onDragStart,
 			drag: this._onDrag,
 			dragend: this._onDragEnd
-		}, this).enable();
+		}, this).enable()
 
-		L.DomUtil.addClass(icon, 'leaflet-marker-draggable');
-	},
+		DomUtil.addClass(icon, 'leaflet-marker-draggable')
+	}
 
-	removeHooks: function () {
+	removeHooks() {
 		this._draggable.off({
 			dragstart: this._onDragStart,
 			drag: this._onDrag,
 			dragend: this._onDragEnd
-		}, this).disable();
+		}, this).disable()
 
-		if (this._marker._icon) {
-			L.DomUtil.removeClass(this._marker._icon, 'leaflet-marker-draggable');
+		if (this._element._icon) {
+			DomUtil.removeClass(this._element._icon, 'leaflet-marker-draggable');
 		}
-	},
+	}
 
-	moved: function () {
-		return this._draggable && this._draggable._moved;
-	},
+	moved() {
+		return this._draggable && this._draggable._moved
+	}
 
-	_onDragStart: function () {
-		this._marker
+	_onDragStart() {
+		this._element
 		    .closePopup()
 		    .fire('movestart')
-		    .fire('dragstart');
-	},
+		    .fire('dragstart')
+	}
 
-	_onDrag: function (e) {
-		var marker = this._marker,
+	_onDrag(e) {
+		var marker = this._element,
 		    shadow = marker._shadow,
-		    iconPos = L.DomUtil.getPosition(marker._icon),
-		    latlng = marker._map.layerPointToLatLng(iconPos);
+		    iconPos = DomUtil.getPosition(marker._icon),
+		    latlng = marker._map.layerPointToLatLng(iconPos)
 
 		// update shadow position
 		if (shadow) {
-			L.DomUtil.setPosition(shadow, iconPos);
+			DomUtil.setPosition(shadow, iconPos)
 		}
 
-		marker._latlng = latlng;
-		e.latlng = latlng;
+		marker._latlng = latlng
+		e.latlng = latlng
 
 		marker
 		    .fire('move', e)
-		    .fire('drag', e);
-	},
-
-	_onDragEnd: function (e) {
-		this._marker
-		    .fire('moveend')
-		    .fire('dragend', e);
+		    .fire('drag', e)
 	}
-});
+
+	_onDragEnd(e) {
+		this._element
+		    .fire('moveend')
+		    .fire('dragend', e)
+	}
+}

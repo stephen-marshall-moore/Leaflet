@@ -19,8 +19,8 @@ let _default_divicon_options = {
 
 export class DivIcon extends Icon {
 
-	constructor(latlng, options = undefined) {
-		super(latlng)		
+	constructor(options = undefined) {
+		super()		
 		Object.assign(this.options, _default_divicon_options, options)
 	}
 

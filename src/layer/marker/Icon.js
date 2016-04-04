@@ -20,8 +20,8 @@ export class Icon {
 	}
 	*/
 
-	constructor(options) {
-		this.options = options
+	constructor(options = undefined) {
+		this.options = options || {}
 	}
 
 	createIcon(oldIcon) {

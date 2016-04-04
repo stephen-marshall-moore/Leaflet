@@ -2,6 +2,7 @@ import {DomUtil} from '../../dom/DomUtil'
 import {LatLng} from '../../geo/LatLng'
 import {Layer} from '../Layer'
 import {DefaultIcon} from './Icon.Default'
+import {MarkerDrag} from './Marker.Drag'
 
 /*
  * L.Marker is used to display clickable/draggable icons on the map.
@@ -42,7 +43,7 @@ export class Marker extends Layer {
 	}
 
 	onRemove() {
-		if (this.dragging && this.dragging.enabled()) {
+		if (this.dragging && this.dragging.enabled) {
 			this.options.draggable = true
 			this.dragging.removeHooks()
 		}
@@ -226,21 +227,19 @@ export class Marker extends Layer {
 
 		this.addInteractiveTarget(this._icon)
 
-		/** wait on Handler
-		if (L.Handler.MarkerDrag) {
-			var draggable = this.options.draggable
+		if (MarkerDrag) {
+			let draggable = this.options.draggable
 			if (this.dragging) {
-				draggable = this.dragging.enabled()
+				draggable = this.dragging.enabled
 				this.dragging.disable()
 			}
 
-			this.dragging = new L.Handler.MarkerDrag(this)
+			this.dragging = new MarkerDrag(this)
 
 			if (draggable) {
 				this.dragging.enable()
 			}
 		}
-		***/
 	}
 
 	setOpacity(opacity) {

@@ -985,7 +985,7 @@ describe("Map", function () {
 		***/
 
 		it("mouseout is forwarded when using a DivIcon", function () {
-			let icon = new DivIcon([1,2], {
+			let icon = new DivIcon({
 				html: "<p>this is text in a child element</p>",
 				iconSize: [100, 100]
 			})
@@ -1000,7 +1000,7 @@ describe("Map", function () {
 		})
 
 		it("mouseout is not forwarded if relatedTarget is a target's child", function () {
-			let icon = new DivIcon([1, 2], {
+			let icon = new DivIcon({
 				html: "<p>this is text in a child element</p>",
 				iconSize: [100, 100]
 			})
@@ -1016,7 +1016,7 @@ describe("Map", function () {
 		})
 
 		it("mouseout is not forwarded if fired on target's child", function () {
-			let icon = new DivIcon([1, 2], {
+			let icon = new DivIcon({
 				html: "<p>this is text in a child element</p>",
 				iconSize: [100, 100]
 			})
