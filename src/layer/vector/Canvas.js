@@ -1,321 +1,339 @@
+import {Browser} from 'src/core/Browser'
+import {Util} from 'src/core/Util'
+import {DomUtil} from 'src/dom/DomUtil'
+import {DomEvent} from 'src/dom/DomEvent'
+import {Bounds} from 'src/geometry/Bounds'
+import {Renderer} from './Renderer'
+
 /*
  * L.Canvas handles Canvas vector layers rendering and mouse events handling. All Canvas-specific code goes here.
  */
 
-L.Canvas = L.Renderer.extend({
+let _default_canvas_options = {}
 
-	onAdd: function () {
-		L.Renderer.prototype.onAdd.call(this);
+export class Canvas extends Renderer {
 
-		this._layers = this._layers || {};
+	constructor(options = undefined) {
+		super()
+		Object.assign(this.options, _default_canvas_options, options)
+	}
+
+	onAdd() {
+		//L.Renderer.prototype.onAdd.call(this)
+		super.onAdd()
+
+		this._layers = this._layers || {}
 
 		// Redraw vectors since canvas is cleared upon removal,
 		// in case of removing the renderer itself from the map.
-		this._draw();
-	},
+		this._draw()
+	}
 
-	_initContainer: function () {
-		var container = this._container = document.createElement('canvas');
+	_initContainer() {
+		let container = this._container = document.createElement('canvas')
 
-		L.DomEvent
-			.on(container, 'mousemove', L.Util.throttle(this._onMouseMove, 32, this), this)
+		DomEvent
+			.on(container, 'mousemove', Util.throttle(this._onMouseMove, 32, this), this)
 			.on(container, 'click dblclick mousedown mouseup contextmenu', this._onClick, this)
-			.on(container, 'mouseout', this._handleMouseOut, this);
+			.on(container, 'mouseout', this._handleMouseOut, this)
 
-		this._ctx = container.getContext('2d');
-	},
+		this._ctx = container.getContext('2d')
+	}
 
-	_update: function () {
-		if (this._map._animatingZoom && this._bounds) { return; }
+	_update() {
+		if (this._map._animatingZoom && this._bounds) { return }
 
-		this._drawnLayers = {};
+		this._drawnLayers = {}
 
-		L.Renderer.prototype._update.call(this);
+		//L.Renderer.prototype._update.call(this)
+		super._update()
 
-		var b = this._bounds,
+		let b = this._bounds,
 		    container = this._container,
 		    size = b.getSize(),
-		    m = L.Browser.retina ? 2 : 1;
+		    m = Browser.retina ? 2 : 1
 
-		L.DomUtil.setPosition(container, b.min);
+		DomUtil.setPosition(container, b.min)
 
-		// set canvas size (also clearing it); use double size on retina
-		container.width = m * size.x;
-		container.height = m * size.y;
-		container.style.width = size.x + 'px';
-		container.style.height = size.y + 'px';
+		// set canvas size (also clearing it) use double size on retina
+		container.width = m * size.x
+		container.height = m * size.y
+		container.style.width = size.x + 'px'
+		container.style.height = size.y + 'px'
 
-		if (L.Browser.retina) {
-			this._ctx.scale(2, 2);
+		if (Browser.retina) {
+			this._ctx.scale(2, 2)
 		}
 
 		// translate so we use the same path coordinates after canvas element moves
-		this._ctx.translate(-b.min.x, -b.min.y);
-	},
+		this._ctx.translate(-b.min.x, -b.min.y)
+	}
 
-	_initPath: function (layer) {
-		this._layers[L.stamp(layer)] = layer;
-	},
+	_initPath(layer) {
+		this._layers[L.stamp(layer)] = layer
+	}
 
-	_addPath: L.Util.falseFn,
+	_addPath() { return false }
 
-	_removePath: function (layer) {
-		layer._removed = true;
-		this._requestRedraw(layer);
-	},
+	_removePath(layer) {
+		layer._removed = true
+		this._requestRedraw(layer)
+	}
 
-	_updatePath: function (layer) {
-		this._redrawBounds = layer._pxBounds;
-		this._draw(true);
-		layer._project();
-		layer._update();
-		this._draw();
-		this._redrawBounds = null;
-	},
+	_updatePath(layer) {
+		this._redrawBounds = layer._pxBounds
+		this._draw(true)
+		layer._project()
+		layer._update()
+		this._draw()
+		this._redrawBounds = null
+	}
 
-	_updateStyle: function (layer) {
-		this._requestRedraw(layer);
-	},
+	_updateStyle(layer) {
+		this._requestRedraw(layer)
+	}
 
-	_requestRedraw: function (layer) {
-		if (!this._map) { return; }
+	_requestRedraw(layer) {
+		if (!this._map) { return }
 
-		var padding = (layer.options.weight || 0) + 1;
-		this._redrawBounds = this._redrawBounds || new L.Bounds();
-		this._redrawBounds.extend(layer._pxBounds.min.subtract([padding, padding]));
-		this._redrawBounds.extend(layer._pxBounds.max.add([padding, padding]));
+		let padding = (layer.options.weight || 0) + 1
+		this._redrawBounds = this._redrawBounds || new Bounds()
+		this._redrawBounds.extend(layer._pxBounds.min.subtract([padding, padding]))
+		this._redrawBounds.extend(layer._pxBounds.max.add([padding, padding]))
 
-		this._redrawRequest = this._redrawRequest || L.Util.requestAnimFrame(this._redraw, this);
-	},
+		this._redrawRequest = this._redrawRequest || Util.requestAnimFrame(this._redraw, this)
+	}
 
-	_redraw: function () {
-		this._redrawRequest = null;
+	_redraw() {
+		this._redrawRequest = null
 
-		this._draw(true); // clear layers in redraw bounds
-		this._draw(); // draw layers
+		this._draw(true) // clear layers in redraw bounds
+		this._draw() // draw layers
 
-		this._redrawBounds = null;
-	},
+		this._redrawBounds = null
+	}
 
-	_draw: function (clear) {
-		this._clear = clear;
-		var layer, bounds = this._redrawBounds;
-		this._ctx.save();
+	_draw(clear) {
+		this._clear = clear
+		let layer, bounds = this._redrawBounds
+		this._ctx.save()
 		if (bounds) {
-			this._ctx.beginPath();
-			this._ctx.rect(bounds.min.x, bounds.min.y, bounds.max.x - bounds.min.x, bounds.max.y - bounds.min.y);
-			this._ctx.clip();
+			this._ctx.beginPath()
+			this._ctx.rect(bounds.min.x, bounds.min.y, bounds.max.x - bounds.min.x, bounds.max.y - bounds.min.y)
+			this._ctx.clip()
 		}
 
-		for (var id in this._layers) {
-			layer = this._layers[id];
+		for (let id in this._layers) {
+			layer = this._layers[id]
 			if (!bounds || layer._pxBounds.intersects(bounds)) {
-				layer._updatePath();
+				layer._updatePath()
 			}
 			if (clear && layer._removed) {
-				delete layer._removed;
-				delete this._layers[id];
+				delete layer._removed
+				delete this._layers[id]
 			}
 		}
-		this._ctx.restore();  // Restore state before clipping.
-	},
+		this._ctx.restore()  // Restore state before clipping.
+	}
 
-	_updatePoly: function (layer, closed) {
+	_updatePoly(layer, closed) {
 
-		var i, j, len2, p,
+		let i, j, len2, p,
 		    parts = layer._parts,
 		    len = parts.length,
-		    ctx = this._ctx;
+		    ctx = this._ctx
 
-		if (!len) { return; }
+		if (!len) { return }
 
-		this._drawnLayers[layer._leaflet_id] = layer;
+		this._drawnLayers[layer._leaflet_id] = layer
 
-		ctx.beginPath();
+		ctx.beginPath()
 
 		for (i = 0; i < len; i++) {
 			for (j = 0, len2 = parts[i].length; j < len2; j++) {
-				p = parts[i][j];
-				ctx[j ? 'lineTo' : 'moveTo'](p.x, p.y);
+				p = parts[i][j]
+				ctx[j ? 'lineTo' : 'moveTo'](p.x, p.y)
 			}
 			if (closed) {
-				ctx.closePath();
+				ctx.closePath()
 			}
 		}
 
-		this._fillStroke(ctx, layer);
+		this._fillStroke(ctx, layer)
 
 		// TODO optimization: 1 fill/stroke for all features with equal style instead of 1 for each feature
-	},
+	}
 
-	_updateCircle: function (layer) {
+	_updateCircle(layer) {
 
-		if (layer._empty()) { return; }
+		if (layer._empty()) { return }
 
-		var p = layer._point,
+		let p = layer._point,
 		    ctx = this._ctx,
 		    r = layer._radius,
-		    s = (layer._radiusY || r) / r;
+		    s = (layer._radiusY || r) / r
 
-		this._drawnLayers[layer._leaflet_id] = layer;
-
-		if (s !== 1) {
-			ctx.save();
-			ctx.scale(1, s);
-		}
-
-		ctx.beginPath();
-		ctx.arc(p.x, p.y / s, r, 0, Math.PI * 2, false);
+		this._drawnLayers[layer._leaflet_id] = layer
 
 		if (s !== 1) {
-			ctx.restore();
+			ctx.save()
+			ctx.scale(1, s)
 		}
 
-		this._fillStroke(ctx, layer);
-	},
+		ctx.beginPath()
+		ctx.arc(p.x, p.y / s, r, 0, Math.PI * 2, false)
 
-	_fillStroke: function (ctx, layer) {
-		var clear = this._clear,
-		    options = layer.options;
+		if (s !== 1) {
+			ctx.restore()
+		}
 
-		ctx.globalCompositeOperation = clear ? 'destination-out' : 'source-over';
+		this._fillStroke(ctx, layer)
+	}
+
+	_fillStroke(ctx, layer) {
+		let clear = this._clear,
+		    options = layer.options
+
+		ctx.globalCompositeOperation = clear ? 'destination-out' : 'source-over'
 
 		if (options.fill) {
-			ctx.globalAlpha = clear ? 1 : options.fillOpacity;
-			ctx.fillStyle = options.fillColor || options.color;
-			ctx.fill(options.fillRule || 'evenodd');
+			ctx.globalAlpha = clear ? 1 : options.fillOpacity
+			ctx.fillStyle = options.fillColor || options.color
+			ctx.fill(options.fillRule || 'evenodd')
 		}
 
 		if (options.stroke && options.weight !== 0) {
-			ctx.globalAlpha = clear ? 1 : options.opacity;
+			ctx.globalAlpha = clear ? 1 : options.opacity
 
 			// if clearing shape, do it with the previously drawn line width
-			layer._prevWeight = ctx.lineWidth = clear ? layer._prevWeight + 1 : options.weight;
+			layer._prevWeight = ctx.lineWidth = clear ? layer._prevWeight + 1 : options.weight
 
-			ctx.strokeStyle = options.color;
-			ctx.lineCap = options.lineCap;
-			ctx.lineJoin = options.lineJoin;
-			ctx.stroke();
+			ctx.strokeStyle = options.color
+			ctx.lineCap = options.lineCap
+			ctx.lineJoin = options.lineJoin
+			ctx.stroke()
 		}
-	},
+	}
 
 	// Canvas obviously doesn't have mouse events for individual drawn objects,
 	// so we emulate that by calculating what's under the mouse on mousemove/click manually
 
-	_onClick: function (e) {
-		var point = this._map.mouseEventToLayerPoint(e), layers = [], layer;
+	_onClick(e) {
+		let point = this._map.mouseEventToLayerPoint(e), layers = [], layer
 
-		for (var id in this._layers) {
-			layer = this._layers[id];
+		for (let id in this._layers) {
+			layer = this._layers[id]
 			if (layer.options.interactive && layer._containsPoint(point)) {
-				L.DomEvent._fakeStop(e);
-				layers.push(layer);
+				DomEvent._fakeStop(e)
+				layers.push(layer)
 			}
 		}
 		if (layers.length)  {
-			this._fireEvent(layers, e);
+			this._fireEvent(layers, e)
 		}
-	},
+	}
 
-	_onMouseMove: function (e) {
-		if (!this._map || this._map.dragging.moving() || this._map._animatingZoom) { return; }
+	_onMouseMove(e) {
+		if (!this._map || this._map.dragging.moving() || this._map._animatingZoom) { return }
 
-		var point = this._map.mouseEventToLayerPoint(e);
-		this._handleMouseOut(e, point);
-		this._handleMouseHover(e, point);
-	},
+		let point = this._map.mouseEventToLayerPoint(e)
+		this._handleMouseOut(e, point)
+		this._handleMouseHover(e, point)
+	}
 
 
-	_handleMouseOut: function (e, point) {
-		var layer = this._hoveredLayer;
+	_handleMouseOut(e, point) {
+		let layer = this._hoveredLayer
 		if (layer && (e.type === 'mouseout' || !layer._containsPoint(point))) {
 			// if we're leaving the layer, fire mouseout
-			L.DomUtil.removeClass(this._container, 'leaflet-interactive');
-			this._fireEvent([layer], e, 'mouseout');
-			this._hoveredLayer = null;
+			DomUtil.removeClass(this._container, 'leaflet-interactive')
+			this._fireEvent([layer], e, 'mouseout')
+			this._hoveredLayer = null
 		}
-	},
+	}
 
-	_handleMouseHover: function (e, point) {
-		var id, layer;
+	_handleMouseHover(e, point) {
+		let id, layer
 
 		for (id in this._drawnLayers) {
-			layer = this._drawnLayers[id];
+			layer = this._drawnLayers[id]
 			if (layer.options.interactive && layer._containsPoint(point)) {
-				L.DomUtil.addClass(this._container, 'leaflet-interactive'); // change cursor
-				this._fireEvent([layer], e, 'mouseover');
-				this._hoveredLayer = layer;
+				DomUtil.addClass(this._container, 'leaflet-interactive') // change cursor
+				this._fireEvent([layer], e, 'mouseover')
+				this._hoveredLayer = layer
 			}
 		}
 
 		if (this._hoveredLayer) {
-			this._fireEvent([this._hoveredLayer], e);
+			this._fireEvent([this._hoveredLayer], e)
 		}
-	},
+	}
 
-	_fireEvent: function (layers, e, type) {
-		this._map._fireDOMEvent(e, type || e.type, layers);
-	},
+	_fireEvent(layers, e, type) {
+		this._map._fireDOMEvent(e, type || e.type, layers)
+	}
 
 	// TODO _bringToFront & _bringToBack, pretty tricky
 
-	_bringToFront: L.Util.falseFn,
-	_bringToBack: L.Util.falseFn
-});
+	_bringToFront() { return false }
+	_bringToBack() { return false }
+}
 
-L.Browser.canvas = (function () {
-	return !!document.createElement('canvas').getContext;
-}());
+/***
+Browser.canvas = (function () {
+	return !!document.createElement('canvas').getContext
+}())
 
 L.canvas = function (options) {
-	return L.Browser.canvas ? new L.Canvas(options) : null;
-};
+	return Browser.canvas ? new L.Canvas(options) : null
+}
 
 L.Polyline.prototype._containsPoint = function (p, closed) {
-	var i, j, k, len, len2, part,
-	    w = this._clickTolerance();
+	let i, j, k, len, len2, part,
+	    w = this._clickTolerance()
 
-	if (!this._pxBounds.contains(p)) { return false; }
+	if (!this._pxBounds.contains(p)) { return false }
 
 	// hit detection for polylines
-	for (i = 0, len = this._parts.length; i < len; i++) {
-		part = this._parts[i];
+	for (i = 0, len = this._parts.length i < len i++) {
+		part = this._parts[i]
 
-		for (j = 0, len2 = part.length, k = len2 - 1; j < len2; k = j++) {
-			if (!closed && (j === 0)) { continue; }
+		for (j = 0, len2 = part.length, k = len2 - 1 j < len2 k = j++) {
+			if (!closed && (j === 0)) { continue }
 
 			if (L.LineUtil.pointToSegmentDistance(p, part[k], part[j]) <= w) {
-				return true;
+				return true
 			}
 		}
 	}
-	return false;
-};
+	return false
+}
 
 L.Polygon.prototype._containsPoint = function (p) {
-	var inside = false,
-	    part, p1, p2, i, j, k, len, len2;
+	let inside = false,
+	    part, p1, p2, i, j, k, len, len2
 
-	if (!this._pxBounds.contains(p)) { return false; }
+	if (!this._pxBounds.contains(p)) { return false }
 
 	// ray casting algorithm for detecting if point is in polygon
-	for (i = 0, len = this._parts.length; i < len; i++) {
-		part = this._parts[i];
+	for (i = 0, len = this._parts.length i < len i++) {
+		part = this._parts[i]
 
-		for (j = 0, len2 = part.length, k = len2 - 1; j < len2; k = j++) {
-			p1 = part[j];
-			p2 = part[k];
+		for (j = 0, len2 = part.length, k = len2 - 1 j < len2 k = j++) {
+			p1 = part[j]
+			p2 = part[k]
 
 			if (((p1.y > p.y) !== (p2.y > p.y)) && (p.x < (p2.x - p1.x) * (p.y - p1.y) / (p2.y - p1.y) + p1.x)) {
-				inside = !inside;
+				inside = !inside
 			}
 		}
 	}
 
 	// also check if it's on polygon stroke
-	return inside || L.Polyline.prototype._containsPoint.call(this, p, true);
-};
+	return inside || L.Polyline.prototype._containsPoint.call(this, p, true)
+}
 
 L.CircleMarker.prototype._containsPoint = function (p) {
-	return p.distanceTo(this._point) <= this._radius + this._clickTolerance();
-};
+	return p.distanceTo(this._point) <= this._radius + this._clickTolerance()
+}
+***/

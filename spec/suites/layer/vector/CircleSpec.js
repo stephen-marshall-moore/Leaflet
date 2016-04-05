@@ -1,46 +1,39 @@
+"use strict"
+
+import {LatLng} from 'src/geo/LatLng'
+import {Circle} from 'src/layer/vector/Circle'
+import {RendererMixin} from 'src/layer/vector/RendererMixin'
+import {Map as MapBase} from 'src/map/Map'
+
 describe('Circle', function () {
 
 	describe('#init', function () {
 
 		it('uses default radius if not given', function () {
-			var circle = L.circle([0, 0]);
-			expect(circle.getRadius()).to.eql(10);
-		});
+			let circle = new Circle([0, 0])
+			expect(circle.radius).to.eql(10)
+		})
 
-	});
+	})
 
 	describe('#getBounds', function () {
 
-		var map, circle;
+		class Map extends RendererMixin(MapBase) {}
+		let map, circle
 
 		beforeEach(function () {
-			map = L.map(document.createElement('div')).setView([0, 0], 4);
-			circle = L.circle([50, 30], {radius: 200}).addTo(map);
-		});
+			map = new Map(document.createElement('div'))
+			map.view = {center: [0, 0], zoom: 4}
+			circle = new Circle([50, 30], {radius: 200})
+			circle.addTo(map)
+		})
 
 		it('returns bounds', function () {
-			var bounds = circle.getBounds();
+			let bounds = circle.bounds
 
-			expect(bounds.getSouthWest()).nearLatLng(new L.LatLng(49.94347, 29.91211));
-			expect(bounds.getNorthEast()).nearLatLng(new L.LatLng(50.05646, 30.08789));
-		});
-	});
+			expect(bounds.southWest).nearLatLng(new LatLng(49.94347, 29.91211))
+			expect(bounds.northEast).nearLatLng(new LatLng(50.05646, 30.08789))
+		})
+	})
 
-	describe('Legacy factory', function () {
-
-		var map, circle;
-
-		beforeEach(function () {
-			map = L.map(document.createElement('div')).setView([0, 0], 4);
-			circle = L.circle([50, 30], 200).addTo(map);
-		});
-
-		it('returns same bounds as 1.0 factory', function () {
-			var bounds = circle.getBounds();
-
-			expect(bounds.getSouthWest()).nearLatLng(new L.LatLng(49.94347, 29.91211));
-			expect(bounds.getNorthEast()).nearLatLng(new L.LatLng(50.05646, 30.08789));
-		});
-	});
-
-});
+})

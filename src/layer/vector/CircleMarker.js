@@ -1,74 +1,76 @@
+import {Bounds} from 'src/geometry/Bounds'
+import {LatLng} from 'src/geo/LatLng'
+import {Path} from './Path'
 /*
  * L.CircleMarker is a circle overlay with a permanent pixel radius.
  */
 
-L.CircleMarker = L.Path.extend({
-
-	options: {
+let _default_circlemarker_options = {
 		fill: true,
 		radius: 10
-	},
+	}
 
-	initialize: function (latlng, options) {
-		L.setOptions(this, options);
-		this._latlng = L.latLng(latlng);
-		this._radius = this.options.radius;
-	},
+export class CircleMarker extends Path {
 
-	setLatLng: function (latlng) {
-		this._latlng = L.latLng(latlng);
-		this.redraw();
-		return this.fire('move', {latlng: this._latlng});
-	},
 
-	getLatLng: function () {
-		return this._latlng;
-	},
+	constructor(latlng, options = undefined) {
+		super()
+		Object.assign(this.options, _default_circlemarker_options, options)
 
-	setRadius: function (radius) {
-		this.options.radius = this._radius = radius;
-		return this.redraw();
-	},
+		this._latlng = LatLng.latLng(latlng)
+		this._radius = this.options.radius
+	}
 
-	getRadius: function () {
-		return this._radius;
-	},
+	set latLng(latlng) {
+		this._latlng = LatLng.latLng(latlng)
+		this.redraw()
+		this.fire('move', {latlng: this._latlng})
+	}
 
-	setStyle : function (options) {
-		var radius = options && options.radius || this._radius;
-		L.Path.prototype.setStyle.call(this, options);
-		this.setRadius(radius);
-		return this;
-	},
+	get latLng() {
+		return this._latlng
+	}
 
-	_project: function () {
-		this._point = this._map.latLngToLayerPoint(this._latlng);
-		this._updateBounds();
-	},
+	set radius(radius) {
+		this.options.radius = this._radius = radius
+		this.redraw()
+	}
 
-	_updateBounds: function () {
+	get radius() {
+		return this._radius
+	}
+
+	set style (options) {
+		let radius = options && options.radius || this._radius
+		//L.Path.prototype.setStyle.call(this, options)
+		super.setStyle(options)
+		this.radius = radius
+	}
+
+	_project() {
+		this._point = this._map.latLngToLayerPoint(this._latlng)
+		this._updateBounds()
+	}
+
+	_updateBounds() {
 		var r = this._radius,
 		    r2 = this._radiusY || r,
 		    w = this._clickTolerance(),
-		    p = [r + w, r2 + w];
-		this._pxBounds = new L.Bounds(this._point.subtract(p), this._point.add(p));
-	},
-
-	_update: function () {
-		if (this._map) {
-			this._updatePath();
-		}
-	},
-
-	_updatePath: function () {
-		this._renderer._updateCircle(this);
-	},
-
-	_empty: function () {
-		return this._radius && !this._renderer._bounds.intersects(this._pxBounds);
+		    p = [r + w, r2 + w]
+		this._pxBounds = new Bounds(this._point.subtract(p), this._point.add(p))
 	}
-});
 
-L.circleMarker = function (latlng, options) {
-	return new L.CircleMarker(latlng, options);
-};
+	_update() {
+		if (this._map) {
+			this._updatePath()
+		}
+	}
+
+	_updatePath() {
+		this._renderer._updateCircle(this)
+	}
+
+	_empty() {
+		return this._radius && !this._renderer._bounds.intersects(this._pxBounds)
+	}
+}

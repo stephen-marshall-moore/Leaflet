@@ -1,10 +1,11 @@
+import {Browser} from 'src/core/Browser'
+import {Layer} from '../Layer'
+
 /*
  * L.Path is the base class for all Leaflet vector layers like polygons and circles.
  */
 
-L.Path = L.Layer.extend({
-
-	options: {
+let _default_path_options = {
 		stroke: true,
 		color: '#3388ff',
 		weight: 3,
@@ -21,73 +22,82 @@ L.Path = L.Layer.extend({
 
 		// className: ''
 		interactive: true
-	},
+	}
 
-	beforeAdd: function (map) {
+export class Path extends Layer {
+
+	constructor(options = undefined) {
+		super()
+		Object.assign(this.options, _default_path_options, options)
+	}
+
+	beforeAdd(map) {
 		// Renderer is set here because we need to call renderer.getEvents
 		// before this.getEvents.
-		this._renderer = map.getRenderer(this);
-	},
+		this._renderer = map.getRenderer(this)
+	}
 
-	onAdd: function () {
-		this._renderer._initPath(this);
-		this._reset();
-		this._renderer._addPath(this);
-	},
+	onAdd() {
+		this._renderer._initPath(this)
+		this._reset()
+		this._renderer._addPath(this)
+	}
 
-	onRemove: function () {
-		this._renderer._removePath(this);
-	},
+	onRemove() {
+		this._renderer._removePath(this)
+	}
 
-	getEvents: function () {
+	getEvents() {
 		return {
 			zoomend: this._project,
 			moveend: this._update,
 			viewreset: this._reset
-		};
-	},
-
-	redraw: function () {
-		if (this._map) {
-			this._renderer._updatePath(this);
 		}
-		return this;
-	},
-
-	setStyle: function (style) {
-		L.setOptions(this, style);
-		if (this._renderer) {
-			this._renderer._updateStyle(this);
-		}
-		return this;
-	},
-
-	bringToFront: function () {
-		if (this._renderer) {
-			this._renderer._bringToFront(this);
-		}
-		return this;
-	},
-
-	bringToBack: function () {
-		if (this._renderer) {
-			this._renderer._bringToBack(this);
-		}
-		return this;
-	},
-
-	getElement: function () {
-		return this._path;
-	},
-
-	_reset: function () {
-		// defined in children classes
-		this._project();
-		this._update();
-	},
-
-	_clickTolerance: function () {
-		// used when doing hit detection for Canvas layers
-		return (this.options.stroke ? this.options.weight / 2 : 0) + (L.Browser.touch ? 10 : 0);
 	}
-});
+
+	redraw() {
+		if (this._map) {
+			this._renderer._updatePath(this)
+		}
+		return this
+	}
+
+	setStyle(style) {
+		//L.setOptions(this, style)
+		Object.assign(this, style)
+		if (this._renderer) {
+			this._renderer._updateStyle(this)
+		}
+		return this
+	}
+
+	bringToFront() {
+		if (this._renderer) {
+			this._renderer._bringToFront(this)
+		}
+		return this
+	}
+
+	bringToBack() {
+		if (this._renderer) {
+			this._renderer._bringToBack(this)
+		}
+		return this
+	}
+
+	getElement() {
+		return this._path
+	}
+
+	_reset() {
+		// defined in children classes
+		this._project()
+		this._update()
+	}
+
+	_clickTolerance() {
+		// used when doing hit detection for Canvas layers
+		return (this.options.stroke ? this.options.weight / 2 : 0) + (Browser.touch ? 10 : 0)
+	}
+}
+

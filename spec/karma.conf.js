@@ -27,6 +27,7 @@ module.exports = function (config) {
 		{pattern: "src/layer/*.js", served: true, included: false, watched: true},
 		{pattern: "src/layer/tile/*.js", served: true, included: false, watched: true},
 		{pattern: "src/layer/marker/*.js", served: true, included: false, watched: true},
+		{pattern: "src/layer/vector/*.js", served: true, included: false, watched: true},
 		// specs
 		"spec/suites/core/*Spec.js",
 		"spec/suites/dom/*Spec.js",
@@ -36,6 +37,9 @@ module.exports = function (config) {
 		"spec/suites/layer/tile/GridLayerSpec.js",
 		"spec/suites/layer/tile/TileLayerSpec.js",
 		"spec/suites/layer/marker/MarkerSpec.js",
+		"spec/suites/layer/vector/PathSpec.js",
+		"spec/suites/layer/vector/CircleMarkerSpec.js",
+		"spec/suites/layer/vector/CircleSpec.js",
 		"spec/suites/map/MapSpec.js",
 		//"spec/suites/**/*.js",
 		{pattern: "dist/images/*.png", included: false}
