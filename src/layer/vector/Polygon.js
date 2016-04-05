@@ -1,4 +1,5 @@
 import {Point} from 'src/geometry/Point'
+import {Bounds} from 'src/geometry/Bounds'
 import {PolyUtil} from 'src/geometry/PolyUtil'
 import {LatLng} from 'src/geo/LatLng'
 import {LatLngBounds} from 'src/geo/LatLngBounds'
@@ -15,7 +16,12 @@ let _default_polygon_options = {
 export class Polygon extends Polyline {
 
 	constructor(latlng, options = undefined) {
-		super()
+		super(latlng)
+		Object.assign(this.options, _default_polygon_options, options)
+
+		if (Polyline._flat(this._latlngs)) {
+			this._latlngs = [this._latlngs]
+		}
 	}
 
 	isEmpty() {
