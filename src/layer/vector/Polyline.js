@@ -195,13 +195,9 @@ export class Polyline extends Path {
 			points = this._rings[i]
 
 			for (j = 0, len2 = points.length; j < len2 - 1; j++) {
-				//segment = LineUtil.clipSegment(points[j], points[j + 1], bounds, j, true)
-				//segment = LineUtil.clipSegment(points[j], points[j + 1], bounds, true, j, false)
-				let rvalue = LineUtil.clipSegment(points[j], points[j + 1], bounds, false, lastCode, false)
-				segment = rvalue.segment
-				lastCode = rvalue.lastCode
+				// lastCode not used first time through j = 0 is falsy
+				({segment, lastCode} = LineUtil.clipSegment(points[j], points[j + 1], bounds, j, lastCode, false))
 
-				console.log(rvalue)
 				if (!segment) { continue }
 
 				parts[k] = parts[k] || []
