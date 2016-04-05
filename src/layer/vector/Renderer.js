@@ -1,3 +1,4 @@
+import {Browser} from 'src/core/Browser'
 import {Util} from 'src/core/Util'
 import {DomUtil} from 'src/dom/DomUtil'
 import {Bounds} from 'src/geometry/Bounds'

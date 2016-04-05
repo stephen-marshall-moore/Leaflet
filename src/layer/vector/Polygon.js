@@ -1,102 +1,110 @@
+import {Point} from 'src/geometry/Point'
+import {PolyUtil} from 'src/geometry/PolyUtil'
+import {LatLng} from 'src/geo/LatLng'
+import {LatLngBounds} from 'src/geo/LatLngBounds'
+import {Polyline} from './Polyline'
+
 /*
  * L.Polygon implements polygon vector layer (closed polyline with a fill inside).
  */
 
-L.Polygon = L.Polyline.extend({
-
-	options: {
+let _default_polygon_options = {
 		fill: true
-	},
+	}
 
-	isEmpty: function () {
-		return !this._latlngs.length || !this._latlngs[0].length;
-	},
+export class Polygon extends Polyline {
 
-	getCenter: function () {
-		var i, j, p1, p2, f, area, x, y, center,
+	constructor(latlng, options = undefined) {
+		super()
+	}
+
+	isEmpty() {
+		return !this._latlngs.length || !this._latlngs[0].length
+	}
+
+	get center() {
+		let i, j, p1, p2, f, area, x, y, center,
 		    points = this._rings[0],
-		    len = points.length;
+		    len = points.length
 
-		if (!len) { return null; }
+		if (!len) { return null }
 
 		// polygon centroid algorithm; only uses the first ring if there are multiple
 
-		area = x = y = 0;
+		area = x = y = 0
 
 		for (i = 0, j = len - 1; i < len; j = i++) {
-			p1 = points[i];
-			p2 = points[j];
+			p1 = points[i]
+			p2 = points[j]
 
-			f = p1.y * p2.x - p2.y * p1.x;
-			x += (p1.x + p2.x) * f;
-			y += (p1.y + p2.y) * f;
-			area += f * 3;
+			f = p1.y * p2.x - p2.y * p1.x
+			x += (p1.x + p2.x) * f
+			y += (p1.y + p2.y) * f
+			area += f * 3
 		}
 
 		if (area === 0) {
 			// Polygon is so small that all points are on same pixel.
-			center = points[0];
+			center = points[0]
 		} else {
-			center = [x / area, y / area];
+			center = [x / area, y / area]
 		}
-		return this._map.layerPointToLatLng(center);
-	},
+		return this._map.layerPointToLatLng(center)
+	}
 
-	_convertLatLngs: function (latlngs) {
-		var result = L.Polyline.prototype._convertLatLngs.call(this, latlngs),
-		    len = result.length;
+	_convertLatLngs(latlngs) {
+		var result = Polyline.prototype._convertLatLngs.call(this, latlngs),
+		    len = result.length
 
 		// remove last point if it equals first one
-		if (len >= 2 && result[0] instanceof L.LatLng && result[0].equals(result[len - 1])) {
-			result.pop();
+		if (len >= 2 && result[0] instanceof LatLng && result[0].equals(result[len - 1])) {
+			result.pop()
 		}
-		return result;
-	},
+		return result
+	}
 
-	_setLatLngs: function (latlngs) {
-		L.Polyline.prototype._setLatLngs.call(this, latlngs);
-		if (L.Polyline._flat(this._latlngs)) {
-			this._latlngs = [this._latlngs];
+	_setLatLngs(latlngs) {
+		//L.Polyline.prototype._setLatLngs.call(this, latlngs)
+		super._setLatLngs(latlngs)
+		if (Polyline._flat(this._latlngs)) {
+			this._latlngs = [this._latlngs]
 		}
-	},
+	}
 
-	_defaultShape: function () {
-		return L.Polyline._flat(this._latlngs[0]) ? this._latlngs[0] : this._latlngs[0][0];
-	},
+	_defaultShape() {
+		return Polyline._flat(this._latlngs[0]) ? this._latlngs[0] : this._latlngs[0][0]
+	}
 
-	_clipPoints: function () {
+	_clipPoints() {
 		// polygons need a different clipping algorithm so we redefine that
 
-		var bounds = this._renderer._bounds,
+		let bounds = this._renderer._bounds,
 		    w = this.options.weight,
-		    p = new L.Point(w, w);
+		    p = new Point(w, w)
 
 		// increase clip padding by stroke width to avoid stroke on clip edges
-		bounds = new L.Bounds(bounds.min.subtract(p), bounds.max.add(p));
+		bounds = new Bounds(bounds.min.subtract(p), bounds.max.add(p))
 
-		this._parts = [];
+		this._parts = []
 		if (!this._pxBounds || !this._pxBounds.intersects(bounds)) {
-			return;
+			return
 		}
 
 		if (this.options.noClip) {
-			this._parts = this._rings;
-			return;
+			this._parts = this._rings
+			return
 		}
 
 		for (var i = 0, len = this._rings.length, clipped; i < len; i++) {
-			clipped = L.PolyUtil.clipPolygon(this._rings[i], bounds, true);
+			clipped = PolyUtil.clipPolygon(this._rings[i], bounds, true)
 			if (clipped.length) {
-				this._parts.push(clipped);
+				this._parts.push(clipped)
 			}
 		}
-	},
-
-	_updatePath: function () {
-		this._renderer._updatePoly(this, true);
 	}
-});
 
-L.polygon = function (latlngs, options) {
-	return new L.Polygon(latlngs, options);
-};
+	_updatePath() {
+		this._renderer._updatePoly(this, true)
+	}
+}
+

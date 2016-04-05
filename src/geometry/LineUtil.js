@@ -179,6 +179,9 @@ export class LineUtil {
 
 	// square distance (to avoid unnecessary Math.sqrt calls)
 	static _sqDist(p1, p2) {
+		if( p1 === undefined ) console.log("p1 undefined")
+		if( p2 === undefined ) console.log("p2 undefined")
+
 		let dx = p2.x - p1.x,
 		    dy = p2.y - p1.y
 		return dx * dx + dy * dy
