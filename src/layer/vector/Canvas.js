@@ -50,7 +50,7 @@ export class Canvas extends Renderer {
 
 		let b = this._bounds,
 		    container = this._container,
-		    size = b.getSize(),
+		    size = b.size,
 		    m = Browser.retina ? 2 : 1
 
 		DomUtil.setPosition(container, b.min)
@@ -70,7 +70,7 @@ export class Canvas extends Renderer {
 	}
 
 	_initPath(layer) {
-		this._layers[L.stamp(layer)] = layer
+		this._layers[Util.stamp(layer)] = layer
 	}
 
 	_addPath() { return false }

@@ -43,6 +43,7 @@ module.exports = function (config) {
 		"spec/suites/layer/vector/PolylineSpec.js",
 		"spec/suites/layer/vector/PolylineGeometrySpec.js",
 		"spec/suites/layer/vector/PolygonSpec.js",
+		"spec/suites/layer/vector/CanvasSpec.js",
 		"spec/suites/map/MapSpec.js",
 		//"spec/suites/**/*.js",
 		{pattern: "dist/images/*.png", included: false}

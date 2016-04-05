@@ -73,4 +73,10 @@ export class CircleMarker extends Path {
 	_empty() {
 		return this._radius && !this._renderer._bounds.intersects(this._pxBounds)
 	}
+
+	// from Canvas
+	_containsPoint(p) {
+		return p.distanceTo(this._point) <= this._radius + this._clickTolerance()
+	}
+
 }

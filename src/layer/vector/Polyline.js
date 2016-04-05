@@ -238,4 +238,27 @@ export class Polyline extends Path {
 		// true if it's a flat array of latlngs false if nested
 		return !Array.isArray(latlngs[0]) || (typeof latlngs[0][0] !== 'object' && typeof latlngs[0][0] !== 'undefined')
 	}
+
+	// from Canvas
+	_containsPoint(p, closed) {
+		let i, j, k, len, len2, part,
+			  w = this._clickTolerance()
+
+		if (!this._pxBounds.contains(p)) { return false }
+
+		// hit detection for polylines
+		for (i = 0, len = this._parts.length; i < len; i++) {
+			part = this._parts[i]
+
+			for (j = 0, len2 = part.length, k = len2 - 1; j < len2; k = j++) {
+				if (!closed && (j === 0)) { continue }
+
+				if (LineUtil.pointToSegmentDistance(p, part[k], part[j]) <= w) {
+					return true
+				}
+			}
+		}
+		return false
+	}
+
 }
