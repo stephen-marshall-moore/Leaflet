@@ -1,113 +1,114 @@
+import {Util} from 'src/core/Util'
+import {Layer} from './Layer'
+
 /*
  * L.LayerGroup is a class to combine several layers into one so that
  * you can manipulate the group (e.g. add/remove it) as one layer.
  */
 
-L.LayerGroup = L.Layer.extend({
+export class LayerGroup extends Layer {
 
-	initialize: function (layers) {
-		this._layers = {};
+	constructor(layers) {
+		super()
+		this._layers = {}
 
-		var i, len;
+		let i, len
 
 		if (layers) {
 			for (i = 0, len = layers.length; i < len; i++) {
-				this.addLayer(layers[i]);
+				this.addLayer(layers[i])
 			}
 		}
-	},
+	}
 
-	addLayer: function (layer) {
-		var id = this.getLayerId(layer);
+	addLayer(layer) {
+		let id = this.getLayerId(layer)
 
-		this._layers[id] = layer;
+		this._layers[id] = layer
 
 		if (this._map) {
-			this._map.addLayer(layer);
+			this._map.addLayer(layer)
 		}
 
-		return this;
-	},
+		return this
+	}
 
-	removeLayer: function (layer) {
-		var id = layer in this._layers ? layer : this.getLayerId(layer);
+	removeLayer(layer) {
+		let id = layer in this._layers ? layer : this.getLayerId(layer)
 
 		if (this._map && this._layers[id]) {
-			this._map.removeLayer(this._layers[id]);
+			this._map.removeLayer(this._layers[id])
 		}
 
-		delete this._layers[id];
+		delete this._layers[id]
 
-		return this;
-	},
+		return this
+	}
 
-	hasLayer: function (layer) {
-		return !!layer && (layer in this._layers || this.getLayerId(layer) in this._layers);
-	},
+	hasLayer(layer) {
+		return !!layer && (layer in this._layers || this.getLayerId(layer) in this._layers)
+	}
 
-	clearLayers: function () {
-		for (var i in this._layers) {
-			this.removeLayer(this._layers[i]);
+	clearLayers() {
+		for (let i in this._layers) {
+			this.removeLayer(this._layers[i])
 		}
-		return this;
-	},
+		return this
+	}
 
-	invoke: function (methodName) {
-		var args = Array.prototype.slice.call(arguments, 1),
-		    i, layer;
+	invoke(methodName) {
+		let args = Array.prototype.slice.call(arguments, 1),
+		    i, layer
 
 		for (i in this._layers) {
-			layer = this._layers[i];
+			layer = this._layers[i]
 
 			if (layer[methodName]) {
-				layer[methodName].apply(layer, args);
+				layer[methodName].apply(layer, args)
 			}
 		}
 
-		return this;
-	},
-
-	onAdd: function (map) {
-		for (var i in this._layers) {
-			map.addLayer(this._layers[i]);
-		}
-	},
-
-	onRemove: function (map) {
-		for (var i in this._layers) {
-			map.removeLayer(this._layers[i]);
-		}
-	},
-
-	eachLayer: function (method, context) {
-		for (var i in this._layers) {
-			method.call(context, this._layers[i]);
-		}
-		return this;
-	},
-
-	getLayer: function (id) {
-		return this._layers[id];
-	},
-
-	getLayers: function () {
-		var layers = [];
-
-		for (var i in this._layers) {
-			layers.push(this._layers[i]);
-		}
-		return layers;
-	},
-
-	setZIndex: function (zIndex) {
-		return this.invoke('setZIndex', zIndex);
-	},
-
-	getLayerId: function (layer) {
-		return L.stamp(layer);
+		return this
 	}
-});
 
-L.layerGroup = function (layers) {
-	return new L.LayerGroup(layers);
-};
+	onAdd(map) {
+		for (let i in this._layers) {
+			map.addLayer(this._layers[i])
+		}
+	}
+
+	onRemove(map) {
+		for (let i in this._layers) {
+			map.removeLayer(this._layers[i])
+		}
+	}
+
+	eachLayer(method, context) {
+		for (let i in this._layers) {
+			method.call(context, this._layers[i])
+		}
+		return this
+	}
+
+	getLayer(id) {
+		return this._layers[id]
+	}
+
+	getLayers() {
+		let layers = []
+
+		for (let i in this._layers) {
+			layers.push(this._layers[i])
+		}
+		return layers
+	}
+
+	setZIndex(zIndex) {
+		return this.invoke('setZIndex', zIndex)
+	}
+
+	getLayerId(layer) {
+		return Util.stamp(layer)
+	}
+}
+
