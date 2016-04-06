@@ -1,10 +1,14 @@
+import {Util} from 'src/core/Util'
+import {DomUtil} from 'src/dom/DomUtil'
+import {Bounds} from 'src/geometry/Bounds'
+import {LatLngBounds} from 'src/geo/LatLngBounds'
+import {Layer} from './Layer'
+
 /*
  * L.ImageOverlay is used to overlay images over the map (to specific geographical bounds).
  */
 
-L.ImageOverlay = L.Layer.extend({
-
-	options: {
+let _default_overlay_options = {
 		opacity: 1,
 		alt: '',
 		interactive: false
@@ -12,155 +16,151 @@ L.ImageOverlay = L.Layer.extend({
 		/*
 		crossOrigin: <Boolean>,
 		*/
-	},
+	}
 
-	initialize: function (url, bounds, options) { // (String, LatLngBounds, Object)
-		this._url = url;
-		this._bounds = L.latLngBounds(bounds);
+export class ImageOverlay extends Layer {
 
-		L.setOptions(this, options);
-	},
+	constructor(url, bounds, options) { // (String, LatLngBounds, Object)
+		super()
+		Object.assign(this.options, _default_overlay_options, options)
 
-	onAdd: function () {
+		this._url = url
+		this._bounds = LatLngBounds.latLngBounds(bounds)
+	}
+
+	onAdd() {
 		if (!this._image) {
-			this._initImage();
+			this._initImage()
 
 			if (this.options.opacity < 1) {
-				this._updateOpacity();
+				this._updateOpacity()
 			}
 		}
 
 		if (this.options.interactive) {
-			L.DomUtil.addClass(this._image, 'leaflet-interactive');
-			this.addInteractiveTarget(this._image);
+			DomUtil.addClass(this._image, 'leaflet-interactive')
+			this.addInteractiveTarget(this._image)
 		}
 
-		this.getPane().appendChild(this._image);
-		this._reset();
-	},
+		this.getPane().appendChild(this._image)
+		this._reset()
+	}
 
-	onRemove: function () {
-		L.DomUtil.remove(this._image);
+	onRemove() {
+		DomUtil.remove(this._image)
 		if (this.options.interactive) {
-			this.removeInteractiveTarget(this._image);
+			this.removeInteractiveTarget(this._image)
 		}
-	},
+	}
 
-	setOpacity: function (opacity) {
-		this.options.opacity = opacity;
+	set opacity(opacity) {
+		this.options.opacity = opacity
 
 		if (this._image) {
-			this._updateOpacity();
+			this._updateOpacity()
 		}
-		return this;
-	},
+	}
 
-	setStyle: function (styleOpts) {
+	set style(styleOpts) {
 		if (styleOpts.opacity) {
-			this.setOpacity(styleOpts.opacity);
+			this.opacity = styleOpts.opacity
 		}
-		return this;
-	},
+	}
 
-	bringToFront: function () {
+	bringToFront() {
 		if (this._map) {
-			L.DomUtil.toFront(this._image);
+			DomUtil.toFront(this._image)
 		}
-		return this;
-	},
+		return this
+	}
 
-	bringToBack: function () {
+	bringToBack() {
 		if (this._map) {
-			L.DomUtil.toBack(this._image);
+			DomUtil.toBack(this._image)
 		}
-		return this;
-	},
+		return this
+	}
 
-	setUrl: function (url) {
-		this._url = url;
+	set url(url) {
+		this._url = url
 
 		if (this._image) {
-			this._image.src = url;
+			this._image.src = url
 		}
-		return this;
-	},
+	}
 
-	setBounds: function (bounds) {
-		this._bounds = bounds;
+	set bounds(bounds) {
+		this._bounds = bounds
 
 		if (this._map) {
-			this._reset();
+			this._reset()
 		}
-		return this;
-	},
+	}
 
-	getAttribution: function () {
-		return this.options.attribution;
-	},
+	get attribution() {
+		return this.options.attribution
+	}
 
-	getEvents: function () {
-		var events = {
+	get events() {
+		let events = {
 			zoom: this._reset,
 			viewreset: this._reset
-		};
+		}
 
 		if (this._zoomAnimated) {
-			events.zoomanim = this._animateZoom;
+			events.zoomanim = this._animateZoom
 		}
 
-		return events;
-	},
+		return events
+	}
 
-	getBounds: function () {
-		return this._bounds;
-	},
+	get bounds() {
+		return this._bounds
+	}
 
-	getElement: function () {
-		return this._image;
-	},
+	get element() {
+		return this._image
+	}
 
-	_initImage: function () {
-		var img = this._image = L.DomUtil.create('img',
-				'leaflet-image-layer ' + (this._zoomAnimated ? 'leaflet-zoom-animated' : ''));
+	_initImage() {
+		let img = this._image = DomUtil.create('img',
+				'leaflet-image-layer ' + (this._zoomAnimated ? 'leaflet-zoom-animated' : ''))
 
-		img.onselectstart = L.Util.falseFn;
-		img.onmousemove = L.Util.falseFn;
+		img.onselectstart = () => false //L.Util.falseFn
+		img.onmousemove = () => false //L.Util.falseFn
 
-		img.onload = L.bind(this.fire, this, 'load');
+		img.onload = Util.bind(this.fire, this, 'load')
 
 		if (this.options.crossOrigin) {
-			img.crossOrigin = '';
+			img.crossOrigin = ''
 		}
 
-		img.src = this._url;
-		img.alt = this.options.alt;
-	},
-
-	_animateZoom: function (e) {
-		var scale = this._map.getZoomScale(e.zoom),
-		    offset = this._map._latLngToNewLayerPoint(this._bounds.getNorthWest(), e.zoom, e.center);
-
-		L.DomUtil.setTransform(this._image, offset, scale);
-	},
-
-	_reset: function () {
-		var image = this._image,
-		    bounds = new L.Bounds(
-		        this._map.latLngToLayerPoint(this._bounds.getNorthWest()),
-		        this._map.latLngToLayerPoint(this._bounds.getSouthEast())),
-		    size = bounds.getSize();
-
-		L.DomUtil.setPosition(image, bounds.min);
-
-		image.style.width  = size.x + 'px';
-		image.style.height = size.y + 'px';
-	},
-
-	_updateOpacity: function () {
-		L.DomUtil.setOpacity(this._image, this.options.opacity);
+		img.src = this._url
+		img.alt = this.options.alt
 	}
-});
 
-L.imageOverlay = function (url, bounds, options) {
-	return new L.ImageOverlay(url, bounds, options);
-};
+	_animateZoom(e) {
+		var scale = this._map.getZoomScale(e.zoom),
+		    offset = this._map._latLngToNewLayerPoint(this._bounds.northWest, e.zoom, e.center)
+
+		DomUtil.setTransform(this._image, offset, scale)
+	}
+
+	_reset() {
+		let image = this._image,
+		    bounds = new Bounds(
+		        this._map.latLngToLayerPoint(this._bounds.northWest),
+		        this._map.latLngToLayerPoint(this._bounds.southEast)),
+		    size = bounds.size
+
+		DomUtil.setPosition(image, bounds.min)
+
+		image.style.width  = size.x + 'px'
+		image.style.height = size.y + 'px'
+	}
+
+	_updateOpacity() {
+		DomUtil.setOpacity(this._image, this.options.opacity)
+	}
+}
+

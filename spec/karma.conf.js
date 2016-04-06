@@ -34,6 +34,7 @@ module.exports = function (config) {
 		"spec/suites/geometry/*Spec.js",
 		"spec/suites/geo/*Spec.js",
 		"spec/suites/layer/PopupSpec.js",
+		"spec/suites/layer/ImageOverlaySpec.js",
 		"spec/suites/layer/tile/GridLayerSpec.js",
 		"spec/suites/layer/tile/TileLayerSpec.js",
 		"spec/suites/layer/marker/MarkerSpec.js",
