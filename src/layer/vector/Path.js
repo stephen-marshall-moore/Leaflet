@@ -64,7 +64,7 @@ export class Path extends Layer {
 
 	setStyle(style) {
 		//L.setOptions(this, style)
-		Object.assign(this, style)
+		Object.assign(this.options, style)
 		if (this._renderer) {
 			this._renderer._updateStyle(this)
 		}

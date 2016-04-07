@@ -29,13 +29,16 @@ module.exports = function (config) {
 		{pattern: "src/layer/marker/*.js", served: true, included: false, watched: true},
 		{pattern: "src/layer/vector/*.js", served: true, included: false, watched: true},
 		// specs
-		"spec/suites/core/*Spec.js",
-		"spec/suites/dom/*Spec.js",
-		"spec/suites/geometry/*Spec.js",
-		"spec/suites/geo/*Spec.js",
-		"spec/suites/layer/PopupSpec.js",
-		"spec/suites/layer/ImageOverlaySpec.js",
+		//"spec/suites/core/*Spec.js",
+		//"spec/suites/dom/*Spec.js",
+		//"spec/suites/geometry/*Spec.js",
+		//"spec/suites/geo/*Spec.js",
+		//"spec/suites/layer/PopupSpec.js",
+		//"spec/suites/layer/ImageOverlaySpec.js",
 		"spec/suites/layer/LayerGroupSpec.js",
+		"spec/suites/layer/FeatureGroupSpec.js",
+		"spec/suites/layer/GeoJSONSpec.js",
+		/***
 		"spec/suites/layer/tile/GridLayerSpec.js",
 		"spec/suites/layer/tile/TileLayerSpec.js",
 		"spec/suites/layer/marker/MarkerSpec.js",
@@ -47,6 +50,7 @@ module.exports = function (config) {
 		"spec/suites/layer/vector/PolygonSpec.js",
 		"spec/suites/layer/vector/CanvasSpec.js",
 		"spec/suites/map/MapSpec.js",
+		***/
 		//"spec/suites/**/*.js",
 		{pattern: "dist/images/*.png", included: false}
 	]);
