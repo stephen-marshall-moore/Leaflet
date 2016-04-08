@@ -1,12 +1,12 @@
 import {Util} from 'src/core/Util'
-import {Marker as MarkerBase} from 'src/layer/marker/Marker'
-import {Circle as CircleBase} from 'src/layer/vector/Circle'
-import {CircleMarker as CircleMarkerBase} from 'src/layer/vector/CircleMarker'
-import {Polyline as PolylineBase} from 'src/layer/vector/Polyline'
-import {Polygon as PolygonBase} from 'src/layer/vector/Polygon'
+import {Marker} from 'src/layer/marker/Marker'
+import {Circle} from 'src/layer/vector/Circle'
+import {CircleMarker} from 'src/layer/vector/CircleMarker'
+import {Polyline} from 'src/layer/vector/Polyline'
+import {Polygon} from 'src/layer/vector/Polygon'
 import {TileLayer} from 'src/layer/tile/TileLayer'
-import {LayerGroup as LayerGroupBase} from 'src/layer/LayerGroup'
-import {GeoJSON, PointToGeoJSON, PolylineToGeoJSON, PolygonToGeoJSON, LayerGroupGeoJSONMixin} from 'src/layer/GeoJSON'
+import {LayerGroup} from 'src/layer/LayerGroup'
+import {GeoJSON} from 'src/layer/GeoJSON'
 import {RendererMixin} from 'src/layer/vector/RendererMixin'
 import {Map as MapBase} from 'src/map/Map'
 
@@ -70,7 +70,6 @@ describe("GeoJSON", function () {
 })
 
 describe("Marker#toGeoJSON", function () {
-	class Marker extends PointToGeoJSON(MarkerBase) {}
 
 	it("returns a 2D Point object", function () {
 		let marker = new Marker([10, 20])
@@ -90,7 +89,6 @@ describe("Marker#toGeoJSON", function () {
 })
 
 describe("Circle#toGeoJSON", function () {
-	class Circle extends PointToGeoJSON(CircleBase) {}
 
 	it("returns a 2D Point object", function () {
 		let circle = new Circle([10, 20], 100)
@@ -110,7 +108,6 @@ describe("Circle#toGeoJSON", function () {
 })
 
 describe("CircleMarker#toGeoJSON", function () {
-	class CircleMarker extends PointToGeoJSON(CircleMarkerBase) {}
 
 	it("returns a 2D Point object", function () {
 		let marker = new CircleMarker([10, 20])
@@ -130,7 +127,6 @@ describe("CircleMarker#toGeoJSON", function () {
 })
 
 describe("Polyline#toGeoJSON", function () {
-	class Polyline extends PolylineToGeoJSON(PolylineBase) {}
 
 	it("returns a 2D LineString object", function () {
 		let polyline = new Polyline([[10, 20], [2, 5]])
@@ -150,7 +146,6 @@ describe("Polyline#toGeoJSON", function () {
 })
 
 describe("Polyline (multi) #toGeoJSON", function () {
-	class Polyline extends PolylineToGeoJSON(PolylineBase) {}
 
 	it("returns a 2D MultiLineString object", function () {
 		let multiPolyline = new Polyline([[[10, 20], [2, 5]], [[1, 2], [3, 4]]])
@@ -176,7 +171,6 @@ describe("Polyline (multi) #toGeoJSON", function () {
 })
 
 describe("Polygon#toGeoJSON", function () {
-	class Polygon extends PolygonToGeoJSON(PolygonBase) {}
 
 	it("returns a 2D Polygon object (no holes) from a flat LatLngs array", function () {
 		let polygon = new Polygon([[1, 2], [3, 4], [5, 6]])
@@ -239,7 +233,6 @@ describe("Polygon#toGeoJSON", function () {
 })
 
 describe("Polygon (multi) #toGeoJSON", function () {
-	class Polygon extends PolygonToGeoJSON(PolygonBase) {}
 
 	it("returns a 2D MultiPolygon object", function () {
 		let multiPolygon = new Polygon([[[[1, 2], [3, 4], [5, 6]]]])
@@ -285,13 +278,6 @@ describe("Polygon (multi) #toGeoJSON", function () {
 })
 
 describe("LayerGroup#toGeoJSON", function () {
-	class Marker extends PointToGeoJSON(MarkerBase) {}
-	class Circle extends PointToGeoJSON(CircleBase) {}
-	class CircleMarker extends PointToGeoJSON(CircleMarkerBase) {}
-	class Polyline extends PolylineToGeoJSON(PolylineBase) {}
-	class Polygon extends PolygonToGeoJSON(PolygonBase) {}
-	class LayerGroup extends LayerGroupGeoJSONMixin(LayerGroupBase) {}
-	class GeoJSONExtended extends LayerGroupGeoJSONMixin(GeoJSON) {}
 
 	it("returns a 2D FeatureCollection object", function () {
 		let marker = new Marker([10, 20]),
@@ -361,7 +347,9 @@ describe("LayerGroup#toGeoJSON", function () {
 			}]
 		}
 
-		expect(new GeoJSONExtended(json).toGeoJSON()).to.eql(json)
+		let geo = new GeoJSON(json)
+		let out = geo.toGeoJSON()
+		expect(out).to.eql(json)
 	})
 
 	it('roundtrips MiltiPoint features', function () {
@@ -379,7 +367,7 @@ describe("LayerGroup#toGeoJSON", function () {
 			}]
 		}
 
-		expect(new GeoJSONExtended(json).toGeoJSON()).to.eql(json)
+		expect(new GeoJSON(json).toGeoJSON()).to.eql(json)
 	})
 
 	it("omits layers which do not implement toGeoJSON", function () {

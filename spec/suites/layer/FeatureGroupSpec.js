@@ -4,7 +4,7 @@ import {LayerGroup} from 'src/layer/LayerGroup'
 import {FeatureGroup} from 'src/layer/FeatureGroup'
 import {Map} from 'src/map/Map'
 
-﻿describe('FeatureGroup', function () {
+describe('FeatureGroup', function () {
 	let map
 	beforeEach(function () {
 		map = new Map(document.createElement('div'))

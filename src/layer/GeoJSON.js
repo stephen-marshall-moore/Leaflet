@@ -5,6 +5,7 @@ import {CircleMarker} from './vector/CircleMarker'
 import {Circle} from './vector/Circle'
 import {Polyline} from './vector/Polyline'
 import {Polygon} from './vector/Polygon'
+import {LayerGroup} from './LayerGroup'
 import {FeatureGroup} from './FeatureGroup'
 
 /*
@@ -128,7 +129,7 @@ export class GeoJSON extends FeatureGroup {
 					layers.push(layer)
 				}
 			}
-			return new FeatureGroupEx(layers)
+			return new FeatureGroup(layers)
 
 		default:
 			throw new Error('Invalid GeoJSON object.')
@@ -195,18 +196,32 @@ export class GeoJSON extends FeatureGroup {
 }
 
 // for Marker, Circle, CircleMarker
-export const PointToGeoJSON = sup => class extends sup {
-	toGeoJSON() {
+//export const PointToGeoJSON = sup => class extends sup {
+//	toGeoJSON() {
+Marker.prototype.toGeoJSON = function() {
 		return GeoJSON.getFeature(this, {
 			type: 'Point',
 			coordinates: GeoJSON.latLngToCoords(this._latlng)
 		})
 	}
-}
+CircleMarker.prototype.toGeoJSON = function() {
+		return GeoJSON.getFeature(this, {
+			type: 'Point',
+			coordinates: GeoJSON.latLngToCoords(this._latlng)
+		})
+	}
+Circle.prototype.toGeoJSON = function() {
+		return GeoJSON.getFeature(this, {
+			type: 'Point',
+			coordinates: GeoJSON.latLngToCoords(this._latlng)
+		})
+	}
+//}
 
 // for Polyline
-export const PolylineToGeoJSON = sup => class extends sup {
-	toGeoJSON() {
+//export const PolylineToGeoJSON = sup => class extends sup {
+//	toGeoJSON() {
+Polyline.prototype.toGeoJSON = function() {
 		let multi = !Polyline._flat(this._latlngs)
 
 		let coords = GeoJSON.latLngsToCoords(this._latlngs, multi ? 1 : 0)
@@ -216,11 +231,12 @@ export const PolylineToGeoJSON = sup => class extends sup {
 			coordinates: coords
 		})
 	}
-}
+//}
 
 // for Polygon
-export const PolygonToGeoJSON = sup => class extends sup {
-	toGeoJSON() {
+//export const PolygonToGeoJSON = sup => class extends sup {
+//	toGeoJSON() {
+Polygon.prototype.toGeoJSON = function() {
 		let holes = !Polyline._flat(this._latlngs),
 			  multi = holes && !Polyline._flat(this._latlngs[0])
 
@@ -235,11 +251,11 @@ export const PolygonToGeoJSON = sup => class extends sup {
 			coordinates: coords
 		})
 	}
-}
+//}
 
 // for LayerGroup
-export const LayerGroupGeoJSONMixin = sup => class extends sup {
-	toMultiPoint() {
+//export const LayerGroupGeoJSONMixin = sup => class extends sup {
+LayerGroup.prototype.toMultiPoint = function() {
 		let coords = []
 
 		this.eachLayer(function (layer) {
@@ -252,7 +268,7 @@ export const LayerGroupGeoJSONMixin = sup => class extends sup {
 		})
 	}
 
-	toGeoJSON() {
+LayerGroup.prototype.toGeoJSON = function() {
 
 		let type = this.feature && this.feature.geometry && this.feature.geometry.type
 
@@ -282,8 +298,8 @@ export const LayerGroupGeoJSONMixin = sup => class extends sup {
 			features: jsons
 		}
 	}
-}
+//}
 
 
-class FeatureGroupEx extends LayerGroupGeoJSONMixin(FeatureGroup) {}
+//class FeatureGroupEx extends LayerGroupGeoJSONMixin(FeatureGroup) {}
 
