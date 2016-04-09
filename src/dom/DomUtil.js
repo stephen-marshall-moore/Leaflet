@@ -175,6 +175,14 @@ export class DomUtil {
 
 		return el._leaflet_pos || new Point(0, 0)
 	}
+
+	static preventOutline(el) {
+		// placeholder
+	}
+
+	static restoreOutline(el) {
+		// placeholder
+	}
 }
 
 DomUtil.TRANSFORM = DomUtil.testProp(
