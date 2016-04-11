@@ -18,6 +18,7 @@ module.exports = function (config) {
 		"spec/suites/SpecHelper.js",
 		// source
 		{pattern: "src/core/*.js", served: true, included: false, watched: true},
+		{pattern: "src/control/*.js", served: true, included: false, watched: true},
 		{pattern: "src/dom/*.js", served: true, included: false, watched: true},
 		{pattern: "src/geometry/*.js", served: true, included: false, watched: true},
 		{pattern: "src/geo/*.js", served: true, included: false, watched: true},
@@ -33,6 +34,10 @@ module.exports = function (config) {
 		"spec/suites/dom/*Spec.js",
 		"spec/suites/geometry/*Spec.js",
 		"spec/suites/geo/*Spec.js",
+		"spec/suites/control/ControlSpec.js",
+		"spec/suites/control/Control.AttributionSpec.js",
+		"spec/suites/control/Control.LayersSpec.js",
+		"spec/suites/control/Control.ScaleSpec.js",
 		"spec/suites/layer/PopupSpec.js",
 		"spec/suites/layer/ImageOverlaySpec.js",
 		"spec/suites/layer/LayerGroupSpec.js",

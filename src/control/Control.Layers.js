@@ -1,3 +1,5 @@
+import {Browser} from 'src/core/Browser'
+import {Util} from 'src/core/Util'
 import {DomUtil} from 'src/dom/DomUtil'
 import {DomEvent} from 'src/dom/DomEvent'
 import {Control} from './Control'
@@ -17,7 +19,7 @@ export class Layers extends Control {
 
 	constructor(baseLayers, overlays, options) {
 		super()
-		Object.assign(this.options, _default_zoom_options, options)
+		Object.assign(this.options, _default_layers_options, options)
 
 		this._layers = {}
 		this._lastZIndex = 0
@@ -63,7 +65,7 @@ export class Layers extends Control {
 	removeLayer(layer) {
 		layer.off('add remove', this._onLayerChange, this)
 
-		delete this._layers[L.stamp(layer)]
+		delete this._layers[Util.stamp(layer)]
 		return this._update()
 	}
 
@@ -75,25 +77,25 @@ export class Layers extends Control {
 		container.setAttribute('aria-haspopup', true)
 
 		DomEvent.disableClickPropagation(container)
-		if (!L.Browser.touch) {
+		if (!Browser.touch) {
 			DomEvent.disableScrollPropagation(container)
 		}
 
 		let form = this._form = DomUtil.create('form', className + '-list')
 
 		if (this.options.collapsed) {
-			if (!L.Browser.android) {
+			if (!Browser.android) {
 				DomEvent.on(container, {
 					mouseenter: this._expand,
 					mouseleave: this._collapse
-				} this)
+				}, this)
 			}
 
 			let link = this._layersLink = DomUtil.create('a', className + '-toggle', container)
 			link.href = '#'
 			link.title = 'Layers'
 
-			if (L.Browser.touch) {
+			if (Browser.touch) {
 				DomEvent
 				    .on(link, 'click', DomEvent.stop)
 				    .on(link, 'click', this._expand, this)
@@ -103,8 +105,8 @@ export class Layers extends Control {
 
 			// work around for Firefox Android issue https://github.com/Leaflet/Leaflet/issues/2033
 			DomEvent.on(form, 'click', function () {
-				setTimeout(L.bind(this._onInputClick, this), 0)
-			} this)
+				setTimeout(Util.bind(this._onInputClick, this), 0)
+			}, this)
 
 			this._map.on('click', this._collapse, this)
 			// TODO keyboard accessibility
@@ -122,7 +124,7 @@ export class Layers extends Control {
 	_addLayer(layer, name, overlay) {
 		layer.on('add remove', this._onLayerChange, this)
 
-		let id = L.stamp(layer)
+		let id = Util.stamp(layer)
 
 		this._layers[id] = {
 			layer: layer,
@@ -168,7 +170,7 @@ export class Layers extends Control {
 			this._update()
 		}
 
-		let obj = this._layers[L.stamp(e.target)]
+		let obj = this._layers[Util.stamp(e.target)]
 
 		let type = obj.overlay ?
 			(e.type === 'add' ? 'overlayadd' : 'overlayremove') :
@@ -205,7 +207,7 @@ export class Layers extends Control {
 			input = this._createRadioElement('leaflet-base-layers', checked)
 		}
 
-		input.layerId = L.stamp(obj.layer)
+		input.layerId = Util.stamp(obj.layer)
 
 		DomEvent.on(input, 'click', this._onInputClick, this)
 
@@ -282,7 +284,7 @@ export class Layers extends Control {
 		let inputs = this._form.getElementsByTagName('input'),
 		    input,
 		    layer,
-		    zoom = this._map.getZoom()
+		    zoom = this._map.zoom
 
 		for (let i = inputs.length - 1; i >= 0; i--) {
 			input = inputs[i]
