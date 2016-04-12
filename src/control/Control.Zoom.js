@@ -88,10 +88,10 @@ export class Zoom extends Control {
 		DomUtil.removeClass(this._zoomInButton, className)
 		DomUtil.removeClass(this._zoomOutButton, className)
 
-		if (this._disabled || map._zoom === map.getMinZoom()) {
+		if (this._disabled || map._zoom === map.minZoom) {
 			DomUtil.addClass(this._zoomOutButton, className)
 		}
-		if (this._disabled || map._zoom === map.getMaxZoom()) {
+		if (this._disabled || map._zoom === map.maxZoom) {
 			DomUtil.addClass(this._zoomInButton, className)
 		}
 	}

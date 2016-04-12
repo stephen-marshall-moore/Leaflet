@@ -49,7 +49,7 @@ export class Scale extends Control {
 
 	_update() {
 		let map = this._map,
-		    y = map.getSize().y / 2
+		    y = map.size.y / 2
 
 		let maxMeters = map.distance(
 				map.containerPointToLatLng([0, y]),
