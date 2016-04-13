@@ -16,7 +16,6 @@
     "FAQ.md",
     "debug",
     "spec",
-    "src",
     "build",
 		"bower_components",
 		"public/vendors"
