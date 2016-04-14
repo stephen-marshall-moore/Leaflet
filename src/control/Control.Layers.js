@@ -266,7 +266,7 @@ export class Layers extends Control {
 	_expand() {
 		DomUtil.addClass(this._container, 'leaflet-control-layers-expanded')
 		this._form.style.height = null
-		let acceptableHeight = this._map.getSize().y - (this._container.offsetTop + 50)
+		let acceptableHeight = this._map.size.y - (this._container.offsetTop + 50)
 		if (acceptableHeight < this._form.clientHeight) {
 			DomUtil.addClass(this._form, 'leaflet-control-layers-scrollbar')
 			this._form.style.height = acceptableHeight + 'px'
