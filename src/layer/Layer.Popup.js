@@ -1,15 +1,15 @@
 import {Point} from 'src/geometry/Point'
 import {Layer} from 'src/layer/Layer'
-//TODO: import {FeatureGroup} from 'src/layer/FeatureGroup'
 import {Popup} from 'src/layer/Popup'
+import {FeatureGroup} from 'src/layer/FeatureGroup'
 
 /*
  * Adds popup-related methods to all layers.
  */
 
-export const PopupLayerMixin = sup => class extends sup {
+//export const PopupLayerMixin = sup => class extends sup {
 
-	bindPopup(content, options) {
+	Layer.prototype.bindPopup = function(content, options) {
 
 		if (content instanceof Popup) {
 			Object.assign(content, options)
@@ -37,7 +37,7 @@ export const PopupLayerMixin = sup => class extends sup {
 		return this
 	}
 
-	unbindPopup() {
+	Layer.prototype.unbindPopup = function() {
 		if (this._popup) {
 			this.off({
 				click: this._openPopup,
@@ -50,18 +50,18 @@ export const PopupLayerMixin = sup => class extends sup {
 		return this
 	}
 
-	openPopup(layer, latlng) {
+	Layer.prototype.openPopup = function(layer, latlng) {
 		if (!(layer instanceof Layer)) {
 			latlng = layer
 			layer = this
 		}
 
-		//if (layer instanceof FeatureGroup) {
-		//	for (var id in this._layers) {
-		//		layer = this._layers[id]
-		//		break
-		//	}
-		//}
+		if (layer instanceof FeatureGroup) {
+			for (let id in this._layers) {
+				layer = this._layers[id]
+				break
+			}
+		}
 
 		if (!latlng) {
 			latlng = layer.getCenter ? layer.getCenter() : layer.getLatLng()
@@ -84,14 +84,14 @@ export const PopupLayerMixin = sup => class extends sup {
 		return this
 	}
 
-	closePopup() {
+	Layer.prototype.closePopup = function() {
 		if (this._popup) {
 			this._popup._close()
 		}
 		return this
 	}
 
-	togglePopup(target) {
+	Layer.prototype.togglePopup = function(target) {
 		if (this._popup) {
 			if (this._popup._map) {
 				this.closePopup()
@@ -102,22 +102,22 @@ export const PopupLayerMixin = sup => class extends sup {
 		return this
 	}
 
-	isPopupOpen() {
+	Layer.prototype.isPopupOpen = function() {
 		return this._popup.isOpen()
 	}
 
-	setPopupContent(content) {
+	Layer.prototype.setPopupContent = function(content) {
 		if (this._popup) {
 			this._popup.setContent(content)
 		}
 		return this
 	}
 
-	getPopup() {
+	Layer.prototype.getPopup = function() {
 		return this._popup
 	}
 
-	_openPopup(e) {
+	Layer.prototype._openPopup = function(e) {
 		var layer = e.layer || e.target
 
 		if (!this._popup) {
@@ -146,7 +146,7 @@ export const PopupLayerMixin = sup => class extends sup {
 		}
 	}
 
-	_popupAnchor(layer) {
+	Layer.prototype._popupAnchor = function(layer) {
 		// where shold we anchor the popup on this layer?
 		var anchor = layer._getPopupAnchor ? layer._getPopupAnchor() : [0, 0]
 
@@ -157,7 +157,7 @@ export const PopupLayerMixin = sup => class extends sup {
 		return Point.point(anchor).add(offsetToAdd)
 	}
 
-	_movePopup(e) {
+	Layer.prototype._movePopup = function(e) {
 		this._popup.setLatLng(e.latlng)
 	}
-}
+//}
