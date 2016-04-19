@@ -9,7 +9,9 @@ import {FeatureGroup} from 'src/layer/FeatureGroup'
 
 //export const PopupLayerMixin = sup => class extends sup {
 
-	Layer.prototype.bindPopup = function(content, options) {
+Object.assign( Layer.prototype, {
+
+		bindPopup(content, options) {
 
 		if (content instanceof Popup) {
 			Object.assign(content, options)
@@ -35,9 +37,9 @@ import {FeatureGroup} from 'src/layer/FeatureGroup'
 		this._originalPopupOffset = this._popup.options.offset
 
 		return this
-	}
+	},
 
-	Layer.prototype.unbindPopup = function() {
+	unbindPopup() {
 		if (this._popup) {
 			this.off({
 				click: this._openPopup,
@@ -48,9 +50,9 @@ import {FeatureGroup} from 'src/layer/FeatureGroup'
 			this._popup = null
 		}
 		return this
-	}
+	},
 
-	Layer.prototype.openPopup = function(layer, latlng) {
+	openPopup(layer, latlng) {
 		if (!(layer instanceof Layer)) {
 			latlng = layer
 			layer = this
@@ -82,16 +84,16 @@ import {FeatureGroup} from 'src/layer/FeatureGroup'
 		}
 
 		return this
-	}
+	},
 
-	Layer.prototype.closePopup = function() {
+	closePopup() {
 		if (this._popup) {
 			this._popup._close()
 		}
 		return this
-	}
+	},
 
-	Layer.prototype.togglePopup = function(target) {
+	togglePopup(target) {
 		if (this._popup) {
 			if (this._popup._map) {
 				this.closePopup()
@@ -100,24 +102,24 @@ import {FeatureGroup} from 'src/layer/FeatureGroup'
 			}
 		}
 		return this
-	}
+	},
 
-	Layer.prototype.isPopupOpen = function() {
+	isPopupOpen() {
 		return this._popup.isOpen()
-	}
+	},
 
-	Layer.prototype.setPopupContent = function(content) {
+	setPopupContent(content) {
 		if (this._popup) {
 			this._popup.setContent(content)
 		}
 		return this
-	}
+	},
 
-	Layer.prototype.getPopup = function() {
+	getPopup() {
 		return this._popup
-	}
+	},
 
-	Layer.prototype._openPopup = function(e) {
+	_openPopup(e) {
 		var layer = e.layer || e.target
 
 		if (!this._popup) {
@@ -144,9 +146,9 @@ import {FeatureGroup} from 'src/layer/FeatureGroup'
 		} else {
 			this.openPopup(layer, e.latlng)
 		}
-	}
+	},
 
-	Layer.prototype._popupAnchor = function(layer) {
+	_popupAnchor(layer) {
 		// where shold we anchor the popup on this layer?
 		var anchor = layer._getPopupAnchor ? layer._getPopupAnchor() : [0, 0]
 
@@ -155,9 +157,9 @@ import {FeatureGroup} from 'src/layer/FeatureGroup'
 
 		// return the final point to anchor the popup
 		return Point.point(anchor).add(offsetToAdd)
-	}
+	},
 
-	Layer.prototype._movePopup = function(e) {
+	_movePopup(e) {
 		this._popup.setLatLng(e.latlng)
 	}
-//}
+})
