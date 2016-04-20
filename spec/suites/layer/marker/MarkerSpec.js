@@ -12,12 +12,12 @@ import {Map} from 'src/map/Map'
 import {Icon} from 'src/layer/marker/Icon'
 import {DefaultIcon} from 'src/layer/marker/Icon.Default'
 import {DivIcon} from 'src/layer/marker/DivIcon'
-import {Marker as MarkerBase} from 'src/layer/marker/Marker'
-import {PopupLayerMixin} from 'src/layer/Layer.Popup'
+import {Marker} from 'src/layer/marker/Marker'
+import 'src/layer/Layer.Popup'
 import {MarkerDrag} from 'src/layer/marker/Marker.Drag'
 
 describe("Marker", function () {	
-	class Marker extends PopupLayerMixin(MarkerBase) {}
+	//class Marker extends PopupLayerMixin(MarkerBase) {}
 
 	let map,
 	    spy,

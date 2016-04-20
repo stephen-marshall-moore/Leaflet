@@ -1,15 +1,15 @@
 import {LatLng} from 'src/geo/LatLng'
 import {Icon} from 'src/layer/marker/Icon'
 import {DivIcon} from 'src/layer/marker/DivIcon'
-import {Marker as BaseMarker} from 'src/layer/marker/Marker'
-import {PopupLayerMixin} from 'src/layer/Layer.Popup'
+import {Marker} from 'src/layer/marker/Marker'
+import 'src/layer/Layer.Popup'
 import {Popup, PopupMapMixin} from 'src/layer/Popup'
 //import {PopupLayerMixin} from 'src/layer/Layer.Popup'
 import {Map as BaseMap} from 'src/map/Map'
 
 describe('Popup', function () {
 
-	class Marker extends PopupLayerMixin(BaseMarker) {}
+	//class Marker extends PopupLayerMixin(BaseMarker) {}
 	class Map extends PopupMapMixin(BaseMap) {}
 
 	var c, map;

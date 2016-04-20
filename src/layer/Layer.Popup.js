@@ -1,13 +1,12 @@
 import {Point} from 'src/geometry/Point'
-import {Layer} from 'src/layer/Layer'
-import {Popup} from 'src/layer/Popup'
-import {FeatureGroup} from 'src/layer/FeatureGroup'
+import {Layer} from './Layer'
+import {Path} from './vector/Path'
+import {Popup} from './Popup'
+import {FeatureGroup} from './FeatureGroup'
 
 /*
  * Adds popup-related methods to all layers.
  */
-
-//export const PopupLayerMixin = sup => class extends sup {
 
 Object.assign( Layer.prototype, {
 
@@ -132,12 +131,10 @@ Object.assign( Layer.prototype, {
 
 		// if this inherits from Path its a vector and we can just
 		// open the popup at the new location
-		/*** TODO: add this back in
-		if (layer instanceof L.Path) {
+		if (layer instanceof Path) {
 			this.openPopup(e.layer || e.target, e.latlng)
 			return
 		}
-		***/
 
 		// otherwise treat it like a marker and figure out
 		// if we should toggle it open/closed
