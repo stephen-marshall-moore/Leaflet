@@ -1,5 +1,7 @@
 <img src="http://leafletjs.com/docs/images/logo.png" alt="Leaflet" />
 
+Note: This forked version has diverged from the main in a rather non-mergeable fashion, as I (Stephen Moore) tried learning Leaflet internals and ES 2015 at the same time by moving code to an ES 2015 way of doing things. That is, it uses ES 2015 classes and Object.assign as replacements for original internal versions. The fact that so much of it still functions I attribute to the solid nature of the library itself rather than my understanding and use of Leaflet and ES 2015.
+
 Leaflet is an open source JavaScript library for **mobile-friendly interactive maps**.
 It is developed by [Vladimir Agafonkin][] of [Mapbox][] with a team of dedicated [contributors][].
 Weighing just about 30 KB of gzipped JS code, it has all the [features][] most developers ever need for online maps.
